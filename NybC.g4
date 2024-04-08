@@ -2,7 +2,7 @@ grammar NybC;
 
 program: programList;
 
-programList : (functionList| stmtList)+;
+programList :  (functionList| stmtList)+;
 
 functionList : (functionStmt ';')+;
 
@@ -29,7 +29,7 @@ beginStmt: 'begin' 'if' condtion';' stmtList 'end' 'if'
          | 'begin' 'loop' condtion';' stmtList 'end' 'loop'
          | 'begin' 'loop' declareStmt';' expression';' assignStmt';' stmtList 'end' 'loop'
          | 'begin' 'loop'';' stmtList';' 'end' 'loop' condtion
-         | 'begin' 'switch' switchCond';' switchExpList 'end' 'switch'
+         | 'begin' 'switch' switchCond';' switchExpList  'end' 'switch'
          ;
 
 extendedIf: 'begin' 'else'';' stmtList 'end' 'else'
@@ -37,11 +37,11 @@ extendedIf: 'begin' 'else'';' stmtList 'end' 'else'
           | 'begin' 'else-if' condtion';' stmtList 'end' 'else-if'';' extendedIf
           ;
 
-switchExpList:switchExp (switchExpList)*
+switchExpList:switchExp switchExpList
+             | ('default'':' stmtList)?
              ;
 
 switchExp: 'case' expression':' stmtList
-         | 'default'':' stmtList
          ;
 
 switchCond: condtion
