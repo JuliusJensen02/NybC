@@ -69,7 +69,7 @@ array: '[]'
 arrayList: (expression(',' arrayList)*)+
          ;
 
-arrayAccess: IDENT'['NUM']'
+arrayAccess: IDENT'['INT']'
            | IDENT'['IDENT']'
            ;
 
@@ -124,7 +124,8 @@ notExpression: '!'parrentExpression
 
 parrentExpression: '('expression')'
                  | IDENT
-                 | NUM
+                 | INT
+                 | FLOAT
                  | STRING
                  | 'true'
                  | 'false'
@@ -133,7 +134,8 @@ parrentExpression: '('expression')'
                  ;
 
 IDENT: ([_]|[a-zA-Z])([_]|[0-9]|[a-zA-Z])*;
-NUM: ([-]|[+])?([0-9]+|[0-9]+.[0-9]+);
+INT: ([0-9]+);
+FLOAT: ([0-9]+.[0-9]+);
 STRING: (["]~(["]|[\n])*["]);
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
