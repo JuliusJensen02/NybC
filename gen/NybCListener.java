@@ -306,4 +306,14 @@ public interface NybCListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitParrentExpression(NybCParser.ParrentExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NybCParser#valueExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterValueExpression(NybCParser.ValueExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NybCParser#valueExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitValueExpression(NybCParser.ValueExpressionContext ctx);
 }

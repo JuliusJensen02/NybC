@@ -1,6 +1,6 @@
 import ASTNode.*;
 import ASTNode.NumberNode;
-import com.sun.jdi.Value;
+import org.antlr.v4.parse.v4ParserException;
 
 public class ToASTVisitor extends NybCBaseVisitor<ProgramNode>{
 
@@ -10,52 +10,48 @@ public class ToASTVisitor extends NybCBaseVisitor<ProgramNode>{
 
     public ProgramNode visitProgramList(NybCParser.ProgramListContext context){
 
-        switch (context.children.getClass()) {
-
-        }
     }
 
-
-
-
-
-
-
-
-
-
-
-    public ExpNode visitBoolean(NybCParser.ExpressionContext context) {
-        BoolNode node = new BoolNode();
-
-        node.setValue(Boolean.parseBoolean(context)
-        return node;
-    }
-
-    public ExpNode visitString(NybCParser.ExpressionContext context) {
-        StringNode node = new StringNode();
-
-        node.setValue(context.getText());
-        return node;
-    }
-
-    public ExpNode visitFloat(NybCParser.ExpressionContext context) {
-        FloatNode node = new FloatNode();
-
-        node.setValue(Float.parseFloat(context.getText()));
-        return node;
-    }
 
     @Override
     public ProgramNode visitParrentExpression(NybCParser.ParrentExpressionContext ctx) {
-       ctx.INT().getText();
-        return super.visitParrentExpression(ctx);
+        if (ctx.valueExpression() != null) {
+            return visit(ctx.valueExpression());
+        } else if (ctx.arrayAccess() != null) {
+            return visit(ctx.arrayAccess());
+        } else if (ctx.callStmt() != null) {
+            return visit(ctx.callStmt());
+        } else if (ctx.expression() != null) {
+            return visit(ctx.expression());
+        } else {
+            throw new RuntimeException();
+        }
     }
 
-    public ExpNode visitInt(NybCParser.ExpressionContext context) {
-        IntNode node = new IntNode();
-
-        node.setValue(Integer.parseInt(context. getText()));
-        return node;
+    @Override
+    public ProgramNode visitValueExpression(NybCParser.ValueExpressionContext ctx) {
+        if (ctx.INT() != null) {
+            IntNode node = new IntNode();
+            node.setValue(Integer.parseInt(ctx.INT().getText()));
+            return node;
+        } else if (ctx.IDENT() != null) {
+            IdentifierNode node = new IdentifierNode();
+            node.setValue(ctx.IDENT().getText());
+            return node;
+        } else if (ctx.FLOAT() != null) {
+            FloatNode node = new FloatNode();
+            node.setValue(Float.parseFloat(ctx.FLOAT().getText()));
+            return node;
+        } else if (ctx.STRING() != null) {
+            StringNode node = new StringNode();
+            node.setValue(ctx.STRING().getText());
+            return node;
+        } else if (ctx.BOOL() != null) {
+            BoolNode node = new BoolNode();
+            node.setValue(Boolean.parseBoolean(ctx.BOOL().getText()));
+            return node;
+        } else {
+            throw new RuntimeException();
+        }
     }
 }

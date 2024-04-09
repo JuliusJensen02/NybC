@@ -1,4 +1,4 @@
-// Generated from NybC.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Bruger/OneDrive - Aalborg Universitet/Software/SW4/NybCProject/src/NybC.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -189,4 +189,10 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitParrentExpression(NybCParser.ParrentExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#valueExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitValueExpression(NybCParser.ValueExpressionContext ctx);
 }

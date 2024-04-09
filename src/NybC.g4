@@ -123,20 +123,23 @@ notExpression: '!'parrentExpression
              ;
 
 parrentExpression: '('expression')'
-                 | IDENT
-                 | INT
-                 | FLOAT
-                 | STRING
-                 | 'true'
-                 | 'false'
+                 | valueExpression
                  | arrayAccess
                  | callStmt
                  ;
+
+valueExpression: IDENT
+                | INT
+                | FLOAT
+                | STRING
+                | BOOL
+                ;
 
 IDENT: ([_]|[a-zA-Z])([_]|[0-9]|[a-zA-Z])*;
 INT: ([0]|[1-9][0-9]*);
 FLOAT: ([0-9]+.[0-9]+);
 STRING: (["]~(["]|[\n])*["]);
+BOOL: ('true'|'false');
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
 
