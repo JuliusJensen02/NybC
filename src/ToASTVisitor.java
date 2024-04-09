@@ -45,10 +45,17 @@ public class ToASTVisitor extends NybCBaseVisitor<ProgramNode>{
         node.setValue(Float.parseFloat(context.getText()));
         return node;
     }
+
+    @Override
+    public ProgramNode visitParrentExpression(NybCParser.ParrentExpressionContext ctx) {
+       ctx.INT().getText();
+        return super.visitParrentExpression(ctx);
+    }
+
     public ExpNode visitInt(NybCParser.ExpressionContext context) {
         IntNode node = new IntNode();
 
-        node.setValue(Integer.parseInt(context.getText()));
+        node.setValue(Integer.parseInt(context. getText()));
         return node;
     }
 }

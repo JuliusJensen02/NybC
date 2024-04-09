@@ -123,12 +123,12 @@ notExpression: '!'parrentExpression
              ;
 
 parrentExpression: '('expression')'
-                 | value=IDENT
-                 | value=INT
-                 | value=FLOAT
-                 | value=STRING
-                 | value='true'
-                 | value='false'
+                 | IDENT
+                 | INT
+                 | FLOAT
+                 | STRING
+                 | 'true'
+                 | 'false'
                  | arrayAccess
                  | callStmt
                  ;
