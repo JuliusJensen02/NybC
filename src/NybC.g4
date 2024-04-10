@@ -52,7 +52,9 @@ condtion: expression
         | callStmt
         ;
 
-declareStmt: 'var' assignStmt
+declareStmt: 'var' IDENT '=' expression
+           | 'var' IDENT '=' callStmt
+           | 'var' IDENT '=' array
            | 'var' IDENT
            ;
 
@@ -85,48 +87,13 @@ ctrlFlowStmt: 'continue'
             | 'return'
             ;
 
-expression: expression '||' andExpression
-          | andExpression
-          ;
-
-andExpression: andExpression '&&' eqExpression
-             | eqExpression
-             ;
-
-eqExpression: eqExpression '==' relExpression
-            | eqExpression '!=' relExpression
-            | relExpression
+expression: '(' expression ')'
+            | UOPS expression
+            | expression BOPS expression
+            | valueExpression
+            | arrayAccess
+            | callStmt
             ;
-
-relExpression: relExpression relOps plusExpression
-             | plusExpression
-             ;
-
-relOps: '<'
-      | '>'
-      | '<='
-      | '>='
-      ;
-
-plusExpression: plusExpression '+' multExpression
-              | plusExpression '-' multExpression
-              | multExpression
-              ;
-
-multExpression: multExpression '*' notExpression
-              | multExpression '/' notExpression
-              | notExpression
-              ;
-
-notExpression: '!'parrentExpression
-             | parrentExpression
-             ;
-
-parrentExpression: '('expression')'
-                 | valueExpression
-                 | arrayAccess
-                 | callStmt
-                 ;
 
 valueExpression: IDENT
                 | INT
@@ -137,8 +104,10 @@ valueExpression: IDENT
 
 IDENT: ([_]|[a-zA-Z])([_]|[0-9]|[a-zA-Z])*;
 INT: ([0]|[1-9][0-9]*);
-FLOAT: ([0-9]+.[0-9]+);
+FLOAT: ([0-9]+'.'[0-9]+);
 STRING: (["]~(["]|[\n])*["]);
+BOPS: ('+' | '-' | '*' | '/' | '<' | '>' | '<=' | '>=' | '||' | '&&' | '==' | '!=');
+UOPS: ('!' | '+' |'-');
 BOOL: ('true'|'false');
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;

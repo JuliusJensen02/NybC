@@ -1,31 +1,65 @@
 import ASTNode.*;
-import ASTNode.NumberNode;
-import org.antlr.v4.parse.v4ParserException;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.lang.reflect.Type;
 
 public class ToASTVisitor extends NybCBaseVisitor<ProgramNode>{
 
-    public ProgramNode visitProgram(NybCParser.ProgramContext context){
-        return visit(context.programList());
-    }
-
+    @Override
     public ProgramNode visitProgramList(NybCParser.ProgramListContext context){
-
+        return visitChildren(context);
     }
-
 
     @Override
-    public ProgramNode visitParrentExpression(NybCParser.ParrentExpressionContext ctx) {
+    public ProgramNode visitDeclareStmt(NybCParser.DeclareStmtContext ctx) {
+        String id = ctx.IDENT().getText();
+        ProgramNode node = new ProgramNode();
+        for (ParseTree childNode: ctx.children) {
+            if (childNode.getClass().getSimpleName().equals("ExpressionContext")){
+                node = visit(childNode);
+            }
+        }
+        switch (node.getClass().getSimpleName()) {
+            case "IntNode": System.out.println(new VarNode<Integer>(id,((IntNode) node).getValue())); return new VarNode<Integer>(id,((IntNode) node).getValue());
+            case "FloatNode": return new VarNode<Float>(id,((FloatNode) node).getValue());
+            case "IdentifierNode": return new VarNode<String>(id,((IdentifierNode) node).getValue());
+            case "StringNode": return new VarNode<String>(id,((StringNode) node).getValue());
+            case "BoolNode": return new VarNode<Boolean>(id,((BoolNode) node).isValue());
+            default: return null;
+        }
+    }
+
+    @Override
+    public ProgramNode visitTerminal(TerminalNode node) {
+        return super.visitTerminal(node);
+    }
+
+    @Override
+    public ProgramNode visitExpression(NybCParser.ExpressionContext ctx) {
+
+        ExpNode node;
+
         if (ctx.valueExpression() != null) {
             return visit(ctx.valueExpression());
         } else if (ctx.arrayAccess() != null) {
             return visit(ctx.arrayAccess());
         } else if (ctx.callStmt() != null) {
             return visit(ctx.callStmt());
-        } else if (ctx.expression() != null) {
-            return visit(ctx.expression());
+        } else if (ctx.children.size() == 2) {
+            node = new UnaryOpNode();
+            ((UnaryOpNode) node).setRight(visit(ctx.getChild(1)));
+            ((UnaryOpNode) node).setOp(ctx.UOPS().getText());
+        } else if (ctx.children.size() == 3 && ctx.getChild(1).getClass().getSimpleName().equals("ExpressionContext")) {
+            node = new ParenthNode();
+            ((ParenthNode) node).setInner(visit(ctx.getChild(1)));
         } else {
-            throw new RuntimeException();
+            node = new BinaryOpNode();
+            ((BinaryOpNode) node).setLeft(visit(ctx.getChild(0)));
+            ((BinaryOpNode) node).setRight(visit(ctx.getChild(2)));
+            ((BinaryOpNode) node).setOp(ctx.BOPS().getText());
         }
+        return node;
     }
 
     @Override

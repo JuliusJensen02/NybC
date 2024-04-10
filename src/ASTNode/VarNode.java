@@ -1,6 +1,6 @@
 package ASTNode;
 
-public class DeclNode <T> extends FuncNode {
+public class VarNode <T> extends StmtNode {
     private String id;
     private T value;
 
@@ -20,8 +20,13 @@ public class DeclNode <T> extends FuncNode {
         this.value = value;
     }
 
-    public DeclNode(String id, T value) {
+    public VarNode(String id, T value) {
         this.id = id;
         this.value = value;
+    }
+
+    @Override
+    public String toString(){
+        return id + value;
     }
 }
