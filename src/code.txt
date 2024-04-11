@@ -1,0 +1,11 @@
+begin if(a);
+    var x = 1;
+    var y = 2;
+end if;
+begin else-if(a);
+    var x = 1;
+    var y = 2;
+end else-if;
+begin else;
+    var x = 1;
+end else;

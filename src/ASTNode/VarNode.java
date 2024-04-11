@@ -27,6 +27,6 @@ public class VarNode <T> extends StmtNode {
 
     @Override
     public String toString(){
-        return id + value;
+        return id+" = "+value;
     }
 }

@@ -1,23 +1,23 @@
 package ASTNode;
 
-public class BinaryOpNode extends ExpNode {
-    private ProgramNode Left;
-    private ProgramNode Right;
+public class BinaryOpNode extends ExpNode implements ASTNode{
+    private ASTNode Left;
+    private ASTNode Right;
     private String Op;
 
-    public ProgramNode getLeft() {
+    public ASTNode getLeft() {
         return Left;
     }
 
-    public void setLeft(ProgramNode left) {
+    public void setLeft(ASTNode left) {
         Left = left;
     }
 
-    public ProgramNode getRight() {
+    public ASTNode getRight() {
         return Right;
     }
 
-    public void setRight(ProgramNode right) {
+    public void setRight(ASTNode right) {
         Right = right;
     }
 
@@ -27,5 +27,9 @@ public class BinaryOpNode extends ExpNode {
 
     public void setOp(String op) {
         Op = op;
+    }
+
+    public String toString() {
+        return Left+Op+Right;
     }
 }

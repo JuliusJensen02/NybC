@@ -1,4 +1,4 @@
-// Generated from C:/Users/Bruger/OneDrive - Aalborg Universitet/Software/SW4/NybCProject/src/NybC.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Julius/Desktop/NybC/src/NybC.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -106,12 +106,6 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitArray(NybCParser.ArrayContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link NybCParser#arrayList}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArrayList(NybCParser.ArrayListContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link NybCParser#arrayAccess}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -141,54 +135,6 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExpression(NybCParser.ExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#andExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAndExpression(NybCParser.AndExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#eqExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEqExpression(NybCParser.EqExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#relExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRelExpression(NybCParser.RelExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#relOps}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRelOps(NybCParser.RelOpsContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#plusExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPlusExpression(NybCParser.PlusExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#multExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitMultExpression(NybCParser.MultExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#notExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNotExpression(NybCParser.NotExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#parrentExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitParrentExpression(NybCParser.ParrentExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link NybCParser#valueExpression}.
 	 * @param ctx the parse tree

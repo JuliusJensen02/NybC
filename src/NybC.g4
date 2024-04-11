@@ -2,84 +2,54 @@ grammar NybC;
 
 program: programList;
 
-programList :  (functionList| stmtList)+;
+programList :  (functionList| (stmt)+)+;
 
 functionList : (functionStmt ';')+;
 
+stmt: beginStmt';'
+    | declareStmt';'
+    | assignStmt';'
+    | callStmt';'
+    | ctrlFlowStmt';'
+    ;
 
-stmtList : (stmt';')+;
-
-
-functionStmt : 'begin' 'function' IDENT '('declareFuncPara')' ';' stmtList 'end' 'function'
-             | 'begin' 'function' IDENT '('declareFuncPara')' ';' stmtList 'end' IDENT
+functionStmt : 'begin' 'function' IDENT '('declareFuncPara')' ';' (stmt)+ 'end' 'function'
+             | 'begin' 'function' IDENT '('declareFuncPara')' ';' (stmt)+ 'end' IDENT
              ;
 
 
 declareFuncPara: ('var' IDENT (',' declareFuncPara)*)?;
 
-stmt: beginStmt
-    | declareStmt
-    | assignStmt
-    | callStmt
-    | ctrlFlowStmt
-    ;
-
-beginStmt: 'begin' 'if' condtion';' stmtList 'end' 'if'
-         | 'begin' 'if' condtion';' stmtList 'end' 'if'';' extendedIf
-         | 'begin' 'loop' condtion';' stmtList 'end' 'loop'
-         | 'begin' 'loop' declareStmt';' expression';' assignStmt';' stmtList 'end' 'loop'
-         | 'begin' 'loop'';' stmtList';' 'end' 'loop' condtion
-         | 'begin' 'switch' switchCond';' switchExpList  'end' 'switch'
+beginStmt: 'begin' 'if''(' expression')'';' (stmt)+ 'end' 'if'(';' extendedIf)*
+         | 'begin' 'loop''(' expression')'';' (stmt)+ 'end' 'loop'
+         | 'begin' 'loop''(' declareStmt';' expression';' assignStmt')'';' (stmt)+ 'end' 'loop'
+         | 'begin' 'loop'';' (stmt)+';' 'end' 'loop''(' expression')'
+         | 'begin' 'switch''(' expression')'';' ('case' expression':' (stmt)+)+('default'':' (stmt)+)?  'end' 'switch'
          ;
 
-extendedIf: 'begin' 'else'';' stmtList 'end' 'else'
-          | 'begin' 'else-if' condtion';' stmtList 'end' 'else-if'
-          | 'begin' 'else-if' condtion';' stmtList 'end' 'else-if'';' extendedIf
+extendedIf: 'begin' 'else'';' (stmt)+ 'end' 'else'
+          | 'begin' 'else-if''(' expression')'';' (stmt)+ 'end' 'else-if'(';' extendedIf)*
           ;
-
-switchExpList:switchExp switchExpList
-             | ('default'':' stmtList)?
-             ;
-
-switchExp: 'case' expression':' stmtList
-         ;
-
-switchCond: condtion
-          | expression
-          ;
-
-condtion: expression
-        | callStmt
-        ;
 
 declareStmt: 'var' IDENT '=' expression
-           | 'var' IDENT '=' callStmt
            | 'var' IDENT '=' array
            | 'var' IDENT
            ;
 
 assignStmt: IDENT '=' expression
-          | IDENT '=' callStmt
           | IDENT '=' array
           | arrayAccess '=' expression
           ;
 
-array: '[]'
-     | '['arrayList']'
+array: '['(expression(',' expression)*)*']'
      ;
-
-arrayList: (expression(',' arrayList)*)+
-         ;
 
 arrayAccess: IDENT'['INT']'
            | IDENT'['IDENT']'
            ;
 
-callStmt: IDENT'('callFuncPara')'
+callStmt: IDENT'('(expression(',' expression)*)?')'
         ;
-
-callFuncPara: (expression(',' callFuncPara)*)?
-            ;
 
 ctrlFlowStmt: 'continue'
             | 'break'

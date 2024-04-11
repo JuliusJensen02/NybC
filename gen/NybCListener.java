@@ -1,4 +1,4 @@
-// Generated from C:/Users/Bruger/OneDrive - Aalborg Universitet/Software/SW4/NybCProject/src/NybC.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Julius/Desktop/NybC/src/NybC.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -167,16 +167,6 @@ public interface NybCListener extends ParseTreeListener {
 	 */
 	void exitArray(NybCParser.ArrayContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link NybCParser#arrayList}.
-	 * @param ctx the parse tree
-	 */
-	void enterArrayList(NybCParser.ArrayListContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link NybCParser#arrayList}.
-	 * @param ctx the parse tree
-	 */
-	void exitArrayList(NybCParser.ArrayListContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link NybCParser#arrayAccess}.
 	 * @param ctx the parse tree
 	 */
@@ -226,86 +216,6 @@ public interface NybCListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExpression(NybCParser.ExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link NybCParser#andExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterAndExpression(NybCParser.AndExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link NybCParser#andExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitAndExpression(NybCParser.AndExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link NybCParser#eqExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterEqExpression(NybCParser.EqExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link NybCParser#eqExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitEqExpression(NybCParser.EqExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link NybCParser#relExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterRelExpression(NybCParser.RelExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link NybCParser#relExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitRelExpression(NybCParser.RelExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link NybCParser#relOps}.
-	 * @param ctx the parse tree
-	 */
-	void enterRelOps(NybCParser.RelOpsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link NybCParser#relOps}.
-	 * @param ctx the parse tree
-	 */
-	void exitRelOps(NybCParser.RelOpsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link NybCParser#plusExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterPlusExpression(NybCParser.PlusExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link NybCParser#plusExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitPlusExpression(NybCParser.PlusExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link NybCParser#multExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterMultExpression(NybCParser.MultExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link NybCParser#multExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitMultExpression(NybCParser.MultExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link NybCParser#notExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterNotExpression(NybCParser.NotExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link NybCParser#notExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitNotExpression(NybCParser.NotExpressionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link NybCParser#parrentExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterParrentExpression(NybCParser.ParrentExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link NybCParser#parrentExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitParrentExpression(NybCParser.ParrentExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link NybCParser#valueExpression}.
 	 * @param ctx the parse tree

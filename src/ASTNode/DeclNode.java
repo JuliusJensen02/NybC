@@ -1,6 +1,6 @@
 package ASTNode;
 
-public class DeclNode <T> extends FuncNode {
+public class DeclNode <T> extends FuncNode implements ASTNode {
     private String id;
     private T value;
 

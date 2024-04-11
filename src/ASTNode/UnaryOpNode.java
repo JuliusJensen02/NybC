@@ -1,14 +1,14 @@
 package ASTNode;
 
-public class UnaryOpNode extends ExpNode{
-    private ProgramNode Right;
+public class UnaryOpNode extends ExpNode implements ASTNode{
+    private ASTNode Right;
     private String Op;
 
-    public ProgramNode getRight() {
+    public ASTNode getRight() {
         return Right;
     }
 
-    public void setRight(ProgramNode right) {
+    public void setRight(ASTNode right) {
         Right = right;
     }
 

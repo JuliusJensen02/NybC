@@ -1,6 +1,6 @@
 package ASTNode;
 
-public class IdentifierNode extends ExpNode {
+public class IdentifierNode extends ExpNode implements ASTNode {
     public String getValue() {
         return value;
     }
@@ -10,4 +10,9 @@ public class IdentifierNode extends ExpNode {
     }
 
     private String value;
+
+    public String toString() {
+        return value;
+    }
 }
+

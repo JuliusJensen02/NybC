@@ -1,13 +1,13 @@
 package ASTNode;
 
-public class ParenthNode extends ExpNode {
-    private ProgramNode Inner;
+public class ParenthNode extends ExpNode implements ASTNode {
+    private ASTNode Inner;
 
-    public ProgramNode getInner() {
+    public ASTNode getInner() {
         return Inner;
     }
 
-    public void setInner(ProgramNode inner) {
+    public void setInner(ASTNode inner) {
         Inner = inner;
     }
 }

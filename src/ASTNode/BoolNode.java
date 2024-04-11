@@ -1,6 +1,6 @@
 package ASTNode;
 
-public class BoolNode extends ExpNode {
+public class BoolNode extends ExpNode implements ASTNode {
     public boolean isValue() {
         return value;
     }
@@ -10,5 +10,9 @@ public class BoolNode extends ExpNode {
     }
 
     private boolean value;
+
+    public String toString() {
+        return String.valueOf(value);
+    }
 
 }

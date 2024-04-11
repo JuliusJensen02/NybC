@@ -1,4 +1,4 @@
-// Generated from C:/Users/Bruger/OneDrive - Aalborg Universitet/Software/SW4/NybCProject/src/NybC.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Julius/Desktop/NybC/src/NybC.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -28,11 +28,11 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunctionList(NybCParser.FunctionListContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link NybCParser#stmtList}.
+	 * Visit a parse tree produced by {@link NybCParser#stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitStmtList(NybCParser.StmtListContext ctx);
+	T visitStmt(NybCParser.StmtContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link NybCParser#functionStmt}.
 	 * @param ctx the parse tree
@@ -46,12 +46,6 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDeclareFuncPara(NybCParser.DeclareFuncParaContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link NybCParser#stmt}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitStmt(NybCParser.StmtContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link NybCParser#beginStmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -63,30 +57,6 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExtendedIf(NybCParser.ExtendedIfContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#switchExpList}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSwitchExpList(NybCParser.SwitchExpListContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#switchExp}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSwitchExp(NybCParser.SwitchExpContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#switchCond}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSwitchCond(NybCParser.SwitchCondContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#condtion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCondtion(NybCParser.CondtionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link NybCParser#declareStmt}.
 	 * @param ctx the parse tree
@@ -106,12 +76,6 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitArray(NybCParser.ArrayContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link NybCParser#arrayList}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArrayList(NybCParser.ArrayListContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link NybCParser#arrayAccess}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -123,12 +87,6 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCallStmt(NybCParser.CallStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#callFuncPara}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCallFuncPara(NybCParser.CallFuncParaContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link NybCParser#ctrlFlowStmt}.
 	 * @param ctx the parse tree

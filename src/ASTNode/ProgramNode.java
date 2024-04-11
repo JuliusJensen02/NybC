@@ -1,6 +1,6 @@
 package ASTNode;
 
-public class ProgramNode {
+public class ProgramNode implements ASTNode{
 
 }
 

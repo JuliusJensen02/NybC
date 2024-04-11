@@ -1,4 +1,4 @@
 package ASTNode;
 
-public class SwitchNode extends CondNode {
+public class SwitchNode extends StmtNode {
 }

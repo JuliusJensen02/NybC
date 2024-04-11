@@ -1,6 +1,6 @@
 package ASTNode;
 
-public class StringNode extends ExpNode {
+public class StringNode extends ExpNode implements ASTNode {
     private String value;
 
     public String getValue() {
