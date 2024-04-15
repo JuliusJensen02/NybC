@@ -1,4 +1,4 @@
 package ASTNode;
 
-public class StmtNode extends ProgramNode {
+public class StmtNode implements ASTNode {
 }

@@ -33,9 +33,9 @@ public class ElseIfNode <T> implements ASTNode{
 
     public String toString() {
         return "ElseIfNode{" +
-                "stmts=" + stmts +
-                ", condition=" + condition +
-                ", elseIfNode=" + elseIfNode +
+                "condition=" + condition +
+                ", stmts=" + stmts +
+                ", elseIfNodes=" + elseIfNode +
                 '}';
     }
 }
