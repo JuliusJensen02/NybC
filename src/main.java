@@ -19,7 +19,6 @@ public class main {
         var parser = new NybCParser(tokenStream);
         var parseTree = parser.program();
         var ASTvisitor = new ToASTVisitor();
-        System.out.println(parseTree.toStringTree(parser));
-        ASTvisitor.visit(parseTree);
+        System.out.println(ASTvisitor.visit(parseTree));
     }
 }

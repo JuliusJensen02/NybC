@@ -1,10 +1,6 @@
 grammar NybC;
 
-program: programList;
-
-programList :  (functionList| (stmt)+)+;
-
-functionList : (functionStmt ';')+;
+program: (functionStmt | stmt)+;
 
 stmt: beginStmt';'
     | declareStmt';'
@@ -13,18 +9,15 @@ stmt: beginStmt';'
     | ctrlFlowStmt';'
     ;
 
-functionStmt : 'begin' 'function' IDENT '('declareFuncPara')' ';' (stmt)+ 'end' 'function'
-             | 'begin' 'function' IDENT '('declareFuncPara')' ';' (stmt)+ 'end' IDENT
+functionStmt : 'begin' 'function' IDENT '('(declareStmt (',' declareStmt)*)?')' ';' (stmt)+ 'end' 'function' ';'
+             | 'begin' 'function' IDENT '('(declareStmt (',' declareStmt)*)?')' ';' (stmt)+ 'end' IDENT ';'
              ;
-
-
-declareFuncPara: ('var' IDENT (',' declareFuncPara)*)?;
 
 beginStmt: 'begin' 'if''(' expression')'';' (stmt)+ 'end' 'if'(';' extendedIf)*
          | 'begin' 'loop''(' expression')'';' (stmt)+ 'end' 'loop'
          | 'begin' 'loop''(' declareStmt';' expression';' assignStmt')'';' (stmt)+ 'end' 'loop'
-         | 'begin' 'loop'';' (stmt)+';' 'end' 'loop''(' expression')'
-         | 'begin' 'switch''(' expression')'';' ('case' expression':' (stmt)+)+('default'':' (stmt)+)?  'end' 'switch'
+         | 'begin' 'loop'';' (stmt)+ 'end' 'loop''(' expression ')'
+         | 'begin' 'switch''(' expression ')'';' ('case' expression':' (stmt)+)+('default'':' (stmt)+)?  'end' 'switch'
          ;
 
 extendedIf: 'begin' 'else'';' (stmt)+ 'end' 'else'

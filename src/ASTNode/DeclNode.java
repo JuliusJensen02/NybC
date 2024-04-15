@@ -1,6 +1,6 @@
 package ASTNode;
 
-public class DeclNode <T> extends FuncNode implements ASTNode {
+public class DeclNode <T> extends StmtNode implements ASTNode {
     private String id;
     private T value;
 
@@ -23,5 +23,16 @@ public class DeclNode <T> extends FuncNode implements ASTNode {
     public DeclNode(String id, T value) {
         this.id = id;
         this.value = value;
+    }
+    public DeclNode(String id){
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "DeclNode{" +
+                "id='" + id + '\'' +
+                ", value=" + value +
+                '}';
     }
 }

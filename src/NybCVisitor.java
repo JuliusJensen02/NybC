@@ -1,4 +1,4 @@
-// Generated from C:/Users/Julius/Desktop/NybC/src/NybC.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Bruger/OneDrive - Aalborg Universitet/Software/SW4/NybCProject/src/NybC.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -16,18 +16,6 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProgram(NybCParser.ProgramContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link NybCParser#programList}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitProgramList(NybCParser.ProgramListContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#functionList}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunctionList(NybCParser.FunctionListContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link NybCParser#stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -39,12 +27,6 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFunctionStmt(NybCParser.FunctionStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link NybCParser#declareFuncPara}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeclareFuncPara(NybCParser.DeclareFuncParaContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link NybCParser#beginStmt}.
 	 * @param ctx the parse tree
