@@ -1,8 +1,43 @@
 import ASTNode.*;
+import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
+
+    @Override
+    public ASTNode visitProgram(NybCParser.ProgramContext ctx) {
+        ProgramNode node = new ProgramNode();
+        for (ParseTree childNode: ctx.children) {
+            if (childNode.getClass().getSimpleName().equals("StmtContext")) {
+                node.addStmt((StmtNode) visit(childNode));
+            } else if (childNode.getClass().getSimpleName().equals("FunctionStmtContext")) {
+                node.addFunction((FuncNode) visit(childNode));
+            } else {
+                throw new RuntimeException();
+            }
+        }
+        return node;
+    }
+
+    @Override
+    public ASTNode visitStmt(NybCParser.StmtContext ctx) {
+        return visit(ctx.getChild(0));
+    }
+
+    @Override
+    public ASTNode visitFunctionStmt(NybCParser.FunctionStmtContext ctx) {
+        FuncNode node = new FuncNode();
+        node.setId(ctx.getChild(2).getText());
+        for (ParseTree childNode: ctx.declareStmt()) {
+            node.addParam((DeclNode) visit(childNode));
+        }
+        for (ParseTree childNode: ctx.stmt()) {
+            node.addStmt((StmtNode) visit(childNode));
+        }
+        return node;
+    }
+
     @Override
     public ASTNode visitBeginStmt(NybCParser.BeginStmtContext ctx) {
         if(ctx.getChild(1).getText().equals("if")){
@@ -20,8 +55,51 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
             if(ctx.extendedIf() != null){
                 node.setElseIfNode((ElseIfNode) visit(ctx.getChild(ctx.children.size() - 1)));
             }
-            System.out.println(node);
             return node;
+        } else if (ctx.getChild(1).getText().equals("loop")){
+            LoopNode node = new LoopNode();
+            switch (ctx.getChild(3).getClass().getSimpleName()){
+                case "ExpressionContext":
+                    node.setType("while");
+                    node.setCondition((ExpNode) visit(ctx.getChild(3)));
+                    break;
+                case "StmtContext":
+                    node.setType("do-while");
+                    node.setCondition((ExpNode) visit(ctx.getChild(ctx.children.size() - 2)));
+                    break;
+                case "DeclareStmtContext":
+                    node.setType("for");
+                    node.setDeclaration((DeclNode) visit(ctx.getChild(3)));
+                    node.setCondition((ExpNode) visit(ctx.getChild(5)));
+                    node.setAssignment((AssignNode) visit(ctx.getChild(7)));
+                    break;
+                default:
+                    throw new RuntimeException();
+            }
+            for (int i = 3; i < ctx.children.size(); i++) {
+                if (ctx.getChild(i).getClass().getSimpleName().equals("StmtContext")){
+                    node.addStmt((StmtNode) visit(ctx.getChild(i)));
+                }
+            }
+            return node;
+        } else if (ctx.getChild(1).getText().equals("switch")) {
+            SwitchNode node = new SwitchNode();
+            node.setSwitchCond((ExpNode) visit(ctx.getChild(3)));
+            for (int i = 3; i < ctx.children.size(); i++) {
+                if (ctx.getChild(i).getText().equals("case") || ctx.getChild(i).getText().equals("default")) {
+                    CaseNode casen = new CaseNode();
+                    if (!ctx.getChild(i).getText().equals("default")) {
+                        casen.setCaseExp((ExpNode) visit(ctx.getChild(i + 1)));
+                    }
+                    int j = i + 3;
+                    while (ctx.getChild(j).getClass().getSimpleName().equals("StmtContext")){
+                        casen.addStmt((StmtNode) visit(ctx.getChild(j)));
+                        j++;
+                    }
+                    node.addCases(casen);
+                }
+            }
+           return node;
         }
         return null;
     }
@@ -56,27 +134,14 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitDeclareStmt(NybCParser.DeclareStmtContext ctx) {
-        String id = ctx.IDENT().getText();
-        ASTNode node = new ProgramNode();
-        for (ParseTree childNode: ctx.children) {
-            node = visit(childNode);
-        }
-        ASTNode varNode = switch (node.getClass().getSimpleName()) {
-            case "IntNode" -> new VarNode<Integer>(id, ((IntNode) node).getValue());
-            case "FloatNode" -> new VarNode<Float>(id, ((FloatNode) node).getValue());
-            case "IdentifierNode" -> new VarNode<String>(id, ((IdentifierNode) node).getValue());
-            case "StringNode" -> new VarNode<String>(id, ((StringNode) node).getValue());
-            case "BoolNode" -> new VarNode<Boolean>(id, ((BoolNode) node).isValue());
-            case "BinaryOpNode" -> new VarNode<BinaryOpNode>(id, ((BinaryOpNode) node));
-            case "UnaryOpNode" -> new VarNode<UnaryOpNode>(id, ((UnaryOpNode) node));
-            case "ParenthNode" -> new VarNode<ParenthNode>(id, ((ParenthNode) node));
-            case "ArrayNode" -> new VarNode<ArrayNode>(id, ((ArrayNode) node));
-            case "ArrayAccessNode" -> new VarNode<ArrayAccessNode>(id, ((ArrayAccessNode) node));
-            case "CallFuncNode" -> new VarNode<CallFuncNode>(id, ((CallFuncNode) node));
-            default -> null;
-        };
-        //System.out.println(varNode);
-        return varNode;
+        if (ctx.getChild(3) != null) {
+            return switch (ctx.getChild(3).getClass().getSimpleName()) {
+                case "ExpressionContext" -> new DeclNode<ExpNode>(ctx.IDENT().getText(), (ExpNode) visit(ctx.getChild(3)));
+                case "ArrayContext" -> new DeclNode<ArrayNode>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.getChild(3)));
+                default ->
+                        throw new IllegalStateException("Unexpected value: " + ctx.getChild(3).getClass().getSimpleName());
+            };
+        } else return new DeclNode<>(ctx.IDENT().getText());
     }
 
     @Override
