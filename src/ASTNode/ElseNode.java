@@ -13,4 +13,10 @@ public class ElseNode implements ASTNode{
     public void addStmt(StmtNode stmt) {
         this.stmts.add(stmt);
     }
+
+    public String toString() {
+        return "ElseNode{" +
+                "stmts=" + stmts +
+                '}';
+    }
 }

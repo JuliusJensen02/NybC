@@ -7,19 +7,27 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
-
-    @Override
-    public ASTNode visitProgramList(NybCParser.ProgramListContext context){
-        return visitChildren(context);
-    }
-
-
     @Override
     public ASTNode visitBeginStmt(NybCParser.BeginStmtContext ctx) {
         if(ctx.getChild(1).getText().equals("if")){
-            //System.out.println(visit(ctx.getChild(4)));
+            IfNode node = new IfNode();
+            node.setCondition((ExpNode) visit(ctx.getChild(3)));
+            int i = 6;
+            for (; i < ctx.children.size(); i++) {
+                if (ctx.getChild(i).getClass().getSimpleName().equals("StmtContext")) {
+                    node.addStmt((StmtNode) visit(ctx.getChild(i)));
+                }
+                else {
+                    break;
+                }
+            }
+            if(ctx.extendedIf() != null){
+                node.setElseIfNode((ElseIfNode) visit(ctx.getChild(ctx.children.size() - 1)));
+            }
+            System.out.println(node);
+            return node;
         }
-        return visitChildren(ctx);
+        return null;
     }
 
     @Override
@@ -37,7 +45,6 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
                 }
             }
 
-            System.out.println(node);
             return node;
         } else if (ctx.getChild(1).getText().equals("else")) {
             ElseNode node = new ElseNode();
