@@ -2,10 +2,6 @@ import ASTNode.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import javax.crypto.ExemptionMechanismException;
-import java.lang.reflect.Type;
-import java.util.List;
-
 public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
     @Override
     public ASTNode visitBeginStmt(NybCParser.BeginStmtContext ctx) {
