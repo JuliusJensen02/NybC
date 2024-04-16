@@ -11,12 +11,10 @@ public class BoolNode extends ExpNode implements ASTNode {
 
     private boolean value;
 
+    @Override
     public String toString() {
-        return String.valueOf(value);
+        return "BoolNode{" +
+                "value=" + value +
+                '}';
     }
-
- /*   @Override
-    public Boolean visit() {
-        return isValue();
-    }*/
 }

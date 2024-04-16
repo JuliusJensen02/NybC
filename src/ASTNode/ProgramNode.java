@@ -6,7 +6,6 @@ import java.util.List;
 
 public class ProgramNode <T> implements ASTNode{
 
-    public HashMap<String, T> valueTable = new HashMap<String, T>();
     private List<T> stmtList = new ArrayList<T>();
 
     public List<T> getStmtList() {
