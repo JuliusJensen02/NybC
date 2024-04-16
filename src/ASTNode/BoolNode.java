@@ -15,4 +15,8 @@ public class BoolNode extends ExpNode implements ASTNode {
         return String.valueOf(value);
     }
 
+ /*   @Override
+    public Boolean visit() {
+        return isValue();
+    }*/
 }

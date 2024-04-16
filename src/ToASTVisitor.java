@@ -3,16 +3,18 @@ import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Objects;
+
+public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitProgram(NybCParser.ProgramContext ctx) {
         ProgramNode node = new ProgramNode();
         for (ParseTree childNode: ctx.children) {
             if (childNode.getClass().getSimpleName().equals("StmtContext")) {
-                node.addStmt((StmtNode) visit(childNode));
-            } else if (childNode.getClass().getSimpleName().equals("FunctionStmtContext")) {
-                node.addFunction((FuncNode) visit(childNode));
+                node.addStmt((Object) visit(childNode));
             } else {
                 throw new RuntimeException();
             }
@@ -28,9 +30,12 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
     @Override
     public ASTNode visitFunctionStmt(NybCParser.FunctionStmtContext ctx) {
         FuncNode node = new FuncNode();
+
         node.setId(ctx.getChild(2).getText());
-        for (ParseTree childNode: ctx.declareStmt()) {
-            node.addParam((DeclNode) visit(childNode));
+        for (ParseTree childNode: ctx.IDENT()) {
+            if (!node.getId().equals(childNode.getText())){
+                node.addParam(childNode.getText());
+            }
         }
         for (ParseTree childNode: ctx.stmt()) {
             node.addStmt((StmtNode) visit(childNode));

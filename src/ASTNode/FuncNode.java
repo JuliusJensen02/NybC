@@ -5,9 +5,9 @@ import org.antlr.v4.codegen.model.decl.Decl;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FuncNode implements ASTNode {
+public class FuncNode extends ProgramNode implements ASTNode {
     private String id;
-    private List<DeclNode> param = new ArrayList<DeclNode>();
+    private List<String> param = new ArrayList<String>();
 
     private List<StmtNode> stmtList = new ArrayList<StmtNode>();
 
@@ -19,11 +19,11 @@ public class FuncNode implements ASTNode {
         this.id = id;
     }
 
-    public List<DeclNode> getParam() {
+    public List<String> getParam() {
         return param;
     }
 
-    public void addParam(DeclNode param) {
+    public void addParam(String param) {
         this.param.add(param);
     }
 

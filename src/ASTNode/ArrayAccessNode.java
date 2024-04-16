@@ -28,4 +28,5 @@ public class ArrayAccessNode <T> extends ExpNode implements ASTNode{
     public String toString(){
         return id+"["+index+"]";
     }
+
 }

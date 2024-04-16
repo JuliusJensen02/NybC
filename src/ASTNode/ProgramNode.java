@@ -1,34 +1,26 @@
 package ASTNode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class ProgramNode implements ASTNode{
+public class ProgramNode <T> implements ASTNode{
 
-    private List<StmtNode> stmtList = new ArrayList<StmtNode>();
-    private List<FuncNode> functionList = new ArrayList<FuncNode>();
+    public HashMap<String, T> valueTable = new HashMap<String, T>();
+    private List<T> stmtList = new ArrayList<T>();
 
-    public List<StmtNode> getStmtList() {
+    public List<T> getStmtList() {
         return stmtList;
     }
 
-    public void addStmt(StmtNode stmt) {
+    public void addStmt(T stmt) {
         this.stmtList.add(stmt);
-    }
-
-    public List<FuncNode> getFunctionList() {
-        return functionList;
-    }
-
-    public void addFunction(FuncNode function) {
-        this.functionList.add(function);
     }
 
     @Override
     public String toString() {
         return "ProgramNode{" +
                 "stmtList=" + stmtList +
-                ", functionList=" + functionList +
                 '}';
     }
 }

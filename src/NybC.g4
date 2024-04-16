@@ -1,16 +1,17 @@
 grammar NybC;
 
-program: (functionStmt | stmt)+;
+program: (stmt)+;
 
 stmt: beginStmt';'
     | declareStmt';'
     | assignStmt';'
     | callStmt';'
     | ctrlFlowStmt';'
+    | functionStmt';'
     ;
 
-functionStmt : 'begin' 'function' IDENT '('(declareStmt (',' declareStmt)*)?')' ';' (stmt)+ 'end' 'function' ';'
-             | 'begin' 'function' IDENT '('(declareStmt (',' declareStmt)*)?')' ';' (stmt)+ 'end' IDENT ';'
+functionStmt : 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' 'function'
+             | 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' IDENT
              ;
 
 beginStmt: 'begin' 'if''(' expression')'';' (stmt)+ 'end' 'if'(';' extendedIf)*
