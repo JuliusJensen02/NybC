@@ -58,7 +58,7 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
                 }
             }
             if(ctx.extendedIf() != null){
-                node.setElseIfNode((ElseIfNode) visit(ctx.getChild(ctx.children.size() - 1)));
+                node.setElseIfNode(visit(ctx.getChild(ctx.children.size() - 1)));
             }
             return node;
         } else if (ctx.getChild(1).getText().equals("loop")){
@@ -108,6 +108,7 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
         }
         return null;
     }
+
 
     @Override
     public ASTNode visitExtendedIf(NybCParser.ExtendedIfContext ctx) {
