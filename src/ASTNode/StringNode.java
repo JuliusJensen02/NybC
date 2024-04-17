@@ -10,4 +10,10 @@ public class StringNode extends ExpNode implements ASTNode {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return "StringNode{" +
+                "value=" + value +
+                '}';
+    }
 }

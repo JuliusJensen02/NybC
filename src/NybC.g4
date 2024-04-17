@@ -52,8 +52,8 @@ ctrlFlowStmt: 'continue'
             ;
 
 expression: '(' expression ')'
-            | UOPS expression
             | expression BOPS expression
+            | UOPS expression
             | valueExpression
             | arrayAccess
             | callStmt
@@ -66,13 +66,12 @@ valueExpression: IDENT
                 | BOOL
                 ;
 
+BOOL: ( 'true' | 'false' );
 IDENT: ([_]|[a-zA-Z])([_]|[0-9]|[a-zA-Z])*;
 INT: ([0]|[1-9][0-9]*);
 FLOAT: ([0-9]+'.'[0-9]+);
 STRING: (["]~(["]|[\n])*["]);
-BOPS: ('+' | '-' | '*' | '/' | '<' | '>' | '<=' | '>=' | '||' | '&&' | '==' | '!=');
-UOPS: ('!' | '+' |'-');
-BOOL: ('true'|'false');
+BOPS: ('+' | '-' | '*' | '/' | '<' | '>' | '<=' | '>=' | '||' | '&&' | '==' | '!='); UOPS: ('!' | '+' | '-');
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
 

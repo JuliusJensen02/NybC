@@ -14,7 +14,7 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
         ProgramNode node = new ProgramNode();
         for (ParseTree childNode: ctx.children) {
             if (childNode.getClass().getSimpleName().equals("StmtContext")) {
-                node.addStmt((Object) visit(childNode));
+                node.addStmt(visit(childNode));
             } else {
                 throw new RuntimeException();
             }
@@ -34,7 +34,7 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
         node.setId(ctx.getChild(2).getText());
         for (ParseTree childNode: ctx.IDENT()) {
             if (!node.getId().equals(childNode.getText())){
-                node.addParam(childNode.getText());
+                node.addParam(new DeclNode(childNode.getText()));
             }
         }
         for (ParseTree childNode: ctx.stmt()) {
@@ -185,26 +185,18 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitCtrlFlowStmt(NybCParser.CtrlFlowStmtContext ctx) {
-        switch (ctx.getClass().getSimpleName()) {
+        CtrlFlowNode node = new CtrlFlowNode();
+        switch (ctx.getChild(0).getText()) {
             case "return" -> {
                 if (ctx.getChild(1) != null) {
-                    ReturnNode returnNode = new ReturnNode();
-                    returnNode.setExp((ExpNode) visit(ctx.getChild(1)));
-                    return returnNode;
-                } else {
-                    return new ReturnNode();
+                    node.setReturnExp((ExpNode) visit(ctx.getChild(1)));
                 }
+                node.setType("return");
             }
-            case "continue" -> {
-                return new ContinueNode();
-            }
-            case "break" -> {
-                return new BreakNode();
-            }
-            default -> {
-                return null;
-            }
+            case "continue" -> node.setType("continue");
+            case "break" -> node.setType("break");
         }
+        return node;
     }
 
     @Override
@@ -227,8 +219,8 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
             ((ParenthNode) node).setInner(visit(ctx.getChild(1)));
         } else {
             node = new BinaryOpNode();
-            ((BinaryOpNode) node).setLeft(visit(ctx.getChild(0)));
-            ((BinaryOpNode) node).setRight(visit(ctx.getChild(2)));
+            ((BinaryOpNode) node).setLeft((ExpNode) visit(ctx.getChild(0)));
+            ((BinaryOpNode) node).setRight((ExpNode) visit(ctx.getChild(2)));
             ((BinaryOpNode) node).setOp(ctx.BOPS().getText());
         }
         return node;
@@ -272,7 +264,9 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
             return node;
         } else if (ctx.STRING() != null) {
             StringNode node = new StringNode();
-            node.setValue(ctx.STRING().getText());
+            String value = ctx.STRING().getText();
+            value = value.substring(1,value.length()-1);
+            node.setValue(value);
             return node;
         } else if (ctx.BOOL() != null) {
             BoolNode node = new BoolNode();

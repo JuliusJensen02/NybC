@@ -25,7 +25,11 @@ public class AssignNode <T,G> extends ExpNode implements ASTNode {
         Right = right;
     }
 
-    public String toString(){
-        return Left+" = "+Right;
+    @Override
+    public String toString() {
+        return "AssignNode{" +
+                "Left=" + Left +
+                ", Right=" + Right +
+                '}';
     }
 }

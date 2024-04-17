@@ -23,7 +23,11 @@ public class CallFuncNode extends ExpNode implements ASTNode{
         return args;
     }
 
-    public String toString(){
-        return id+"("+args+")";
+    @Override
+    public String toString() {
+        return "CallFuncNode{" +
+                "id='" + id + '\'' +
+                ", args=" + args +
+                '}';
     }
 }
