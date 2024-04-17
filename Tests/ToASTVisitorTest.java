@@ -94,14 +94,14 @@ public class ToASTVisitorTest {
 
 
         //Test for bool to fix with merge
-       /* var parseTreeForBool = setupParseTree("var x = true;");
+        var parseTreeForBool = setupParseTree("var x = true;");
         NybCParser.ValueExpressionContext BoolExpCtx = (NybCParser.ValueExpressionContext)
                 parseTreeForBool.getChild(0).getChild(0).getChild(3).getChild(0);
         BoolNode boolResult = (BoolNode) ASTvisitor.visitValueExpression(BoolExpCtx);
 
         Assertions.assertNotNull(boolResult);
         assertThat(boolResult, instanceOf(BoolNode.class));
-        Assertions.assertEquals(true, boolResult.isValue());*/
+        Assertions.assertEquals(true, boolResult.isValue());
     }
 
 
