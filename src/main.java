@@ -25,10 +25,13 @@ public class main implements VisitorInterface{
         var parser = new NybCParser(tokenStream);
         var parseTree = parser.program();
         var ASTvisitor = new ToASTVisitor();
+        var AST = ASTvisitor.visit(parseTree);
         System.out.println(ASTvisitor.visit(parseTree));
-        var InitialVisitor = new InitialVisitor<>();
-        InitialVisitor.Visit((ProgramNode) ASTvisitor.visit(parseTree));
-        System.out.println(vmap);
-
+        var InitialVisitor = new InitialVisitor();
+        InitialVisitor.Visit((ProgramNode) AST);
+        System.out.println(fmap);
+        System.out.println(stack);
+        var Interpreter = new Interpreter();
+        Interpreter.Visit((ProgramNode) AST);
     }
 }

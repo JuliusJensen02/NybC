@@ -1,17 +1,16 @@
 grammar NybC;
 
-program: (stmt)+;
+program: (stmt | functionStmt)+;
 
 stmt: beginStmt';'
     | declareStmt';'
     | assignStmt';'
     | callStmt';'
     | ctrlFlowStmt';'
-    | functionStmt';'
     ;
 
-functionStmt : 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' 'function'
-             | 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' IDENT
+functionStmt : 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' 'function'';'
+             | 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' IDENT ';'
              ;
 
 beginStmt: 'begin' 'if''(' expression')'';' (stmt)+ 'end' 'if'(';' extendedIf)*
@@ -51,9 +50,26 @@ ctrlFlowStmt: 'continue'
             | 'return'
             ;
 
-expression: '(' expression ')'
-            | expression BOPS expression
-            | UOPS expression
+expression: expression RELOPS relationalExp
+            | relationalExp
+            ;
+
+relationalExp: relationalExp '+' additionExp
+            | relationalExp '-' additionExp
+            | additionExp
+            ;
+
+additionExp: additionExp '*' unaryExp
+            | additionExp '/' unaryExp
+            | unaryExp
+            ;
+unaryExp:    '!' parenthExp
+            | '+' parenthExp
+            | '-' parenthExp
+            | parenthExp
+            ;
+
+parenthExp: '(' expression ')'
             | valueExpression
             | arrayAccess
             | callStmt
@@ -71,7 +87,7 @@ IDENT: ([_]|[a-zA-Z])([_]|[0-9]|[a-zA-Z])*;
 INT: ([0]|[1-9][0-9]*);
 FLOAT: ([0-9]+'.'[0-9]+);
 STRING: (["]~(["]|[\n])*["]);
-BOPS: ('+' | '-' | '*' | '/' | '<' | '>' | '<=' | '>=' | '||' | '&&' | '==' | '!='); UOPS: ('!' | '+' | '-');
+RELOPS: ('<' | '>' | '<=' | '>=' | '||' | '&&' | '==' | '!=');
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
 

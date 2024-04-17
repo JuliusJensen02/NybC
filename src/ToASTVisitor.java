@@ -13,7 +13,7 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
     public ASTNode visitProgram(NybCParser.ProgramContext ctx) {
         ProgramNode node = new ProgramNode();
         for (ParseTree childNode: ctx.children) {
-            if (childNode.getClass().getSimpleName().equals("StmtContext")) {
+            if (childNode.getClass().getSimpleName().equals("StmtContext") || childNode.getClass().getSimpleName().equals("FunctionStmtContext")) {
                 node.addStmt(visit(childNode));
             } else {
                 throw new RuntimeException();
@@ -58,7 +58,7 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
                 }
             }
             if(ctx.extendedIf() != null){
-                node.setElseIfNode((ElseIfNode) visit(ctx.getChild(ctx.children.size() - 1)));
+                node.setElseIfNode(visit(ctx.getChild(ctx.children.size() - 1)));
             }
             return node;
         } else if (ctx.getChild(1).getText().equals("loop")){
@@ -171,7 +171,7 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
         ArrayNode arrayNode = new ArrayNode();
         for (ParseTree childNode: ctx.children) {
             if(childNode.getClass().getSimpleName().equals("ExpressionContext")){
-                arrayNode.addValue(visit(childNode));
+                arrayNode.addValue((ExpNode) visit(childNode));
             }
         }
         return arrayNode;
@@ -203,26 +203,69 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
 
         ASTNode node;
 
-        if (ctx.valueExpression() != null) {
-            return visit(ctx.valueExpression());
-        } else if (ctx.arrayAccess() != null) {
-            return visit(ctx.arrayAccess());
-        } else if (ctx.callStmt() != null) {
-            return visit(ctx.callStmt());
-        } else if (ctx.children.size() == 2) {
-            node = new UnaryOpNode();
-            ((UnaryOpNode) node).setRight(visit(ctx.getChild(1)));
-            ((UnaryOpNode) node).setOp(ctx.UOPS().getText());
-        } else if (ctx.children.size() == 3 && ctx.getChild(1).getClass().getSimpleName().equals("ExpressionContext")) {
-            node = new ParenthNode();
-            ((ParenthNode) node).setInner(visit(ctx.getChild(1)));
-        } else {
+        if (ctx.children.size() == 3) {
             node = new BinaryOpNode();
             ((BinaryOpNode) node).setLeft((ExpNode) visit(ctx.getChild(0)));
             ((BinaryOpNode) node).setRight((ExpNode) visit(ctx.getChild(2)));
-            ((BinaryOpNode) node).setOp(ctx.BOPS().getText());
+            ((BinaryOpNode) node).setOp(ctx.RELOPS().getText());
+            return node;
+        } else {
+            return visit(ctx.getChild(0));
         }
-        return node;
+    }
+
+    @Override
+    public ASTNode visitRelationalExp(NybCParser.RelationalExpContext ctx) {
+        ASTNode node;
+
+        if (ctx.children.size() == 3) {
+            node = new BinaryOpNode();
+            ((BinaryOpNode) node).setLeft((ExpNode) visit(ctx.getChild(0)));
+            ((BinaryOpNode) node).setRight((ExpNode) visit(ctx.getChild(2)));
+            ((BinaryOpNode) node).setOp(ctx.getChild(1).getText());
+            return node;
+        } else {
+            return visit(ctx.getChild(0));
+        }
+    }
+
+    @Override
+    public ASTNode visitAdditionExp(NybCParser.AdditionExpContext ctx) {
+        ASTNode node;
+        if (ctx.children.size() == 3) {
+            node = new BinaryOpNode();
+            ((BinaryOpNode) node).setLeft((ExpNode) visit(ctx.getChild(0)));
+            ((BinaryOpNode) node).setRight((ExpNode) visit(ctx.getChild(2)));
+            ((BinaryOpNode) node).setOp(ctx.getChild(1).getText());
+            return node;
+        } else {
+            return visit(ctx.getChild(0));
+        }
+    }
+
+    @Override
+    public ASTNode visitUnaryExp(NybCParser.UnaryExpContext ctx) {
+        ASTNode node;
+        if (ctx.children.size() == 2) {
+            node = new UnaryOpNode();
+            ((UnaryOpNode)node).setRight((ExpNode) visit(ctx.getChild(1)));
+            ((UnaryOpNode)node).setOp(ctx.getChild(0).getText());
+            return node;
+        } else {
+            return visit(ctx.getChild(0));
+        }
+    }
+
+    @Override
+    public ASTNode visitParenthExp(NybCParser.ParenthExpContext ctx) {
+        ASTNode node;
+        if (ctx.children.size() ==  3) {
+            node = new ParenthNode();
+            ((ParenthNode) node).setInner((ExpNode) visit(ctx.getChild(1)));
+            return node;
+        } else {
+            return visit(ctx.getChild(0));
+        }
     }
 
     @Override

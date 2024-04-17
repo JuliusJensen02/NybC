@@ -1,5 +1,4 @@
-var x = - "3" + "alpha";
-x = 12;
 
-var y = true;
-
+var z = 12;
+var x = [];
+var y = [1,2];

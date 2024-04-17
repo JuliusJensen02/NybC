@@ -82,6 +82,30 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpression(NybCParser.ExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link NybCParser#relationalExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelationalExp(NybCParser.RelationalExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#additionExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAdditionExp(NybCParser.AdditionExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#unaryExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUnaryExp(NybCParser.UnaryExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#parenthExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParenthExp(NybCParser.ParenthExpContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link NybCParser#valueExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

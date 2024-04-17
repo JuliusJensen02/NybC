@@ -3,15 +3,15 @@ package ASTNode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IfNode extends StmtNode implements ASTNode{
+public class IfNode <T> extends StmtNode implements ASTNode{
     private ExpNode condition;
     private List<StmtNode> stmts = new ArrayList<StmtNode>();
-    private ElseIfNode elseIfNode;
+    private T elseIfNode;
 
-    public ElseIfNode getElseIfNode() {
+    public T getElseIfNode() {
         return elseIfNode;
     }
-    public void setElseIfNode(ElseIfNode elseIfNode) {
+    public void setElseIfNode(T elseIfNode) {
         this.elseIfNode = elseIfNode;
     }
     public ExpNode getCondition() {
