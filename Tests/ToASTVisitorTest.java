@@ -29,7 +29,7 @@ public class ToASTVisitorTest {
         NybCParser.FunctionStmtContext functionStmtContext =(NybCParser.FunctionStmtContext) parseTreeForFunction.getChild(0).getChild(0);
         FuncNode funcNode = (FuncNode) ASTvisitor.visitFunctionStmt(functionStmtContext);
         Assertions.assertNotNull(funcNode);
-        Assertions.assertEquals("FuncNode{id='test', param=[testValue], stmtList=[DeclNode{id='x', value=4}]}", funcNode.toString());
+        Assertions.assertEquals("FuncNode{id='test', param=[DeclNode{id='testValue', value=null}], stmtList=[DeclNode{id='x', value=IntNode{value=4}}]}", funcNode.toString());
     }
 
 
@@ -41,8 +41,76 @@ public class ToASTVisitorTest {
     //visitBeginStmt - Daniel
 
     //visitDeclareStmt - Markus
+    @Test
+    void visitDeclareStmtTest(){
+        var ASTvisitor = new ToASTVisitor();
+
+        //Test for no value
+        var parseTreeForDeclareStmt = setupParseTree("var x;");
+        NybCParser.DeclareStmtContext declareStmtContext =(NybCParser.DeclareStmtContext) parseTreeForDeclareStmt.getChild(0).getChild(0);
+        DeclNode declNode = (DeclNode) ASTvisitor.visitDeclareStmt(declareStmtContext);
+
+        Assertions.assertNotNull(declNode);
+        Assertions.assertEquals("x", declNode.getId());
+        Assertions.assertNull(declNode.getValue());
+
+        //Test for expression
+        var parseTreeForDeclareStmtWithExpression = setupParseTree("var x = 4;");
+        NybCParser.DeclareStmtContext declareStmtContextWithExpression =(NybCParser.DeclareStmtContext) parseTreeForDeclareStmtWithExpression.getChild(0).getChild(0);
+        DeclNode<IntNode> declNodeWithExpression = (DeclNode<IntNode>) ASTvisitor.visitDeclareStmt(declareStmtContextWithExpression);
+
+        Assertions.assertNotNull(declNodeWithExpression);
+        Assertions.assertEquals("x", declNodeWithExpression.getId());
+
+        IntNode knownIntNode = new IntNode();
+        knownIntNode.value = 4;
+        Assertions.assertEquals(knownIntNode.value, declNodeWithExpression.getValue().value);
+
+        //Test for array
+        var parseTreeForDeclareStmtWithArray = setupParseTree("var x = [4];");
+        NybCParser.DeclareStmtContext declareStmtContextWithArray =(NybCParser.DeclareStmtContext) parseTreeForDeclareStmtWithArray.getChild(0).getChild(0);
+        DeclNode<ArrayNode> declNodeWithArray = (DeclNode<ArrayNode>) ASTvisitor.visitDeclareStmt(declareStmtContextWithArray);
+
+        Assertions.assertNotNull(declNodeWithArray);
+        Assertions.assertEquals("x", declNodeWithArray.getId());
+
+        ArrayNode knownArrayNode = new ArrayNode();
+        knownArrayNode.addValue(new IntNode());
+        Assertions.assertEquals(knownArrayNode.getValue().size(), declNodeWithArray.getValue().getValue().size());
+    }
 
     //visitAssignStmt - Markus
+    @Test
+    void visitAssignStmtTest(){
+        var ASTvisitor = new ToASTVisitor();
+
+        //Test for expression
+        var parseTreeForAssignStmt = setupParseTree("x = 4;");
+        NybCParser.AssignStmtContext assignExpressionStmtContext =(NybCParser.AssignStmtContext) parseTreeForAssignStmt.getChild(0).getChild(0);
+        AssignNode<String, IntNode> assignExpressionNode = (AssignNode<String, IntNode>) ASTvisitor.visitAssignStmt(assignExpressionStmtContext);
+
+        Assertions.assertNotNull(assignExpressionNode);
+        Assertions.assertEquals("x", assignExpressionNode.getLeft());
+        Assertions.assertEquals(4, assignExpressionNode.getRight().getValue());
+
+        //Test for array
+        var parseTreeForArrayStmt = setupParseTree("x = [4];");
+        NybCParser.AssignStmtContext assignArrayStmtContext =(NybCParser.AssignStmtContext) parseTreeForArrayStmt.getChild(0).getChild(0);
+        AssignNode<String, ArrayNode> assignArrayNode = (AssignNode<String, ArrayNode>) ASTvisitor.visitAssignStmt(assignArrayStmtContext);
+
+        Assertions.assertNotNull(assignArrayNode);
+        Assertions.assertEquals("x", assignArrayNode.getLeft());
+        Assertions.assertEquals(1, assignArrayNode.getRight().getValue().size());
+
+        //Test for arrayAccess expression assign
+        var parseTreeForArrayAccessStmt = setupParseTree("x[0] = 4;");
+        NybCParser.AssignStmtContext assignArrayAccessStmtContext =(NybCParser.AssignStmtContext) parseTreeForArrayAccessStmt.getChild(0).getChild(0);
+        AssignNode<ArrayAccessNode, IntNode> assignArrayAccessNode = (AssignNode<ArrayAccessNode, IntNode>) ASTvisitor.visitAssignStmt(assignArrayAccessStmtContext);
+
+        Assertions.assertNotNull(assignArrayAccessNode);
+        Assertions.assertEquals("x", assignArrayAccessNode.getLeft().getId());
+        Assertions.assertEquals(4, assignArrayAccessNode.getRight().getValue());
+    }
 
 
     @Test
