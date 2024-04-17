@@ -3,7 +3,7 @@ package ASTNode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IfNode<T> extends StmtNode{
+public class IfNode<T> extends StmtNode implements ASTNode{
     private ExpNode condition;
     private List<StmtNode> stmts = new ArrayList<StmtNode>();
     private T elseIfNode;

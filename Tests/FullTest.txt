@@ -1,5 +1,6 @@
 begin function test(var x,var y);
 
+var p = true;
 var t = x;
 var u = y;
 
