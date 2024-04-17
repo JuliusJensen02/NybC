@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class ToASTVisitorTest {
@@ -35,10 +36,53 @@ public class ToASTVisitorTest {
 
     @Test
     void visitCallStmtTest(){
-        // It wants to call - Daniel
+        var ASTvisitor = new ToASTVisitor();
+        var parseTreeForCallStmt = setupParseTree("var x = a(x);");
+
+
+        CallFuncNode callFuncCtx = (CallFuncNode) ASTvisitor.visitCallStmt((NybCParser.CallStmtContext)
+                parseTreeForCallStmt.getChild(0).getChild(0).getChild(3).getChild(0));
+
+        Assertions.assertNotNull(callFuncCtx);
+        Assertions.assertEquals("CallFuncNode{id='a', args=[x]}",callFuncCtx.toString());
+    }
+
+    @Test
+    void visitBeginStmtTest(){
+        var ASTvisitor = new ToASTVisitor();
+
+        //Test For an if statement
+        var parseTreeForIf = setupParseTree("begin if(1<2); var x; end if;");
+        IfNode ifNodeCtx = (IfNode) ASTvisitor.visitBeginStmt((NybCParser.BeginStmtContext) parseTreeForIf.getChild(0).getChild(0));
+        Assertions.assertNotNull(ifNodeCtx);
+        assertEquals("IfNode{condition=BinaryOpNode{Left=IntNode{value=1}, Op=<, Right=IntNode{value=2}}, stmts=[DeclNode{id='x', value=null}], elseIfNodes=null}",ifNodeCtx.toString());
+
+        //Test for a while loop
+        var parseTreeForLoop = setupParseTree("begin loop(x<10); x = x+1; end loop;");
+        LoopNode loopNodeCtx = (LoopNode) ASTvisitor.visitBeginStmt((NybCParser.BeginStmtContext) parseTreeForLoop.getChild(0).getChild(0));
+        Assertions.assertNotNull(loopNodeCtx);
+        Assertions.assertEquals("LoopNode{condition=BinaryOpNode{Left=x, Op=<, Right=IntNode{value=10}}, declaration=null, assignment=null, type='while', stmtList=[AssignNode{Left=x, Right=BinaryOpNode{Left=x, Op=+, Right=IntNode{value=1}}}]}", loopNodeCtx.toString());
+
+        //Test for a for loop
+        var parseTreeForForLoop = setupParseTree("begin loop(var x = 0; x<10; x=x+1); a(2); end loop;");
+        LoopNode ForLoopNodeCtx = (LoopNode) ASTvisitor.visitBeginStmt((NybCParser.BeginStmtContext) parseTreeForForLoop.getChild(0).getChild(0));
+        Assertions.assertNotNull(ForLoopNodeCtx);
+        Assertions.assertEquals("LoopNode{condition=BinaryOpNode{Left=x, Op=<, Right=IntNode{value=10}}, declaration=DeclNode{id='x', value=IntNode{value=0}}, assignment=AssignNode{Left=x, Right=BinaryOpNode{Left=x, Op=+, Right=IntNode{value=1}}}, type='for', stmtList=[CallFuncNode{id='a', args=[IntNode{value=2}]}]}",ForLoopNodeCtx.toString());
+
+        //Test for a do while loop
+        var parseTreeForDoWhile = setupParseTree("begin loop; x = x+1; end loop(x<10);");
+        LoopNode DoWhileLoopNodeCtx = (LoopNode) ASTvisitor.visitBeginStmt((NybCParser.BeginStmtContext) parseTreeForDoWhile.getChild(0).getChild(0));
+        Assertions.assertNotNull(DoWhileLoopNodeCtx);
+        Assertions.assertEquals("LoopNode{condition=BinaryOpNode{Left=x, Op=<, Right=IntNode{value=10}}, declaration=null, assignment=null, type='do-while', stmtList=[AssignNode{Left=x, Right=BinaryOpNode{Left=x, Op=+, Right=IntNode{value=1}}}]}",DoWhileLoopNodeCtx.toString());
+
+        //Test for a switch
+        var parseTreeSwitch = setupParseTree("begin switch(x); case 2: out(x); case 4: out(x); default: out(x); end switch;");
+        SwitchNode SwitchNodeCtx = (SwitchNode) ASTvisitor.visitBeginStmt((NybCParser.BeginStmtContext) parseTreeSwitch.getChild(0).getChild(0));
+        Assertions.assertNotNull(SwitchNodeCtx);
+        Assertions.assertEquals("SwitchNode{switchCond=x, cases=[CaseNode{caseExp=IntNode{value=2}, stmtList=[CallFuncNode{id='out', args=[x]}]}, CaseNode{caseExp=IntNode{value=4}, stmtList=[CallFuncNode{id='out', args=[x]}]}, CaseNode{caseExp=null, stmtList=[]}]}",SwitchNodeCtx.toString());
+
 
     }
-    //visitBeginStmt - Daniel
 
     //visitDeclareStmt - Markus
     @Test
