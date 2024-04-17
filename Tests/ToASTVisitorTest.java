@@ -35,9 +35,14 @@ public class ToASTVisitorTest {
 
     @Test
     void visitCallStmtTest(){
-        // It wants to call
+        // It wants to call - Daniel
 
     }
+    //visitBeginStmt - Daniel
+
+    //visitDeclareStmt - Markus
+
+    //visitAssignStmt - Markus
 
 
     @Test
@@ -85,7 +90,7 @@ public class ToASTVisitorTest {
 
         Assertions.assertNotNull(stringResult);
         assertThat(stringResult, instanceOf(StringNode.class));
-        Assertions.assertEquals("\"Hello\"", stringResult.getValue());
+        Assertions.assertEquals("Hello", stringResult.getValue());
 
 
         //Test for bool to fix with merge
