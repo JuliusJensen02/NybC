@@ -30,7 +30,6 @@ public class main implements VisitorInterface{
         var InitialVisitor = new InitialVisitor();
         InitialVisitor.Visit((ProgramNode) AST);
         System.out.println(fmap);
-        System.out.println(stack);
         var Interpreter = new Interpreter();
         Interpreter.Visit((ProgramNode) AST);
     }

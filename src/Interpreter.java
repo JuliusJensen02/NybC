@@ -9,18 +9,34 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
 
     @Override
     public void Visit(ProgramNode node) {
+        Object CtrlFlow;
         for (Object stmt: node.getStmtList()) {
             if (!(stmt instanceof FuncNode) && !(stmt instanceof DeclNode)){
-                Visit((StmtNode) stmt);
+                CtrlFlow = Visit((StmtNode) stmt);
+                if (CtrlFlow != null) {
+                    if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
+                        throw new RuntimeException("The statement '" + ((CtrlFlowNode)CtrlFlow).getType() +  "' can not be used in global scope");
+                    } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                        break;
+                    }
+                }
             }
         }
     }
 
     @Override
     public Object Visit(FuncNode node) {
-
+        Object CtrlFlow;
         for (StmtNode stmt: node.getStmsList()) {
-            Visit(stmt);
+            CtrlFlow = Visit(stmt);
+            if (CtrlFlow != null) {
+                if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
+                    throw new RuntimeException("The statement " + ((CtrlFlowNode)CtrlFlow).getType() +  " can not be used on functions");
+                } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                    stack.pop();
+                    return CtrlFlow;
+                }
+            }
         }
         stack.pop();
         return null;
@@ -28,41 +44,90 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
 
     @Override
     public Object Visit(LoopNode node) {
+        HashMap<String, Object> map = new HashMap<>();
+        stack.push(map);
 
+        if (node.getDeclaration() != null) {
+            Visit(node.getDeclaration());
+        }
         if (!(Visit(node.getCondition()) instanceof Boolean)) {
             throw new RuntimeException("Condition for loops needs to be a boolean value");
         }
+        Object CtrlFlow;
+        Boolean bool = (Boolean) Visit(node.getCondition());
         switch (node.getType()){
             case "while":
-                HashMap<String, Object> map = new HashMap<>();
-                stack.push(map);
-                while ((Boolean) Visit(node.getCondition())){
+                while (bool){
+                    HashMap<String, Object> InnerMap = new HashMap<>();
+                    stack.push(InnerMap);
+                    bool = (Boolean) Visit(node.getCondition());
                     for (StmtNode stmt: node.getStmtList()) {
-                        Visit(stmt);
+                        CtrlFlow = Visit(stmt);
+                        if (CtrlFlow != null) {
+                            if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                                stack.pop();
+                                stack.pop();
+                                return CtrlFlow;
+                            } else if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
+                                bool = false;
+                                break;
+                            } else if (((CtrlFlowNode) CtrlFlow).getType().equals("continue")) {
+                                break;
+                            }
+                        }
                     }
+                    stack.pop();
                 }
                 stack.pop();
                 break;
             case "for":
-                HashMap<String, Object> map1 = new HashMap<>();
-                stack.push(map1);
-                Visit(node.getDeclaration());
-                while ((Boolean) Visit(node.getCondition())) {
+                while (bool) {
+                    HashMap<String, Object> InnerMap = new HashMap<>();
+                    stack.push(InnerMap);
+                    bool = (Boolean) Visit(node.getCondition());
                     for (StmtNode stmt: node.getStmtList()) {
-                        Visit(stmt);
+                        CtrlFlow = Visit(stmt);
+                        if (CtrlFlow != null) {
+                            if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                                stack.pop();
+                                stack.pop();
+                                return CtrlFlow;
+                            } else if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
+                                bool = false;
+                                break;
+                            } else if (((CtrlFlowNode) CtrlFlow).getType().equals("continue")) {
+                                break;
+                            }
+                        }
+
                     }
+                    stack.pop();
                     Visit(node.getAssignment());
                 }
                 stack.pop();
                 break;
             case "do-while":
-                HashMap<String, Object> map2 = new HashMap<>();
-                stack.push(map2);
                 do {
+                    HashMap<String, Object> InnerMap = new HashMap<>();
+                    stack.push(InnerMap);
+                    bool = (Boolean) Visit(node.getCondition());
                     for (StmtNode stmt: node.getStmtList()) {
-                        Visit(stmt);
+                        CtrlFlow = Visit(stmt);
+                        if (CtrlFlow != null) {
+                            if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                                stack.pop();
+                                stack.pop();
+                                return CtrlFlow;
+                            } else if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
+                                bool = false;
+                                break;
+                            } else if (((CtrlFlowNode) CtrlFlow).getType().equals("continue")) {
+                                break;
+                            }
+                        }
                     }
-                } while ((Boolean) Visit(node.getCondition()));
+                    stack.pop();
+                } while (bool);
                 stack.pop();
                 break;
         }
@@ -73,9 +138,37 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
     public Object Visit(SwitchNode node) {
         HashMap<String, Object> map = new HashMap<>();
         stack.push(map);
-        for (CaseNode cases: node.getCases()) {
-            if (Visit(node.getSwitchCond()) == cases.getCaseExp() || cases.getCaseExp() == null) {
-                Visit(cases);
+        Object CtrlFlow;
+
+        if (Visit(node.getSwitchCond()) instanceof String) {
+            for (CaseNode cases: node.getCases()) {
+                if (Visit(node.getSwitchCond()).equals(Visit(cases.getCaseExp())) || cases.getCaseExp() == null) {
+                    CtrlFlow = Visit(cases);
+                    if (CtrlFlow != null) {
+                        if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
+                            stack.pop();
+                            return null;
+                        } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                            stack.pop();
+                            return CtrlFlow;
+                        }
+                    }
+                }
+            }
+        } else {
+            for (CaseNode cases: node.getCases()) {
+                if (Visit(node.getSwitchCond()) == Visit(cases.getCaseExp()) || cases.getCaseExp() == null) {
+                    CtrlFlow = Visit(cases);
+                    if (CtrlFlow != null) {
+                        if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
+                            stack.pop();
+                            return null;
+                        } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                            stack.pop();
+                            return CtrlFlow;
+                        }
+                    }
+                }
             }
         }
         stack.pop();
@@ -84,8 +177,12 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
 
     @Override
     public Object Visit(CaseNode node) {
+        Object CtrlFlow;
         for (StmtNode stmt: node.getStmtList()) {
-            Visit(stmt);
+            CtrlFlow = Visit(stmt);
+            if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                return CtrlFlow;
+            }
         }
         return null;
     }
@@ -150,13 +247,22 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
         return null;
     }
 
-    @Override
-    public Object Visit(CtrlFlowNode node) {
-        return null;
-    }
+
 
     @Override
     public Object Visit(DeclNode node) {
+        for (int i = stack.size() - 1; stack.get(i).containsKey("0"); i--) {
+            if (stack.get(i).containsKey(node.getId())) {
+                throw new RuntimeException("Variable " + node.getId() + " already declared");
+            }
+        }
+        if (node.getValue() instanceof ArrayNode) {
+            stack.peek().put(node.getId(), Visit((ArrayNode) node.getValue()));
+        } else if (node.getValue() instanceof ExpNode) {
+            stack.peek().put(node.getId(), Visit((ExpNode) node.getValue()));
+        } else {
+            stack.peek().put(node.getId(), null);
+        }
         return null;
     }
 
@@ -167,15 +273,28 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
         }
         HashMap<String, Object> map = new HashMap<>();
         stack.push(map);
+        Object CtrlFlow;
         if ((Boolean) Visit(node.getCondition())){
             for (StmtNode stmt: node.getStmts()){
-                Visit(stmt);
+                CtrlFlow = Visit(stmt);
+                if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                    stack.pop();
+                    return CtrlFlow;
+                }
             }
         } else {
             if (node.getElseIfNode() instanceof ElseIfNode) {
-                Visit((ElseIfNode<?>) node.getElseIfNode());
+                CtrlFlow = Visit((ElseIfNode<?>) node.getElseIfNode());
+                if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                    stack.pop();
+                    return CtrlFlow;
+                }
             } else if (node.getElseIfNode() instanceof ElseNode) {
-                Visit((ElseNode) node.getElseIfNode());
+                CtrlFlow = Visit((ElseNode) node.getElseIfNode());
+                if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                    stack.pop();
+                    return CtrlFlow;
+                }
             }
         }
         stack.pop();
@@ -189,15 +308,29 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
         }
         HashMap<String, Object> map = new HashMap<>();
         stack.push(map);
+
+        Object CtrlFlow;
         if ((Boolean) Visit(node.getCondition())){
             for (StmtNode stmt: node.getStmts()){
-                Visit(stmt);
+                CtrlFlow = Visit(stmt);
+                if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                    stack.pop();
+                    return CtrlFlow;
+                }
             }
         } else {
             if (node.getElseIfNode() instanceof ElseIfNode) {
-                Visit((ElseIfNode<?>) node.getElseIfNode());
+                CtrlFlow = Visit((ElseIfNode<?>) node.getElseIfNode());
+                if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                    stack.pop();
+                    return CtrlFlow;
+                }
             } else if (node.getElseIfNode() instanceof ElseNode) {
-                Visit((ElseNode) node.getElseIfNode());
+                CtrlFlow = Visit((ElseNode) node.getElseIfNode());
+                if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                    stack.pop();
+                    return CtrlFlow;
+                }
             }
         }
         stack.pop();
@@ -208,8 +341,13 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
     public Object Visit(ElseNode node) {
         HashMap<String, Object> map = new HashMap<>();
         stack.push(map);
+        Object CtrlFlow;
         for (StmtNode stmt: node.getStmts()){
-            Visit(stmt);
+            CtrlFlow = Visit(stmt);
+            if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                stack.pop();
+                return CtrlFlow;
+            }
         }
         stack.pop();
         return null;
@@ -217,11 +355,27 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
 
     @Override
     public Object Visit(CallFuncNode node) {
-        HashMap<String, Object> map = lookupFunc(node.getId());
-        stack.push(map);
-        FuncNode funcNode = (FuncNode) map.get("0");
-        Visit(funcNode);
+        if (node.getId().equals("out")) {
+            if (node.getArgs().size() == 1) {
+                System.out.println(Visit(node.getArgs().get(0)));
+            } else {
+                throw new RuntimeException("'out' can only take one argument");
+            }
+        } else if (node.getId().equals("in")) {
+        } else {
+            HashMap<String, Object> map = lookupFunc(node.getId());
+            stack.push(map);
+            FuncNode funcNode = (FuncNode) map.get("0");
+            int i = 0;
+            for (DeclNode param: funcNode.getParam()) {
+                map.replace(param.getId(), Visit(node.getArgs().get(i)));
+                i++;
+            }
+            Object CtrlFlow = Visit(funcNode);
+            if (CtrlFlow != null && ((CtrlFlowNode) CtrlFlow).getReturnExp() != null) {
+                return map.get("1");
+            }
+        }
         return null;
     }
-
 }

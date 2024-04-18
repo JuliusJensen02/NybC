@@ -30,14 +30,28 @@ public  class ASTVisitor implements VisitorInterface{
         }
         return list;
     }
+
+    public CtrlFlowNode Visit(CtrlFlowNode node) {
+        if (node.getType().equals("return") && node.getReturnExp() != null){
+            var value = Visit(node.getReturnExp());
+            for (int i = stack.size() - 1; i >= 0; i--) {
+                if (stack.get(i).containsKey("0")) {
+                    stack.get(i).put("1", value);
+                }
+            }
+        }
+        return node;
+    }
     public Object Visit(BinaryOpNode node){
         var left = Visit(node.getLeft());
         var right = Visit(node.getRight());
         switch (node.getOp()){
             case "+":
-                if (left instanceof String || right instanceof String){
+                if (left instanceof String){
+                    return (String) left + right;
+                } else if (right instanceof String) {
                     return left + (String) right;
-                } else if (left instanceof Integer && right instanceof Integer) {
+                }else if (left instanceof Integer && right instanceof Integer) {
                     return (int) left + (int) right;
                 } else if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() + ((Number) right).floatValue();
@@ -112,7 +126,7 @@ public  class ASTVisitor implements VisitorInterface{
                 } else if (left instanceof Integer && right instanceof Integer) {
                     return (int) left == (int) right;
                 } else {
-                    throw new RuntimeException();
+                    throw new RuntimeException(left + " " + right );
                 }
             case "||":
                 if (left instanceof Boolean && right instanceof Boolean) {
@@ -164,7 +178,6 @@ public  class ASTVisitor implements VisitorInterface{
     public  Object Visit(ElseIfNode<?> node){return null;};
     public  Object Visit(IfNode<?> node){return null;};
     public  Object Visit(DeclNode node){return null;};
-    public  Object Visit(CtrlFlowNode node){return null;};
     public  Object Visit(AssignNode node){return null;};
     public  Object Visit(CaseNode node){return null;};
     public  Object Visit(SwitchNode node){return null;};
@@ -200,7 +213,6 @@ public  class ASTVisitor implements VisitorInterface{
 
     public Object Visit (StmtNode node)
     {
-        System.out.println(node);
         if (node instanceof IfNode) {
             return Visit((IfNode) node);
         } else if (node instanceof LoopNode) {

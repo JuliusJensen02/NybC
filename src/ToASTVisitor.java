@@ -95,12 +95,19 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
                     CaseNode casen = new CaseNode();
                     if (!ctx.getChild(i).getText().equals("default")) {
                         casen.setCaseExp((ExpNode) visit(ctx.getChild(i + 1)));
+                        int j = i + 3;
+                        while (ctx.getChild(j).getClass().getSimpleName().equals("StmtContext")){
+                            casen.addStmt((StmtNode) visit(ctx.getChild(j)));
+                            j++;
+                        }
+                    } else {
+                        int j = i + 2;
+                        while (ctx.getChild(j).getClass().getSimpleName().equals("StmtContext")){
+                            casen.addStmt((StmtNode) visit(ctx.getChild(j)));
+                            j++;
+                        }
                     }
-                    int j = i + 3;
-                    while (ctx.getChild(j).getClass().getSimpleName().equals("StmtContext")){
-                        casen.addStmt((StmtNode) visit(ctx.getChild(j)));
-                        j++;
-                    }
+
                     node.addCases(casen);
                 }
             }
