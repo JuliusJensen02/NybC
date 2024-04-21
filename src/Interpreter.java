@@ -256,6 +256,8 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                 throw new RuntimeException("Variable " + node.getId() + " already declared");
             }
         }
+
+
         if (node.getValue() instanceof ArrayNode) {
             stack.peek().put(node.getId(), Visit((ArrayNode) node.getValue()));
         } else if (node.getValue() instanceof ExpNode) {
@@ -355,6 +357,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
 
     @Override
     public Object Visit(CallFuncNode node) {
+
         if (node.getId().equals("out")) {
             if (node.getArgs().size() == 1) {
                 System.out.println(Visit(node.getArgs().get(0)));
@@ -362,6 +365,9 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                 throw new RuntimeException("'out' can only take one argument");
             }
         } else if (node.getId().equals("in")) {
+
+            System.out.println("Hello");
+
         } else {
             HashMap<String, Object> map = lookupFunc(node.getId());
             stack.push(map);

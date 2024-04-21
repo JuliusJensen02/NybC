@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public  class ASTVisitor implements VisitorInterface{
+public class ASTVisitor implements VisitorInterface{
 
     public Object Visit(IdentifierNode node) {
         return lookup(node.getValue());
