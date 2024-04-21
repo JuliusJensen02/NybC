@@ -116,6 +116,7 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
         return null;
     }
 
+
     @Override
     public ASTNode visitExtendedIf(NybCParser.ExtendedIfContext ctx) {
         if (ctx.getChild(1).getText().equals("else-if")) {
