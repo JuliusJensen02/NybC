@@ -5,6 +5,8 @@ import ASTNode.IntNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 public class ASTVisitorTest {
 
 
@@ -14,7 +16,7 @@ public class ASTVisitorTest {
         intNode.value = 2;
         DeclNode declNode = new DeclNode("x",intNode);
 
-        InitialVisitor initialVisitor = new InitialVisitor();
+        InitialVisitor initialVisitor = new InitialVisitor(new NybCStack(), new ArrayList<>()); //Fix list
 
         System.out.println(initialVisitor.Visit(declNode));
 
@@ -28,7 +30,7 @@ public class ASTVisitorTest {
 
     @Test
     void CtrlFlowNodeVisit(){
-        InitialVisitor initialVisitor = new InitialVisitor();
+        InitialVisitor initialVisitor = new InitialVisitor(new NybCStack(), new ArrayList<>()); //Fix list
         CtrlFlowNode ctrlFlowNode = new CtrlFlowNode();
 
         ctrlFlowNode.setType("return");

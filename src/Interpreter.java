@@ -4,7 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-public class Interpreter extends ASTVisitor implements VisitorInterface{
+public class Interpreter extends ASTVisitor{
+    List<String> keywords;
+    public Interpreter(NybCStack nybCStack, List<String> keywords) {
+        super(nybCStack);
+        this.keywords = keywords;
+    }
 
     @Override
     public void Visit(ProgramNode node) {
@@ -32,19 +37,19 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                 if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
                     Error.CONTINUE_BREAK_NOT_ALLOWED_IN_FUNCTION(((CtrlFlowNode) CtrlFlow).getType());
                 } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                    stack.pop();
+                    nybCStack.getStack().pop();
                     return CtrlFlow;
                 }
             }
         }
-        stack.pop();
+        nybCStack.getStack().pop();
         return null;
     }
 
     @Override
     public Object Visit(LoopNode node) {
         HashMap<String, Object> map = new HashMap<>();
-        stack.push(map);
+        nybCStack.getStack().push(map);
 
         if (node.getDeclaration() != null) {
             Visit(node.getDeclaration());
@@ -58,7 +63,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
             case "while" -> {
                 while (bool) {
                     HashMap<String, Object> InnerMap = new HashMap<>();
-                    stack.push(InnerMap);
+                    nybCStack.getStack().push(InnerMap);
                     bool = (Boolean) Visit(node.getCondition());
                     label:
                     for (StmtNode stmt : node.getStmtList()) {
@@ -66,8 +71,8 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                         if (CtrlFlow != null) {
                             switch (((CtrlFlowNode) CtrlFlow).getType()) {
                                 case "return":
-                                    stack.pop();
-                                    stack.pop();
+                                    nybCStack.getStack().pop();
+                                    nybCStack.getStack().pop();
                                     return CtrlFlow;
                                 case "break":
                                     bool = false;
@@ -77,14 +82,14 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                             }
                         }
                     }
-                    stack.pop();
+                    nybCStack.getStack().pop();
                 }
-                stack.pop();
+                nybCStack.getStack().pop();
             }
             case "for" -> {
                 while (bool) {
                     HashMap<String, Object> InnerMap = new HashMap<>();
-                    stack.push(InnerMap);
+                    nybCStack.getStack().push(InnerMap);
                     bool = (Boolean) Visit(node.getCondition());
                     label1:
                     for (StmtNode stmt : node.getStmtList()) {
@@ -92,8 +97,8 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                         if (CtrlFlow != null) {
                             switch (((CtrlFlowNode) CtrlFlow).getType()) {
                                 case "return":
-                                    stack.pop();
-                                    stack.pop();
+                                    nybCStack.getStack().pop();
+                                    nybCStack.getStack().pop();
                                     return CtrlFlow;
                                 case "break":
                                     bool = false;
@@ -104,15 +109,15 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                         }
 
                     }
-                    stack.pop();
+                    nybCStack.getStack().pop();
                     Visit(node.getAssignment());
                 }
-                stack.pop();
+                nybCStack.getStack().pop();
             }
             case "do-while" -> {
                 do {
                     HashMap<String, Object> InnerMap = new HashMap<>();
-                    stack.push(InnerMap);
+                    nybCStack.getStack().push(InnerMap);
                     bool = (Boolean) Visit(node.getCondition());
                     label2:
                     for (StmtNode stmt : node.getStmtList()) {
@@ -120,8 +125,8 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                         if (CtrlFlow != null) {
                             switch (((CtrlFlowNode) CtrlFlow).getType()) {
                                 case "return":
-                                    stack.pop();
-                                    stack.pop();
+                                    nybCStack.getStack().pop();
+                                    nybCStack.getStack().pop();
                                     return CtrlFlow;
                                 case "break":
                                     bool = false;
@@ -131,9 +136,9 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                             }
                         }
                     }
-                    stack.pop();
+                    nybCStack.getStack().pop();
                 } while (bool);
-                stack.pop();
+                nybCStack.getStack().pop();
             }
         }
         return null;
@@ -142,7 +147,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
     @Override
     public Object Visit(SwitchNode node) {
         HashMap<String, Object> map = new HashMap<>();
-        stack.push(map);
+        nybCStack.getStack().push(map);
         Object CtrlFlow;
 
         if (Visit(node.getSwitchCond()) instanceof String) {
@@ -151,10 +156,10 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                     CtrlFlow = Visit(cases);
                     if (CtrlFlow != null) {
                         if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
-                            stack.pop();
+                            nybCStack.getStack().pop();
                             return null;
                         } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                            stack.pop();
+                            nybCStack.getStack().pop();
                             return CtrlFlow;
                         }
                     }
@@ -166,17 +171,17 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                     CtrlFlow = Visit(cases);
                     if (CtrlFlow != null) {
                         if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
-                            stack.pop();
+                            nybCStack.getStack().pop();
                             return null;
                         } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                            stack.pop();
+                            nybCStack.getStack().pop();
                             return CtrlFlow;
                         }
                     }
                 }
             }
         }
-        stack.pop();
+        nybCStack.getStack().pop();
         return null;
     }
 
@@ -234,12 +239,12 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
         } else if (left instanceof String) {
             lookup((String) left);
 
-            for (int i = stack.size() - 1; i >= 0; i--) {
-                if (stack.get(i).containsKey(left)) {
+            for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
+                if (nybCStack.getStack().get(i).containsKey(left)) {
                     if (right instanceof ArrayNode) {
-                        stack.get(i).replace((String) left, Visit((ArrayNode) node.getRight()));
+                        nybCStack.getStack().get(i).replace((String) left, Visit((ArrayNode) node.getRight()));
                     } else if (right instanceof ExpNode) {
-                        stack.get(i).replace((String) left, Visit((ExpNode) node.getRight()));
+                        nybCStack.getStack().get(i).replace((String) left, Visit((ExpNode) node.getRight()));
                     } else {
                         throw new RuntimeException("The assigned value is not accepted");
                     }
@@ -260,17 +265,17 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                 throw new RuntimeException("Variable name '" + node.getId() + "' is reserved");
             }
         }
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            if (stack.get(i).containsKey(node.getId())) {
+        for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
+            if (nybCStack.getStack().get(i).containsKey(node.getId())) {
                 throw new RuntimeException("Variable " + node.getId() + " already declared");
             }
         }
         if (node.getValue() instanceof ArrayNode) {
-            stack.peek().put(node.getId(), Visit((ArrayNode) node.getValue()));
+            nybCStack.getStack().peek().put(node.getId(), Visit((ArrayNode) node.getValue()));
         } else if (node.getValue() instanceof ExpNode) {
-            stack.peek().put(node.getId(), Visit((ExpNode) node.getValue()));
+            nybCStack.getStack().peek().put(node.getId(), Visit((ExpNode) node.getValue()));
         } else {
-            stack.peek().put(node.getId(), null);
+            nybCStack.getStack().peek().put(node.getId(), null);
         }
         return null;
     }
@@ -281,24 +286,24 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
             throw new RuntimeException("Condition for if statements needs to be a boolean value");
         }
         HashMap<String, Object> map = new HashMap<>();
-        stack.push(map);
+        nybCStack.getStack().push(map);
         Object CtrlFlow;
         if (node.getCondition() == null || (Boolean) Visit(node.getCondition())){
             for (StmtNode stmt: node.getStmts()){
                 CtrlFlow = Visit(stmt);
                 if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
-                    stack.pop();
+                    nybCStack.getStack().pop();
                     return CtrlFlow;
                 }
             }
         } else {
             CtrlFlow = Visit(node.getElseIfNode());
             if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
-                stack.pop();
+                nybCStack.getStack().pop();
                 return CtrlFlow;
             }
         }
-        stack.pop();
+        nybCStack.getStack().pop();
         return null;
     }
 
@@ -315,7 +320,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
             return scan.nextLine();
         } else {
             HashMap<String, Object> map = lookupFunc(node.getId());
-            stack.push(map);
+            nybCStack.getStack().push(map);
             FuncNode funcNode = (FuncNode) map.get("0");
             if (node.getArgs().size() != funcNode.getParam().size()){
                 throw new RuntimeException("Function call must have the same amount of parameters as function");

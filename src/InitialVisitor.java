@@ -4,10 +4,16 @@ import org.antlr.v4.codegen.model.decl.Decl;
 
 import javax.sound.midi.SysexMessage;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class InitialVisitor extends ASTVisitor implements VisitorInterface{
+public class InitialVisitor extends ASTVisitor {
+    List<String> keywords;
+    public InitialVisitor(NybCStack nybCStack, List<String> keywords) {
+        super(nybCStack);
+        this.keywords = keywords;
+    }
 
 /*    @Override
     public Object Visit(DeclNode<?> node) {
@@ -29,7 +35,7 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
     @Override
     public void Visit(ProgramNode node) {
         HashMap<String, Object> global = new HashMap<>();
-        stack.push(global);
+        nybCStack.getStack().push(global);
 
         for (Object stmt: node.getStmtList()) {
             /*if (stmt instanceof DeclNode) {
@@ -51,7 +57,7 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
                     functionMap.put(param.getId(), param.getValue());
                 }
                 functionMap.put("0", stmt);
-                fmap.put(((FuncNode) function).getId(), functionMap);
+                nybCStack.getFmap().put(((FuncNode) function).getId(), functionMap);
             }
         }
     }
