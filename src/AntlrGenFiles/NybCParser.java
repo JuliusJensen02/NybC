@@ -88,7 +88,7 @@ public class NybCParser extends Parser {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "NybC.g4"; }
+	public String getGrammarFileName() { return "AntlrGenFiles/NybC.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

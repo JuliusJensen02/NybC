@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-public class Interpreter extends ASTVisitor{
+public class Interpreter extends ASTVisitor {
     List<String> keywords;
     public Interpreter(NybCStack nybCStack, List<String> keywords) {
         super(nybCStack);
@@ -260,8 +260,8 @@ public class Interpreter extends ASTVisitor{
     @Override
     public Object Visit(DeclNode<?> node) {
 
-        for (int i = 0; i < keywords.size(); i++) {
-            if (node.getId().equals(keywords.get(i))){
+        for (String keyword : keywords) {
+            if (node.getId().equals(keyword)) {
                 throw new RuntimeException("Variable name '" + node.getId() + "' is reserved");
             }
         }
