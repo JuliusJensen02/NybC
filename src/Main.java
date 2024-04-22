@@ -5,36 +5,18 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 public class Main implements VisitorInterface{
 
 
 
     public static void main(String[] args) throws IOException {
+        keywords.addAll(Arrays.asList("begin", "end", "loop", "in", "out", "if", "else", "switch", "var", "function", "case", "return", "break", "continue", "true", "false"));
 
-        keywords.add("begin");
-        keywords.add("end");
-        keywords.add("loop");
-        keywords.add("in");
-        keywords.add("out");
-        keywords.add("if");
-        keywords.add("else");
-        keywords.add("switch");
-        keywords.add("var");
-        keywords.add("function");
-        keywords.add("case");
-        keywords.add("return");
-        keywords.add("break");
-        keywords.add("continue");
-        keywords.add("true");
-        keywords.add("false");
-
-
-        Path fileName = Path.of("src/code.txt");
+        Path fileName = Path.of("src/code.nybc");
         var inputStream = CharStreams.fromString(Files.readString(fileName));
         var lexer = new NybCLexer(inputStream);
-
-
         var tokenStream = new CommonTokenStream(lexer);
 
         NybCParser parser;
@@ -51,7 +33,7 @@ public class Main implements VisitorInterface{
             var Interpreter = new Interpreter();
             Interpreter.Visit((ProgramNode) AST);
         } catch (NullPointerException e){
-            System.out.println("Stakkels Angela");
+            Error.SYNTAX_ERROR(e);
         }
     }
 }

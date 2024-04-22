@@ -7,5 +7,4 @@ public interface VisitorInterface {
     static Stack<HashMap<String, Object>> stack = new Stack<>();
     static List<String> keywords = new ArrayList<String>();
     static HashMap<String, Object> fmap = new HashMap<>();
-
 }

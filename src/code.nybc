@@ -1,7 +1,6 @@
-
 var a = 0;
 begin if ( a + 2 != 2 || a != 1 );
-    out("This does not work");
+    out(a);
 end if;
 begin function hello (var a);
     out("Hello World!");

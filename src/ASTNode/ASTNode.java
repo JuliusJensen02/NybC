@@ -1,6 +1,3 @@
 package ASTNode;
 
-public interface ASTNode {
-
-    //public T visit();
-}
+public interface ASTNode {}

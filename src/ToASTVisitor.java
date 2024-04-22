@@ -12,14 +12,13 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
     }
 
     @Override
-    public ASTNode visitProgram(NybCParser.ProgramContext ctx) {
+    public ProgramNode visitProgram(NybCParser.ProgramContext ctx) {
         ProgramNode node = new ProgramNode();
         for (ParseTree childNode: ctx.children) {
-            if (childNode.getClass().getSimpleName().equals("StmtContext") || childNode.getClass().getSimpleName().equals("FunctionStmtContext")) {
-                node.addStmt(visit(childNode));
-            } else {
-                throw new RuntimeException();
+            if (!childNode.getClass().getSimpleName().equals("StmtContext") && !childNode.getClass().getSimpleName().equals("FunctionStmtContext")) {
+                Error.GLOBAL_MUST_CONTAIN_STMT(childNode.getClass().getSimpleName());
             }
+            node.addStmt(visit(childNode));
         }
         return node;
     }
@@ -35,19 +34,19 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
 
         node.setId(ctx.getChild(2).getText());
         if (!ctx.getChild(ctx.children.size()-2).getText().equals(node.getId()) && !ctx.getChild(ctx.children.size()-2).getText().equals("function"))  {
-            throw new RuntimeException("Incorrect name for end of function");
+            Error.INCORRECT_END_FUNCTION();
         }
         if (ctx.getChild(ctx.children.size()-2).getText().equals("function")){
             for (int i = 1; i < ctx.IDENT().size(); i++) {
                 if (node.getId().equals(ctx.IDENT(i).getText())){
-                    throw new RuntimeException("Parameter for function can not be the same as name for function");
+                    Error.FUNC_PARAM_EQ_FUNC_NAME();
                 }
                 node.addParam(new DeclNode<>(ctx.IDENT(i).getText()));
             }
         } else {
             for (int i = 1; i < ctx.IDENT().size()-1; i++) {
                 if (node.getId().equals(ctx.IDENT(i).getText())){
-                    throw new RuntimeException("Parameter for function can not be the same as name for function");
+                    Error.FUNC_PARAM_EQ_FUNC_NAME();
                 }
                 node.addParam(new DeclNode<>(ctx.IDENT(i).getText()));
             }
@@ -129,15 +128,15 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
     }
 
     @Override
-    public ASTNode visitDeclareStmt(NybCParser.DeclareStmtContext ctx) {
+    public DeclNode<?> visitDeclareStmt(NybCParser.DeclareStmtContext ctx) {
         if (ctx.getChild(3) != null) {
-            return switch (ctx.getChild(3).getClass().getSimpleName()) {
-                case "ExpressionContext" -> new DeclNode<>(ctx.IDENT().getText(), (ExpNode) visit(ctx.expression()));
-                case "ArrayContext" -> new DeclNode<>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.array()));
-                default ->
-                        throw new IllegalStateException("Unexpected value: " + ctx.getChild(3).getClass().getSimpleName());
+            switch (ctx.getChild(3).getClass().getSimpleName()) {
+                case "ExpressionContext" -> {return new DeclNode<>(ctx.IDENT().getText(), (ExpNode) visit(ctx.expression()));}
+                case "ArrayContext" -> {return new DeclNode<>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.array()));}
+                default -> Error.DECLARE_ASSIGNMENT_WRONG_TYPE(ctx.getChild(3).getClass().getSimpleName());
             };
         } else return new DeclNode<>(ctx.IDENT().getText());
+        return null;
     }
 
     @Override
@@ -329,7 +328,8 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
             node.setValue(Boolean.parseBoolean(ctx.BOOL().getText()));
             return node;
         } else {
-            throw new RuntimeException();
+            Error.INCORRECT_TYPE_FOR_VALUE_EXP();
+            return null;
         }
     }
 }

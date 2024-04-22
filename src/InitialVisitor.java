@@ -39,9 +39,9 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
                 global.put(((DeclNode<?>) stmt).getId(),Visit(((DeclNode<?>) stmt)));
             } else*/
             if (stmt instanceof FuncNode) {
-                for (int i = 0; i < keywords.size(); i++) {
-                    if (((FuncNode)stmt).getId().equals(keywords.get(i))){
-                        throw new RuntimeException("Function name '" + ((FuncNode)stmt).getId() + "' is reserved");
+                for (String keyword : keywords) {
+                    if (((FuncNode) stmt).getId().equals(keyword)) {
+                        Error.FUNCTION_NAME_RESERVED(((FuncNode) stmt).getId());
                     }
                 }
                 Object function = Visit((FuncNode) stmt);

@@ -14,7 +14,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                 CtrlFlow = Visit((StmtNode) stmt);
                 if (CtrlFlow != null) {
                     if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
-                        throw new RuntimeException("The statement '" + ((CtrlFlowNode)CtrlFlow).getType() +  "' can not be used in global scope");
+                        Error.CONTINUE_BREAK_NOT_ALLOWED_IN_GLOBAL(((CtrlFlowNode) CtrlFlow).getType());
                     } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
                         break;
                     }
@@ -30,7 +30,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
             CtrlFlow = Visit(stmt);
             if (CtrlFlow != null) {
                 if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
-                    throw new RuntimeException("The statement " + ((CtrlFlowNode)CtrlFlow).getType() +  " can not be used on functions");
+                    Error.CONTINUE_BREAK_NOT_ALLOWED_IN_FUNCTION(((CtrlFlowNode) CtrlFlow).getType());
                 } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
                     stack.pop();
                     return CtrlFlow;
