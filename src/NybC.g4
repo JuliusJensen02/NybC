@@ -13,15 +13,19 @@ functionStmt : 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' 
              | 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' IDENT ';'
              ;
 
-beginStmt: 'begin' 'if''(' expression')'';' (stmt)+ 'end' 'if'(';' extendedIf)*
+beginStmt: 'begin' 'if''(' expression')'';' (stmt)+ 'end' 'if'(';' extendedIf)?
          | 'begin' 'loop''(' expression')'';' (stmt)+ 'end' 'loop'
          | 'begin' 'loop''(' declareStmt';' expression';' assignStmt')'';' (stmt)+ 'end' 'loop'
          | 'begin' 'loop'';' (stmt)+ 'end' 'loop''(' expression ')'
-         | 'begin' 'switch''(' expression ')'';' ('case' expression':' (stmt)+)+('default'':' (stmt)+)?  'end' 'switch'
+         | 'begin' 'switch''(' expression ')'';' (switchCase)+ 'end' 'switch'
          ;
 
-extendedIf: 'begin' 'else'';' (stmt)+ 'end' 'else'
-          | 'begin' 'else-if''(' expression')'';' (stmt)+ 'end' 'else-if'(';' extendedIf)*
+extendedIf: 'begin' 'else-if''(' expression')'';' (stmt)+ 'end' 'else-if'(';' extendedIf)?
+          | 'begin' 'else'';' (stmt)+ 'end' 'else'
+          ;
+
+switchCase: 'case' expression':' (stmt)+
+          | 'default'':' (stmt)+
           ;
 
 declareStmt: 'var' IDENT '=' expression

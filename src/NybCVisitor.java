@@ -1,4 +1,4 @@
-// Generated from C:/Users/Bruger/OneDrive - Aalborg Universitet/Software/SW4/NybCProject/src/NybC.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Julius/Desktop/NybC/src/NybC.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -39,6 +39,12 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExtendedIf(NybCParser.ExtendedIfContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#switchCase}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSwitchCase(NybCParser.SwitchCaseContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link NybCParser#declareStmt}.
 	 * @param ctx the parse tree

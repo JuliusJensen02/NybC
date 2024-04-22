@@ -1,13 +1,15 @@
 import ASTNode.*;
-import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Objects;
-
-public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
+public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
+    @Override
+    public ASTNode visit(ParseTree tree) {
+        if (tree == null) {
+            return null;
+        }
+        return tree.accept(this);
+    }
 
     @Override
     public ASTNode visitProgram(NybCParser.ProgramContext ctx) {
@@ -23,18 +25,18 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
     }
 
     @Override
-    public ASTNode visitStmt(NybCParser.StmtContext ctx) {
-        return visit(ctx.getChild(0));
+    public StmtNode visitStmt(NybCParser.StmtContext ctx) {
+        return (StmtNode) visit(ctx.getChild(0));
     }
 
     @Override
-    public ASTNode visitFunctionStmt(NybCParser.FunctionStmtContext ctx) {
+    public FuncNode visitFunctionStmt(NybCParser.FunctionStmtContext ctx) {
         FuncNode node = new FuncNode();
 
         node.setId(ctx.getChild(2).getText());
         for (ParseTree childNode: ctx.IDENT()) {
             if (!node.getId().equals(childNode.getText())){
-                node.addParam(new DeclNode(childNode.getText()));
+                node.addParam(new DeclNode<>(childNode.getText()));
             }
         }
         for (ParseTree childNode: ctx.stmt()) {
@@ -45,111 +47,80 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitBeginStmt(NybCParser.BeginStmtContext ctx) {
-        if(ctx.getChild(1).getText().equals("if")){
-            IfNode node = new IfNode();
-            node.setCondition((ExpNode) visit(ctx.getChild(3)));
-            int i = 6;
-            for (; i < ctx.children.size(); i++) {
-                if (ctx.getChild(i).getClass().getSimpleName().equals("StmtContext")) {
-                    node.addStmt((StmtNode) visit(ctx.getChild(i)));
+        return switch (ctx.getChild(1).getText()){
+            case "if" -> {
+                IfNode node = new IfNode();
+                node.setCondition((ExpNode) visit(ctx.getChild(3)));
+                node.setIfNode((IfNode) visit(ctx.extendedIf()));
+                for (ParseTree stmtNode: ctx.stmt()){
+                    node.addStmt((StmtNode) visit(stmtNode));
                 }
-                else {
-                    break;
-                }
+                yield node;
             }
-            if(ctx.extendedIf() != null){
-                node.setElseIfNode(visit(ctx.getChild(ctx.children.size() - 1)));
-            }
-            return node;
-        } else if (ctx.getChild(1).getText().equals("loop")){
-            LoopNode node = new LoopNode();
-            switch (ctx.getChild(3).getClass().getSimpleName()){
-                case "ExpressionContext":
-                    node.setType("while");
-                    node.setCondition((ExpNode) visit(ctx.getChild(3)));
-                    break;
-                case "StmtContext":
-                    node.setType("do-while");
-                    node.setCondition((ExpNode) visit(ctx.getChild(ctx.children.size() - 2)));
-                    break;
-                case "DeclareStmtContext":
-                    node.setType("for");
-                    node.setDeclaration((DeclNode) visit(ctx.getChild(3)));
-                    node.setCondition((ExpNode) visit(ctx.getChild(5)));
-                    node.setAssignment((AssignNode) visit(ctx.getChild(7)));
-                    break;
-                default:
-                    throw new RuntimeException();
-            }
-            for (int i = 3; i < ctx.children.size(); i++) {
-                if (ctx.getChild(i).getClass().getSimpleName().equals("StmtContext")){
-                    node.addStmt((StmtNode) visit(ctx.getChild(i)));
-                }
-            }
-            return node;
-        } else if (ctx.getChild(1).getText().equals("switch")) {
-            SwitchNode node = new SwitchNode();
-            node.setSwitchCond((ExpNode) visit(ctx.getChild(3)));
-            for (int i = 3; i < ctx.children.size(); i++) {
-                if (ctx.getChild(i).getText().equals("case") || ctx.getChild(i).getText().equals("default")) {
-                    CaseNode casen = new CaseNode();
-                    if (!ctx.getChild(i).getText().equals("default")) {
-                        casen.setCaseExp((ExpNode) visit(ctx.getChild(i + 1)));
-                        int j = i + 3;
-                        while (ctx.getChild(j).getClass().getSimpleName().equals("StmtContext")){
-                            casen.addStmt((StmtNode) visit(ctx.getChild(j)));
-                            j++;
-                        }
-                    } else {
-                        int j = i + 2;
-                        while (ctx.getChild(j).getClass().getSimpleName().equals("StmtContext")){
-                            casen.addStmt((StmtNode) visit(ctx.getChild(j)));
-                            j++;
-                        }
+            case "loop" -> {
+                LoopNode node = new LoopNode();
+                switch (ctx.getChild(3).getClass().getSimpleName()) {
+                    case "ExpressionContext" -> {
+                        node.setType("while");
+                        node.setCondition((ExpNode) visit(ctx.getChild(3)));
                     }
-
-                    node.addCases(casen);
+                    case "StmtContext" -> {
+                        node.setType("do-while");
+                        node.setCondition((ExpNode) visit(ctx.getChild(ctx.children.size() - 2)));
+                    }
+                    case "DeclareStmtContext" -> {
+                        node.setType("for");
+                        node.setDeclaration((DeclNode<Integer>) visit(ctx.getChild(3)));
+                        node.setCondition((ExpNode) visit(ctx.getChild(5)));
+                        node.setAssignment((AssignNode<String, Integer>) visit(ctx.getChild(7)));
+                    }
                 }
+                for (ParseTree stmt : ctx.stmt()) {
+                    node.addStmt((StmtNode) visit(stmt));
+                }
+                yield node;
             }
-           return node;
-        }
-        return null;
+            case "switch" -> {
+                SwitchNode node = new SwitchNode();
+                node.setSwitchCond((ExpNode) visit(ctx.expression()));
+                for (ParseTree caseNode : ctx.switchCase()) {
+                    node.addCase((CaseNode) visit(caseNode));
+                }
+                yield node;
+            }
+            default -> null;
+        };
     }
 
     @Override
-    public ASTNode visitExtendedIf(NybCParser.ExtendedIfContext ctx) {
-        if (ctx.getChild(1).getText().equals("else-if")) {
-            ElseIfNode node = new ElseIfNode();
-            for (ParseTree childNode : ctx.children) {
-                if (childNode.getClass().getSimpleName().equals("StmtContext")) {
-                    node.addStmt((StmtNode) visit(childNode));
-                } else if (childNode.getClass().getSimpleName().equals("ExpressionContext")) {
-                    node.setCondition((ExpNode) visit(childNode));
-                }
-                if(ctx.extendedIf() != null && childNode.getClass().getSimpleName().equals("ExtendedIfContext")){
-                    node.setElseIfNode(visit(childNode));
-                }
-            }
-
-            return node;
-        } else if (ctx.getChild(1).getText().equals("else")) {
-            ElseNode node = new ElseNode();
-            for (ParseTree childNode : ctx.children) {
-                if (childNode.getClass().getSimpleName().equals("StmtContext")) {
-                    node.addStmt((StmtNode) visit(childNode));
-                }
-            }
-            return node;
+    public ASTNode visitSwitchCase(NybCParser.SwitchCaseContext ctx) {
+        CaseNode node = new CaseNode();
+        if (ctx.getChild(0).getText().equals("case")) {
+            node.setCaseExp((ExpNode) visit(ctx.getChild(1)));
         }
-        return null;
+        for (ParseTree stmtNode : ctx.stmt()) {
+            node.addStmt((StmtNode) visit(stmtNode));
+        }
+        return node;
+    }
+
+    @Override
+    public IfNode visitExtendedIf(NybCParser.ExtendedIfContext ctx) {
+        IfNode node = new IfNode();
+        for (ParseTree stmtNode : ctx.stmt()) {
+            node.addStmt((StmtNode) visit(stmtNode));
+        }
+        node.setCondition((ExpNode) visit(ctx.expression()));
+        node.setIfNode((IfNode) visit(ctx.extendedIf()));
+        return node;
     }
 
     @Override
     public ASTNode visitDeclareStmt(NybCParser.DeclareStmtContext ctx) {
         if (ctx.getChild(3) != null) {
             return switch (ctx.getChild(3).getClass().getSimpleName()) {
-                case "ExpressionContext" -> new DeclNode<ExpNode>(ctx.IDENT().getText(), (ExpNode) visit(ctx.getChild(3)));
-                case "ArrayContext" -> new DeclNode<ArrayNode>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.getChild(3)));
+                case "ExpressionContext" -> new DeclNode<>(ctx.IDENT().getText(), (ExpNode) visit(ctx.expression()));
+                case "ArrayContext" -> new DeclNode<>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.array()));
                 default ->
                         throw new IllegalStateException("Unexpected value: " + ctx.getChild(3).getClass().getSimpleName());
             };
@@ -157,29 +128,25 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
     }
 
     @Override
-    public ASTNode visitAssignStmt(NybCParser.AssignStmtContext ctx) {
+    public AssignNode<?, ?> visitAssignStmt(NybCParser.AssignStmtContext ctx) {
         if(ctx.getChild(0).getClass().getSimpleName().equals("ArrayAccessContext")){
-            return new AssignNode<ArrayAccessNode, ExpNode>(
-                    ((ArrayAccessNode)visit(ctx.getChild(0))), ((ExpNode)visit(ctx.getChild(2)))
-            );
+            return new AssignNode<>(((ArrayAccessNode<?>)visit(ctx.getChild(0))), ((ExpNode)visit(ctx.getChild(2))));
         }
         else{
             if(ctx.getChild(2).getClass().getSimpleName().equals("ArrayContext")) {
-                return new AssignNode<String, ArrayNode>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.getChild(2)));
+                return new AssignNode<>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.getChild(2)));
             }
             else{
-                return new AssignNode<String, ExpNode>(ctx.IDENT().getText(), (ExpNode) visit(ctx.getChild(2)));
+                return new AssignNode<>(ctx.IDENT().getText(), (ExpNode) visit(ctx.getChild(2)));
             }
         }
     }
 
     @Override
-    public ASTNode visitArray(NybCParser.ArrayContext ctx) {
+    public ArrayNode visitArray(NybCParser.ArrayContext ctx) {
         ArrayNode arrayNode = new ArrayNode();
-        for (ParseTree childNode: ctx.children) {
-            if(childNode.getClass().getSimpleName().equals("ExpressionContext")){
-                arrayNode.addValue((ExpNode) visit(childNode));
-            }
+        for (ParseTree expNode : ctx.expression()) {
+            arrayNode.addValue((ExpNode) visit(expNode));
         }
         return arrayNode;
     }
@@ -190,15 +157,11 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
     }
 
     @Override
-    public ASTNode visitCtrlFlowStmt(NybCParser.CtrlFlowStmtContext ctx) {
+    public CtrlFlowNode visitCtrlFlowStmt(NybCParser.CtrlFlowStmtContext ctx) {
         CtrlFlowNode node = new CtrlFlowNode();
+        node.setReturnExp((ExpNode) visit(ctx.expression()));
         switch (ctx.getChild(0).getText()) {
-            case "return" -> {
-                if (ctx.getChild(1) != null) {
-                    node.setReturnExp((ExpNode) visit(ctx.getChild(1)));
-                }
-                node.setType("return");
-            }
+            case "return" -> node.setType("return");
             case "continue" -> node.setType("continue");
             case "break" -> node.setType("break");
         }
@@ -207,15 +170,12 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitExpression(NybCParser.ExpressionContext ctx) {
-
-        ASTNode node;
-
         if (ctx.children.size() == 3) {
-            node = new BinaryOpNode();
-            ((BinaryOpNode) node).setLeft((ExpNode) visit(ctx.getChild(0)));
-            ((BinaryOpNode) node).setRight((ExpNode) visit(ctx.getChild(2)));
-            ((BinaryOpNode) node).setOp(ctx.RELOPS().getText());
-            return node;
+            return new BinaryOpNode(
+                    (ExpNode) visit(ctx.getChild(0)),
+                    ctx.getChild(1).getText(),
+                    (ExpNode) visit(ctx.getChild(2))
+            );
         } else {
             return visit(ctx.getChild(0));
         }
@@ -223,14 +183,12 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitRelationalExp(NybCParser.RelationalExpContext ctx) {
-        ASTNode node;
-
         if (ctx.children.size() == 3) {
-            node = new BinaryOpNode();
-            ((BinaryOpNode) node).setLeft((ExpNode) visit(ctx.getChild(0)));
-            ((BinaryOpNode) node).setRight((ExpNode) visit(ctx.getChild(2)));
-            ((BinaryOpNode) node).setOp(ctx.getChild(1).getText());
-            return node;
+            return new BinaryOpNode(
+                    (ExpNode) visit(ctx.getChild(0)),
+                    ctx.getChild(1).getText(),
+                    (ExpNode) visit(ctx.getChild(2))
+            );
         } else {
             return visit(ctx.getChild(0));
         }
@@ -238,13 +196,12 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitAdditionExp(NybCParser.AdditionExpContext ctx) {
-        ASTNode node;
         if (ctx.children.size() == 3) {
-            node = new BinaryOpNode();
-            ((BinaryOpNode) node).setLeft((ExpNode) visit(ctx.getChild(0)));
-            ((BinaryOpNode) node).setRight((ExpNode) visit(ctx.getChild(2)));
-            ((BinaryOpNode) node).setOp(ctx.getChild(1).getText());
-            return node;
+            return new BinaryOpNode(
+                    (ExpNode) visit(ctx.getChild(0)),
+                    ctx.getChild(1).getText(),
+                    (ExpNode) visit(ctx.getChild(2))
+            );
         } else {
             return visit(ctx.getChild(0));
         }
@@ -252,11 +209,10 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitUnaryExp(NybCParser.UnaryExpContext ctx) {
-        ASTNode node;
         if (ctx.children.size() == 2) {
-            node = new UnaryOpNode();
-            ((UnaryOpNode)node).setRight((ExpNode) visit(ctx.getChild(1)));
-            ((UnaryOpNode)node).setOp(ctx.getChild(0).getText());
+            UnaryOpNode node = new UnaryOpNode();
+            node.setRight((ExpNode) visit(ctx.getChild(1)));
+            node.setOp(ctx.getChild(0).getText());
             return node;
         } else {
             return visit(ctx.getChild(0));
@@ -265,10 +221,9 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitParenthExp(NybCParser.ParenthExpContext ctx) {
-        ASTNode node;
         if (ctx.children.size() ==  3) {
-            node = new ParenthNode();
-            ((ParenthNode) node).setInner((ExpNode) visit(ctx.getChild(1)));
+            ParenthNode node = new ParenthNode();
+            node.setInner((ExpNode) visit(ctx.getChild(1)));
             return node;
         } else {
             return visit(ctx.getChild(0));
@@ -276,17 +231,17 @@ public class ToASTVisitor <T> extends NybCBaseVisitor<ASTNode>{
     }
 
     @Override
-    public ASTNode visitArrayAccess(NybCParser.ArrayAccessContext ctx) {
+    public ArrayAccessNode<?> visitArrayAccess(NybCParser.ArrayAccessContext ctx) {
         String id = ctx.getChild(0).getText();
         if(ctx.INT() != null){
-            return new ArrayAccessNode<Integer>(id, Integer.parseInt(ctx.INT().getText()));
+            return new ArrayAccessNode<>(id, Integer.parseInt(ctx.INT().getText()));
         } else {
-            return new ArrayAccessNode<String>(id, ctx.getChild(2).getText());
+            return new ArrayAccessNode<>(id, ctx.getChild(2).getText());
         }
     }
 
     @Override
-    public ASTNode visitCallStmt(NybCParser.CallStmtContext ctx) {
+    public CallFuncNode visitCallStmt(NybCParser.CallStmtContext ctx) {
         CallFuncNode node = new CallFuncNode();
         node.setId(ctx.IDENT().getText());
         for (ParseTree childNode: ctx.children) {

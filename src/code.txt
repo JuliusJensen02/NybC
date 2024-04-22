@@ -1,13 +1,10 @@
-var x = "c";
-out("Hello World!" + 3);
-begin switch (x);
-    case "b":
-        out("value is " + x);
-        break;
-    case "a":
-        out("value is " + x);
-        break;
-    default:
-        out("There is no x");
-        break;
-end switch;
+var x = "a";
+begin if(x == "a");
+    out("a");
+end if;
+begin else-if(x == "b");
+    out("b");
+end else-if;
+begin else;
+    out("c");
+end else;

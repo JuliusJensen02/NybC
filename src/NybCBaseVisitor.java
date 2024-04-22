@@ -1,4 +1,4 @@
-// Generated from C:/Users/Bruger/OneDrive - Aalborg Universitet/Software/SW4/NybCProject/src/NybC.g4 by ANTLR 4.13.1
+// Generated from C:/Users/Julius/Desktop/NybC/src/NybC.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
@@ -46,6 +46,13 @@ public class NybCBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements N
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitExtendedIf(NybCParser.ExtendedIfContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitSwitchCase(NybCParser.SwitchCaseContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

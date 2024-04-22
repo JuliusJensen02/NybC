@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ProgramNode <T> implements ASTNode{
+public class ProgramNode implements ASTNode{
 
 
-    private List<T> stmtList = new ArrayList<T>();
+    private List<ASTNode> stmtList = new ArrayList<>();
 
-    public List<T> getStmtList() {
+    public List<ASTNode> getStmtList() {
         return stmtList;
     }
 
-    public void addStmt(T stmt) {
+    public void addStmt(ASTNode stmt) {
         this.stmtList.add(stmt);
     }
 

@@ -3,16 +3,16 @@ package ASTNode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IfNode <T> extends StmtNode implements ASTNode{
+public class IfNode extends StmtNode implements ASTNode{
     private ExpNode condition;
     private List<StmtNode> stmts = new ArrayList<StmtNode>();
-    private T elseIfNode;
+    private IfNode ifNode;
 
-    public T getElseIfNode() {
-        return elseIfNode;
+    public IfNode getElseIfNode() {
+        return ifNode;
     }
-    public void setElseIfNode(T elseIfNode) {
-        this.elseIfNode = elseIfNode;
+    public void setIfNode(IfNode elseIfNode) {
+        this.ifNode = elseIfNode;
     }
     public ExpNode getCondition() {
         return condition;
@@ -31,7 +31,7 @@ public class IfNode <T> extends StmtNode implements ASTNode{
         return "IfNode{" +
                 "condition=" + condition +
                 ", stmts=" + stmts +
-                ", elseIfNodes=" + elseIfNode +
+                ", elseIfNodes=" + ifNode +
                 '}';
     }
 }

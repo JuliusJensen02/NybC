@@ -44,11 +44,11 @@ WS=35
 'if'=9
 'loop'=10
 'switch'=11
-'case'=12
-':'=13
-'default'=14
-'else'=15
-'else-if'=16
+'else-if'=12
+'else'=13
+'case'=14
+':'=15
+'default'=16
 '='=17
 '['=18
 ']'=19

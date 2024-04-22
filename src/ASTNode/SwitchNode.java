@@ -19,7 +19,7 @@ public class SwitchNode extends StmtNode implements ASTNode {
         return cases;
     }
 
-    public void addCases(CaseNode casing) {
+    public void addCase(CaseNode casing) {
         this.cases.add(casing);
     }
 

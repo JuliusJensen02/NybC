@@ -9,7 +9,7 @@ import java.util.List;
 public class InitialVisitor extends ASTVisitor implements VisitorInterface{
 
     @Override
-    public Object Visit(DeclNode node) {
+    public Object Visit(DeclNode<?> node) {
 
         if (node.getValue() instanceof ArrayNode) {
             return (List<Object>) Visit((ArrayNode) node.getValue());
@@ -32,15 +32,15 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
 
         for (Object stmt: node.getStmtList()) {
             if (stmt instanceof DeclNode) {
-                if (global.containsKey(((DeclNode) stmt).getId())){
-                    throw new RuntimeException("Variable " + ((DeclNode) stmt).getId() + " has already been declared");
+                if (global.containsKey(((DeclNode<?>) stmt).getId())){
+                    throw new RuntimeException("Variable " + ((DeclNode<?>) stmt).getId() + " has already been declared");
                 }
-                global.put(((DeclNode) stmt).getId(),Visit(((DeclNode) stmt)));
+                global.put(((DeclNode<?>) stmt).getId(),Visit(((DeclNode<?>) stmt)));
             } else if (stmt instanceof FuncNode) {
                 Object function = Visit((FuncNode) stmt);
                 HashMap<String, Object> functionMap = new HashMap<>();
 
-                for (DeclNode param: ((FuncNode)function).getParam()){
+                for (DeclNode<?> param: ((FuncNode)function).getParam()){
                     functionMap.put(param.getId(), param.getValue());
                 }
                 functionMap.put("0", stmt);
@@ -48,5 +48,4 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
             }
         }
     }
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! FUCK JAVA!!!!!!!!!!!!!!!!!!!!
 }

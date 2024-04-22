@@ -45,20 +45,21 @@ public  class ASTVisitor implements VisitorInterface{
     public Object Visit(BinaryOpNode node){
         var left = Visit(node.getLeft());
         var right = Visit(node.getRight());
-        switch (node.getOp()){
-            case "+":
-                if (left instanceof String){
+        switch (node.getOp()) {
+            case "+" -> {
+                if (left instanceof String) {
                     return (String) left + right;
                 } else if (right instanceof String) {
                     return left + (String) right;
-                }else if (left instanceof Integer && right instanceof Integer) {
+                } else if (left instanceof Integer && right instanceof Integer) {
                     return (int) left + (int) right;
                 } else if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() + ((Number) right).floatValue();
                 } else {
                     throw new RuntimeException();
                 }
-            case "-":
+            }
+            case "-" -> {
                 if (left instanceof Integer && right instanceof Integer) {
                     return (int) left - (int) right;
                 } else if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
@@ -66,7 +67,8 @@ public  class ASTVisitor implements VisitorInterface{
                 } else {
                     throw new RuntimeException();
                 }
-            case "*":
+            }
+            case "*" -> {
                 if (left instanceof Integer && right instanceof Integer) {
                     return (int) left * (int) right;
                 } else if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
@@ -74,96 +76,109 @@ public  class ASTVisitor implements VisitorInterface{
                 } else {
                     throw new RuntimeException();
                 }
-            case "/":
+            }
+            case "/" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer) && ((Number) right).floatValue() != 0.0) {
                     return ((Number) left).floatValue() / ((Number) right).floatValue();
                 } else {
                     throw new RuntimeException();
                 }
-            case "<":
+            }
+            case "<" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() < ((Number) right).floatValue();
                 } else {
                     throw new RuntimeException();
                 }
-            case ">":
+            }
+            case ">" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() > ((Number) right).floatValue();
                 } else {
                     throw new RuntimeException();
                 }
-            case "<=":
+            }
+            case "<=" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() <= ((Number) right).floatValue();
                 } else {
                     throw new RuntimeException();
                 }
-            case ">=":
+            }
+            case ">=" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() >= ((Number) right).floatValue();
                 } else {
                     throw new RuntimeException();
                 }
-            case "!=":
-                if (left instanceof String && right instanceof String){
+            }
+            case "!=" -> {
+                if (left instanceof String && right instanceof String) {
                     return !left.equals(right);
-                } else if (left instanceof Float && right instanceof Float){
+                } else if (left instanceof Float && right instanceof Float) {
                     return (float) left != (float) right;
                 } else if (left instanceof Boolean && right instanceof Boolean) {
-                    return (Boolean) left != (Boolean) right;
+                    return left != right;
                 } else if (left instanceof Integer && right instanceof Integer) {
                     return (int) left != (int) right;
                 } else {
                     throw new RuntimeException();
                 }
-            case "==":
-                if (left instanceof String && right instanceof String){
+            }
+            case "==" -> {
+                if (left instanceof String && right instanceof String) {
                     return left.equals(right);
-                } else if (left instanceof Float && right instanceof Float){
+                } else if (left instanceof Float && right instanceof Float) {
                     return (float) left == (float) right;
                 } else if (left instanceof Boolean && right instanceof Boolean) {
-                    return (Boolean) left == (Boolean) right;
+                    return left == right;
                 } else if (left instanceof Integer && right instanceof Integer) {
                     return (int) left == (int) right;
                 } else {
-                    throw new RuntimeException(left + " " + right );
+                    throw new RuntimeException(left + " " + right);
                 }
-            case "||":
+            }
+            case "||" -> {
                 if (left instanceof Boolean && right instanceof Boolean) {
                     return (Boolean) left || (Boolean) right;
                 } else {
                     throw new RuntimeException();
                 }
-            case "&&":
+            }
+            case "&&" -> {
                 if (left instanceof Boolean && right instanceof Boolean) {
                     return (Boolean) left && (Boolean) right;
                 } else {
                     throw new RuntimeException();
                 }
+            }
         }
         return null;
     }
     public Object Visit(UnaryOpNode node) {
         var right = Visit(node.getRight());
-        switch (node.getOp()){
-            case "+":
+        switch (node.getOp()) {
+            case "+" -> {
                 if (right instanceof Integer || right instanceof Float) {
                     return ((Number) right).floatValue();
                 } else {
                     throw new RuntimeException();
                 }
-            case "-":
+            }
+            case "-" -> {
                 if (right instanceof Integer || right instanceof Float) {
                     return -1 * ((Number) right).floatValue();
                 } else {
                     throw new RuntimeException();
                 }
-            case "!":
-                if (right instanceof Boolean){
+            }
+            case "!" -> {
+                if (right instanceof Boolean) {
                     return !(Boolean) right;
                 } else {
                     throw new RuntimeException();
                 }
+            }
         }
         return null;
     }
@@ -172,18 +187,16 @@ public  class ASTVisitor implements VisitorInterface{
     public Object Visit(ParenthNode node) {
         return Visit(node.getInner());
     }
-    public  Object Visit(ArrayAccessNode node){return null;};
-    public  Object Visit(CallFuncNode node){return null;};
-    public  Object Visit(ElseNode node){return null;};
-    public  Object Visit(ElseIfNode<?> node){return null;};
-    public  Object Visit(IfNode<?> node){return null;};
-    public  Object Visit(DeclNode node){return null;};
-    public  Object Visit(AssignNode node){return null;};
-    public  Object Visit(CaseNode node){return null;};
-    public  Object Visit(SwitchNode node){return null;};
-    public  Object Visit(LoopNode node){return null;};
-    public  Object Visit(FuncNode node){return null;};
-    public  void Visit(ProgramNode node){};
+    public  Object Visit(ArrayAccessNode<?> node){return null;}
+    public  Object Visit(CallFuncNode node){return null;}
+    public  Object Visit(IfNode node){return null;}
+    public  Object Visit(DeclNode<?> node){return null;}
+    public  Object Visit(AssignNode<?,?> node){return null;}
+    public  Object Visit(CaseNode node){return null;}
+    public  Object Visit(SwitchNode node){return null;}
+    public  Object Visit(LoopNode node){return null;}
+    public  Object Visit(FuncNode node){return null;}
+    public  void Visit(ProgramNode node){}
 
     public Object Visit(ExpNode node)
     {
@@ -204,7 +217,7 @@ public  class ASTVisitor implements VisitorInterface{
         }else if (node instanceof BinaryOpNode) {
             return Visit((BinaryOpNode) node);
         }else if (node instanceof ArrayAccessNode) {
-            return Visit((ArrayAccessNode) node);
+            return Visit((ArrayAccessNode<?>) node);
         }else if (node instanceof CallFuncNode) {
             return Visit((CallFuncNode) node);
         }
@@ -220,9 +233,9 @@ public  class ASTVisitor implements VisitorInterface{
         }else if (node instanceof SwitchNode) {
             return Visit((SwitchNode) node);
         }else if (node instanceof DeclNode) {
-            return Visit((DeclNode) node);
+            return Visit((DeclNode<?>) node);
         }else if (node instanceof AssignNode) {
-            return Visit((AssignNode) node);
+            return Visit((AssignNode<?,?>) node);
         }else if (node instanceof CallFuncNode) {
             return Visit((CallFuncNode) node);
         }else if (node instanceof CtrlFlowNode) {

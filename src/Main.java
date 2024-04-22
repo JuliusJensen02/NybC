@@ -1,14 +1,11 @@
 import ASTNode.ProgramNode;
 import org.antlr.v4.runtime.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Stack;
 
-public class main implements VisitorInterface{
+public class Main implements VisitorInterface{
 
 
 
@@ -24,9 +21,9 @@ public class main implements VisitorInterface{
 
         var parser = new NybCParser(tokenStream);
         var parseTree = parser.program();
-        var ASTvisitor = new ToASTVisitor();
-        var AST = ASTvisitor.visit(parseTree);
-        System.out.println(ASTvisitor.visit(parseTree));
+        var ASTVisitor = new ToASTVisitor();
+        var AST = ASTVisitor.visit(parseTree);
+        System.out.println(ASTVisitor.visit(parseTree));
         var InitialVisitor = new InitialVisitor();
         InitialVisitor.Visit((ProgramNode) AST);
         System.out.println(fmap);
