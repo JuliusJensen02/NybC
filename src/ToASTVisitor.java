@@ -104,6 +104,7 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
         };
     }
 
+
     @Override
     public ASTNode visitSwitchCase(NybCParser.SwitchCaseContext ctx) {
         CaseNode node = new CaseNode();
