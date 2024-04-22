@@ -44,6 +44,11 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
                         Error.FUNCTION_NAME_RESERVED(((FuncNode) stmt).getId());
                     }
                 }
+                for (String key: fmap.keySet()){
+                    if(key.equals(((FuncNode) stmt).getId())) {
+                        Error.FUNCTION_ALREADY_DECLARED(((FuncNode) stmt).getId());
+                    }
+                }
                 Object function = Visit((FuncNode) stmt);
                 HashMap<String, Object> functionMap = new HashMap<>();
 
