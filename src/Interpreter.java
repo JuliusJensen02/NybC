@@ -2,6 +2,7 @@ import ASTNode.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 
 public class Interpreter extends ASTVisitor implements VisitorInterface{
 
@@ -9,7 +10,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
     public void Visit(ProgramNode node) {
         Object CtrlFlow;
         for (Object stmt: node.getStmtList()) {
-            if (!(stmt instanceof FuncNode) && !(stmt instanceof DeclNode)){
+            if (!(stmt instanceof FuncNode)){
                 CtrlFlow = Visit((StmtNode) stmt);
                 if (CtrlFlow != null) {
                     if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
@@ -251,11 +252,15 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
         return null;
     }
 
-
-
     @Override
     public Object Visit(DeclNode<?> node) {
-        for (int i = stack.size() - 1; stack.get(i).containsKey("0"); i--) {
+
+        for (int i = 0; i < keywords.size(); i++) {
+            if (node.getId().equals(keywords.get(i))){
+                throw new RuntimeException("Variable name '" + node.getId() + "' is reserved");
+            }
+        }
+        for (int i = stack.size() - 1; i >= 0; i--) {
             if (stack.get(i).containsKey(node.getId())) {
                 throw new RuntimeException("Variable " + node.getId() + " already declared");
             }
@@ -306,11 +311,15 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                 throw new RuntimeException("'out' can only take one argument");
             }
         } else if (node.getId().equals("in")) {
-
+            Scanner scan = new Scanner(System.in);
+            return scan.nextLine();
         } else {
             HashMap<String, Object> map = lookupFunc(node.getId());
             stack.push(map);
             FuncNode funcNode = (FuncNode) map.get("0");
+            if (node.getArgs().size() != funcNode.getParam().size()){
+                throw new RuntimeException("Function call must have the same amount of parameters as function");
+            }
             int i = 0;
             for (DeclNode<?> param: funcNode.getParam()) {
                 map.replace(param.getId(), Visit(node.getArgs().get(i)));

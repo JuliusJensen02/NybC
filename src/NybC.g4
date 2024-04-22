@@ -54,7 +54,18 @@ ctrlFlowStmt: 'continue'
             | 'return'
             ;
 
-expression: expression RELOPS relationalExp
+expression: expression '||' orExp
+            | orExp
+            ;
+orExp:      orExp '&&' andExp
+            | andExp
+            ;
+andExp:     andExp '==' eqExp
+            | andExp '!=' eqExp
+            | eqExp
+            ;
+
+eqExp:      eqExp RELOPS relationalExp
             | relationalExp
             ;
 
@@ -91,7 +102,7 @@ IDENT: ([_]|[a-zA-Z])([_]|[0-9]|[a-zA-Z])*;
 INT: ([0]|[1-9][0-9]*);
 FLOAT: ([0-9]+'.'[0-9]+);
 STRING: (["]~(["]|[\n])*["]);
-RELOPS: ('<' | '>' | '<=' | '>=' | '||' | '&&' | '==' | '!=');
+RELOPS: ('<' | '>' | '<=' | '>=');
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
 

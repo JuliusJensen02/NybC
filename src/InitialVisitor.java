@@ -2,13 +2,14 @@
 import ASTNode.*;
 import org.antlr.v4.codegen.model.decl.Decl;
 
+import javax.sound.midi.SysexMessage;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 
 public class InitialVisitor extends ASTVisitor implements VisitorInterface{
 
-    @Override
+/*    @Override
     public Object Visit(DeclNode<?> node) {
 
         if (node.getValue() instanceof ArrayNode) {
@@ -18,7 +19,7 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
         } else  {
             return null;
         }
-    }
+    }*/
 
     @Override
     public Object Visit(FuncNode node) {
@@ -31,12 +32,18 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
         stack.push(global);
 
         for (Object stmt: node.getStmtList()) {
-            if (stmt instanceof DeclNode) {
+            /*if (stmt instanceof DeclNode) {
                 if (global.containsKey(((DeclNode<?>) stmt).getId())){
                     throw new RuntimeException("Variable " + ((DeclNode<?>) stmt).getId() + " has already been declared");
                 }
                 global.put(((DeclNode<?>) stmt).getId(),Visit(((DeclNode<?>) stmt)));
-            } else if (stmt instanceof FuncNode) {
+            } else*/
+            if (stmt instanceof FuncNode) {
+                for (int i = 0; i < keywords.size(); i++) {
+                    if (((FuncNode)stmt).getId().equals(keywords.get(i))){
+                        throw new RuntimeException("Function name '" + ((FuncNode)stmt).getId() + "' is reserved");
+                    }
+                }
                 Object function = Visit((FuncNode) stmt);
                 HashMap<String, Object> functionMap = new HashMap<>();
 

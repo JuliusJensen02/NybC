@@ -34,9 +34,22 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
         FuncNode node = new FuncNode();
 
         node.setId(ctx.getChild(2).getText());
-        for (ParseTree childNode: ctx.IDENT()) {
-            if (!node.getId().equals(childNode.getText())){
-                node.addParam(new DeclNode<>(childNode.getText()));
+        if (!ctx.getChild(ctx.children.size()-2).getText().equals(node.getId()) && !ctx.getChild(ctx.children.size()-2).getText().equals("function"))  {
+            throw new RuntimeException("Incorrect name for end of function");
+        }
+        if (ctx.getChild(ctx.children.size()-2).getText().equals("function")){
+            for (int i = 1; i < ctx.IDENT().size(); i++) {
+                if (node.getId().equals(ctx.IDENT(i).getText())){
+                    throw new RuntimeException("Parameter for function can not be the same as name for function");
+                }
+                node.addParam(new DeclNode<>(ctx.IDENT(i).getText()));
+            }
+        } else {
+            for (int i = 1; i < ctx.IDENT().size()-1; i++) {
+                if (node.getId().equals(ctx.IDENT(i).getText())){
+                    throw new RuntimeException("Parameter for function can not be the same as name for function");
+                }
+                node.addParam(new DeclNode<>(ctx.IDENT(i).getText()));
             }
         }
         for (ParseTree childNode: ctx.stmt()) {
@@ -170,6 +183,45 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
 
     @Override
     public ASTNode visitExpression(NybCParser.ExpressionContext ctx) {
+        if (ctx.children.size() == 3) {
+            return new BinaryOpNode(
+                    (ExpNode) visit(ctx.getChild(0)),
+                    ctx.getChild(1).getText(),
+                    (ExpNode) visit(ctx.getChild(2))
+            );
+        } else {
+            return visit(ctx.getChild(0));
+        }
+    }
+
+    @Override
+    public ASTNode visitOrExp(NybCParser.OrExpContext ctx) {
+        if (ctx.children.size() == 3) {
+            return new BinaryOpNode(
+                    (ExpNode) visit(ctx.getChild(0)),
+                    ctx.getChild(1).getText(),
+                    (ExpNode) visit(ctx.getChild(2))
+            );
+        } else {
+            return visit(ctx.getChild(0));
+        }
+    }
+
+    @Override
+    public ASTNode visitAndExp(NybCParser.AndExpContext ctx) {
+        if (ctx.children.size() == 3) {
+            return new BinaryOpNode(
+                    (ExpNode) visit(ctx.getChild(0)),
+                    ctx.getChild(1).getText(),
+                    (ExpNode) visit(ctx.getChild(2))
+            );
+        } else {
+            return visit(ctx.getChild(0));
+        }
+    }
+
+    @Override
+    public ASTNode visitEqExp(NybCParser.EqExpContext ctx) {
         if (ctx.children.size() == 3) {
             return new BinaryOpNode(
                     (ExpNode) visit(ctx.getChild(0)),

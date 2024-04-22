@@ -1,10 +1,9 @@
-var x = "a";
-begin if(x == "a");
-    out("a");
+
+var a = 0;
+begin if ( a + 2 != 2 || a != 1 );
+    out("This does not work");
 end if;
-begin else-if(x == "b");
-    out("b");
-end else-if;
-begin else;
-    out("c");
-end else;
+begin function hello (var a);
+    out("Hello World!");
+    return a;
+end function;
