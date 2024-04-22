@@ -40,6 +40,12 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExtendedIf(NybCParser.ExtendedIfContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link NybCParser#switchCase}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSwitchCase(NybCParser.SwitchCaseContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link NybCParser#declareStmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -81,6 +87,48 @@ public interface NybCVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExpression(NybCParser.ExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#orExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOrExp(NybCParser.OrExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#andExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAndExp(NybCParser.AndExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#eqExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEqExp(NybCParser.EqExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#relationalExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelationalExp(NybCParser.RelationalExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#additionExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAdditionExp(NybCParser.AdditionExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#unaryExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUnaryExp(NybCParser.UnaryExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link NybCParser#parenthExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParenthExp(NybCParser.ParenthExpContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link NybCParser#valueExpression}.
 	 * @param ctx the parse tree

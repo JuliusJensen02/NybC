@@ -1,14 +1,14 @@
 package ASTNode;
 
 public class UnaryOpNode extends ExpNode implements ASTNode{
-    private ASTNode Right;
+    private ExpNode Right;
     private String Op;
 
-    public ASTNode getRight() {
+    public ExpNode getRight() {
         return Right;
     }
 
-    public void setRight(ASTNode right) {
+    public void setRight(ExpNode right) {
         Right = right;
     }
 
@@ -18,5 +18,13 @@ public class UnaryOpNode extends ExpNode implements ASTNode{
 
     public void setOp(String op) {
         Op = op;
+    }
+
+    @Override
+    public String toString() {
+        return "UnaryOpNode{" +
+                "Op='" + Op + '\'' +
+                ",  Right=" + Right +
+                '}';
     }
 }

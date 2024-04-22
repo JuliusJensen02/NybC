@@ -1,28 +1,31 @@
 grammar NybC;
 
-program: (stmt)+;
+program: (stmt | functionStmt)+;
 
 stmt: beginStmt';'
     | declareStmt';'
     | assignStmt';'
     | callStmt';'
     | ctrlFlowStmt';'
-    | functionStmt';'
     ;
 
-functionStmt : 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' 'function'
-             | 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' IDENT
+functionStmt : 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' 'function'';'
+             | 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' IDENT ';'
              ;
 
-beginStmt: 'begin' 'if''(' expression')'';' (stmt)+ 'end' 'if'(';' extendedIf)*
+beginStmt: 'begin' 'if''(' expression')'';' (stmt)+ 'end' 'if'(';' extendedIf)?
          | 'begin' 'loop''(' expression')'';' (stmt)+ 'end' 'loop'
          | 'begin' 'loop''(' declareStmt';' expression';' assignStmt')'';' (stmt)+ 'end' 'loop'
          | 'begin' 'loop'';' (stmt)+ 'end' 'loop''(' expression ')'
-         | 'begin' 'switch''(' expression ')'';' ('case' expression':' (stmt)+)+('default'':' (stmt)+)?  'end' 'switch'
+         | 'begin' 'switch''(' expression ')'';' (switchCase)+ 'end' 'switch'
          ;
 
-extendedIf: 'begin' 'else'';' (stmt)+ 'end' 'else'
-          | 'begin' 'else-if''(' expression')'';' (stmt)+ 'end' 'else-if'(';' extendedIf)*
+extendedIf: 'begin' 'else-if''(' expression')'';' (stmt)+ 'end' 'else-if'(';' extendedIf)?
+          | 'begin' 'else'';' (stmt)+ 'end' 'else'
+          ;
+
+switchCase: 'case' expression':' (stmt)+
+          | 'default'':' (stmt)+
           ;
 
 declareStmt: 'var' IDENT '=' expression
@@ -51,9 +54,37 @@ ctrlFlowStmt: 'continue'
             | 'return'
             ;
 
-expression: '(' expression ')'
-            | UOPS expression
-            | expression BOPS expression
+expression: expression '||' orExp
+            | orExp
+            ;
+orExp:      orExp '&&' andExp
+            | andExp
+            ;
+andExp:     andExp '==' eqExp
+            | andExp '!=' eqExp
+            | eqExp
+            ;
+
+eqExp:      eqExp RELOPS relationalExp
+            | relationalExp
+            ;
+
+relationalExp: relationalExp '+' additionExp
+            | relationalExp '-' additionExp
+            | additionExp
+            ;
+
+additionExp: additionExp '*' unaryExp
+            | additionExp '/' unaryExp
+            | unaryExp
+            ;
+unaryExp:    '!' parenthExp
+            | '+' parenthExp
+            | '-' parenthExp
+            | parenthExp
+            ;
+
+parenthExp: '(' expression ')'
             | valueExpression
             | arrayAccess
             | callStmt
@@ -66,13 +97,12 @@ valueExpression: IDENT
                 | BOOL
                 ;
 
+BOOL: ( 'true' | 'false' );
 IDENT: ([_]|[a-zA-Z])([_]|[0-9]|[a-zA-Z])*;
 INT: ([0]|[1-9][0-9]*);
 FLOAT: ([0-9]+'.'[0-9]+);
 STRING: (["]~(["]|[\n])*["]);
-BOPS: ('+' | '-' | '*' | '/' | '<' | '>' | '<=' | '>=' | '||' | '&&' | '==' | '!=');
-UOPS: ('!' | '+' |'-');
-BOOL: ('true'|'false');
+RELOPS: ('<' | '>' | '<=' | '>=');
 LINE_COMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
 

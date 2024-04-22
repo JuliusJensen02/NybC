@@ -1,8 +1,0 @@
-begin function hello();
-    var x = 3;
-end hello;
-var t;
-begin function test(var x, var y);
-    var z = 4;
-end function;
-var z;

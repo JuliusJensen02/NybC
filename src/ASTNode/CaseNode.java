@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CaseNode extends SwitchNode implements ASTNode {
-    private ExpNode caseExp;
+    private ExpNode caseExp = null;
     private List<StmtNode> stmtList = new ArrayList<StmtNode>();
 
     public ExpNode getCaseExp() {
