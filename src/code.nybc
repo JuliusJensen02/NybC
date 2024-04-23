@@ -6,3 +6,4 @@ begin function hello (var a);
     out("Hello World!");
     return a;
 end function;
+hello(3);

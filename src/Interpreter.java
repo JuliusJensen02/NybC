@@ -37,19 +37,18 @@ public class Interpreter extends ASTVisitor {
                 if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
                     Error.CONTINUE_BREAK_NOT_ALLOWED_IN_FUNCTION(((CtrlFlowNode) CtrlFlow).getType());
                 } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                    nybCStack.getStack().pop();
+                    nybCStack.PopStack();
                     return CtrlFlow;
                 }
             }
         }
-        nybCStack.getStack().pop();
+        nybCStack.PopStack();
         return null;
     }
 
     @Override
     public Object Visit(LoopNode node) {
-        HashMap<String, Object> map = new HashMap<>();
-        nybCStack.getStack().push(map);
+        nybCStack.PushStack();
 
         if (node.getDeclaration() != null) {
             Visit(node.getDeclaration());
@@ -62,8 +61,7 @@ public class Interpreter extends ASTVisitor {
         switch (node.getType()) {
             case "while" -> {
                 while (bool) {
-                    HashMap<String, Object> InnerMap = new HashMap<>();
-                    nybCStack.getStack().push(InnerMap);
+                    nybCStack.PushStack();
                     bool = (Boolean) Visit(node.getCondition());
                     label:
                     for (StmtNode stmt : node.getStmtList()) {
@@ -71,8 +69,8 @@ public class Interpreter extends ASTVisitor {
                         if (CtrlFlow != null) {
                             switch (((CtrlFlowNode) CtrlFlow).getType()) {
                                 case "return":
-                                    nybCStack.getStack().pop();
-                                    nybCStack.getStack().pop();
+                                    nybCStack.PopStack();
+                                    nybCStack.PopStack();
                                     return CtrlFlow;
                                 case "break":
                                     bool = false;
@@ -82,23 +80,22 @@ public class Interpreter extends ASTVisitor {
                             }
                         }
                     }
-                    nybCStack.getStack().pop();
+                    nybCStack.PopStack();
                 }
-                nybCStack.getStack().pop();
+                nybCStack.PopStack();
             }
             case "for" -> {
                 while (bool) {
-                    HashMap<String, Object> InnerMap = new HashMap<>();
-                    nybCStack.getStack().push(InnerMap);
+                    nybCStack.PushStack();
                     bool = (Boolean) Visit(node.getCondition());
-                    label1:
+                    label1: //FIX; Nah fuck det her lav en helper func her
                     for (StmtNode stmt : node.getStmtList()) {
                         CtrlFlow = Visit(stmt);
                         if (CtrlFlow != null) {
                             switch (((CtrlFlowNode) CtrlFlow).getType()) {
                                 case "return":
-                                    nybCStack.getStack().pop();
-                                    nybCStack.getStack().pop();
+                                    nybCStack.PopStack();
+                                    nybCStack.PopStack();
                                     return CtrlFlow;
                                 case "break":
                                     bool = false;
@@ -109,24 +106,23 @@ public class Interpreter extends ASTVisitor {
                         }
 
                     }
-                    nybCStack.getStack().pop();
+                    nybCStack.PopStack();
                     Visit(node.getAssignment());
                 }
-                nybCStack.getStack().pop();
+                nybCStack.PopStack();
             }
             case "do-while" -> {
                 do {
-                    HashMap<String, Object> InnerMap = new HashMap<>();
-                    nybCStack.getStack().push(InnerMap);
+                    nybCStack.PushStack();
                     bool = (Boolean) Visit(node.getCondition());
-                    label2:
+                    label2: //FIX; Nah fuck det her lav en helper func her
                     for (StmtNode stmt : node.getStmtList()) {
                         CtrlFlow = Visit(stmt);
                         if (CtrlFlow != null) {
                             switch (((CtrlFlowNode) CtrlFlow).getType()) {
                                 case "return":
-                                    nybCStack.getStack().pop();
-                                    nybCStack.getStack().pop();
+                                    nybCStack.PopStack();
+                                    nybCStack.PopStack();
                                     return CtrlFlow;
                                 case "break":
                                     bool = false;
@@ -136,9 +132,9 @@ public class Interpreter extends ASTVisitor {
                             }
                         }
                     }
-                    nybCStack.getStack().pop();
+                    nybCStack.PopStack();
                 } while (bool);
-                nybCStack.getStack().pop();
+                nybCStack.PopStack();
             }
         }
         return null;
@@ -146,8 +142,7 @@ public class Interpreter extends ASTVisitor {
 
     @Override
     public Object Visit(SwitchNode node) {
-        HashMap<String, Object> map = new HashMap<>();
-        nybCStack.getStack().push(map);
+        nybCStack.PushStack();
         Object CtrlFlow;
 
         if (Visit(node.getSwitchCond()) instanceof String) {
@@ -156,10 +151,10 @@ public class Interpreter extends ASTVisitor {
                     CtrlFlow = Visit(cases);
                     if (CtrlFlow != null) {
                         if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
-                            nybCStack.getStack().pop();
+                            nybCStack.PopStack();
                             return null;
                         } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                            nybCStack.getStack().pop();
+                            nybCStack.PopStack();
                             return CtrlFlow;
                         }
                     }
@@ -171,17 +166,17 @@ public class Interpreter extends ASTVisitor {
                     CtrlFlow = Visit(cases);
                     if (CtrlFlow != null) {
                         if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
-                            nybCStack.getStack().pop();
+                            nybCStack.PopStack();
                             return null;
                         } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                            nybCStack.getStack().pop();
+                            nybCStack.PopStack();
                             return CtrlFlow;
                         }
                     }
                 }
             }
         }
-        nybCStack.getStack().pop();
+        nybCStack.PopStack();
         return null;
     }
 
@@ -237,20 +232,18 @@ public class Interpreter extends ASTVisitor {
                 throw new RuntimeException("Array index must be a whole number or a variable");
             }
         } else if (left instanceof String) {
-            lookup((String) left);
+            lookup((String) left); //FIX; ved ikke hvad det her skal bruges til?
 
-            for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
-                if (nybCStack.getStack().get(i).containsKey(left)) {
-                    if (right instanceof ArrayNode) {
-                        nybCStack.getStack().get(i).replace((String) left, Visit((ArrayNode) node.getRight()));
-                    } else if (right instanceof ExpNode) {
-                        nybCStack.getStack().get(i).replace((String) left, Visit((ExpNode) node.getRight()));
-                    } else {
-                        throw new RuntimeException("The assigned value is not accepted");
-                    }
-                    break;
+            if (nybCStack.IsVariableOnStack((String) left)) {
+                if (right instanceof ArrayNode) {
+                    nybCStack.ReplaceVariableOnStack((String) left, Visit((ArrayNode) node.getRight()));
+                } else if (right instanceof ExpNode) {
+                    nybCStack.ReplaceVariableOnStack((String) left, Visit((ExpNode) node.getRight()));
+                } else {
+                    throw new RuntimeException("The assigned value is not accepted");
                 }
             }
+
         } else {
             throw new RuntimeException("You can not assign values to " + left);
         }
@@ -265,17 +258,15 @@ public class Interpreter extends ASTVisitor {
                 throw new RuntimeException("Variable name '" + node.getId() + "' is reserved");
             }
         }
-        for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
-            if (nybCStack.getStack().get(i).containsKey(node.getId())) {
-                throw new RuntimeException("Variable " + node.getId() + " already declared");
-            }
+        if(nybCStack.IsVariableOnCurrentStack(node.getId())) {
+            throw new RuntimeException("Variable " + node.getId() + " already declared");
         }
         if (node.getValue() instanceof ArrayNode) {
-            nybCStack.getStack().peek().put(node.getId(), Visit((ArrayNode) node.getValue()));
+            nybCStack.PutVariableToCurrentStack(node.getId(), Visit((ArrayNode) node.getValue()));
         } else if (node.getValue() instanceof ExpNode) {
-            nybCStack.getStack().peek().put(node.getId(), Visit((ExpNode) node.getValue()));
+            nybCStack.PutVariableToCurrentStack(node.getId(), Visit((ExpNode) node.getValue()));
         } else {
-            nybCStack.getStack().peek().put(node.getId(), null);
+            nybCStack.PutVariableToCurrentStack(node.getId(), null);
         }
         return null;
     }
@@ -285,8 +276,8 @@ public class Interpreter extends ASTVisitor {
         if (!(Visit(node.getCondition()) instanceof Boolean) && node.getCondition() != null){
             throw new RuntimeException("Condition for if statements needs to be a boolean value");
         }
-        HashMap<String, Object> map = new HashMap<>();
-        nybCStack.getStack().push(map);
+        //HashMap<String, Object> map = new HashMap<>();
+        nybCStack.PushStack();
         Object CtrlFlow;
         if (node.getCondition() == null || (Boolean) Visit(node.getCondition())){
             for (StmtNode stmt: node.getStmts()){
@@ -319,20 +310,20 @@ public class Interpreter extends ASTVisitor {
             Scanner scan = new Scanner(System.in);
             return scan.nextLine();
         } else {
-            HashMap<String, Object> map = lookupFunc(node.getId());
-            nybCStack.getStack().push(map);
-            FuncNode funcNode = (FuncNode) map.get("0");
+            //HashMap<String, Object> map = lookupFunc(node.getId());
+            nybCStack.PushStack(lookupFunc(node.getId()));
+            FuncNode funcNode = (FuncNode) nybCStack.GetVariableOnStack("0");
             if (node.getArgs().size() != funcNode.getParam().size()){
                 throw new RuntimeException("Function call must have the same amount of parameters as function");
             }
             int i = 0;
             for (DeclNode<?> param: funcNode.getParam()) {
-                map.replace(param.getId(), Visit(node.getArgs().get(i)));
+                nybCStack.ReplaceVariableOnStack(param.getId(), Visit(node.getArgs().get(i)));
                 i++;
             }
             Object CtrlFlow = Visit(funcNode);
             if (CtrlFlow != null && ((CtrlFlowNode) CtrlFlow).getReturnExp() != null) {
-                return map.get("1");
+                return nybCStack.GetVariableOnStack("1");
             }
         }
         return null;

@@ -30,8 +30,7 @@ public class InitialVisitor extends ASTVisitor {
 
     @Override
     public void Visit(ProgramNode node) {
-        HashMap<String, Object> global = new HashMap<>();
-        nybCStack.getStack().push(global);
+        nybCStack.PushStack();
 
         for (Object stmt: node.getStmtList()) {
             /*if (stmt instanceof DeclNode) {
