@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 public class ASTVisitorTest {
 
-
     @Test
     void DeclNodeVisitTest(){
         IntNode intNode = new IntNode();

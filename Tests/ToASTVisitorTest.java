@@ -2,7 +2,7 @@ import ASTNode.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class ToASTVisitorTest {
 
 
         CallFuncNode callFuncCtx = (CallFuncNode) ASTvisitor.visitCallStmt((NybCParser.CallStmtContext)
-                parseTreeForCallStmt.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0));
+                parseTreeForCallStmt.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0));
 
         Assertions.assertNotNull(callFuncCtx);
         Assertions.assertEquals("CallFuncNode{id='a', args=[x]}",callFuncCtx.toString());
@@ -163,8 +163,9 @@ public class ToASTVisitorTest {
 
         //Test For an Integer
         var parseTreeForInt = setupParseTree("var x = 4;");
+
         NybCParser.ValueExpressionContext IntExpCtx = (NybCParser.ValueExpressionContext)
-                parseTreeForInt.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0);
+                parseTreeForInt.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0);
         IntNode IntResult = (IntNode) ASTvisitor.visitValueExpression(IntExpCtx);
         Assertions.assertNotNull(IntResult);
         assertThat(IntResult, instanceOf(IntNode.class));
@@ -173,7 +174,7 @@ public class ToASTVisitorTest {
         //Test For Identifier
         var parseTreeForIdent = setupParseTree("var x = y;");
         NybCParser.ValueExpressionContext IdentExpCtx = (NybCParser.ValueExpressionContext)
-                parseTreeForIdent.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0);
+                parseTreeForIdent.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0);
         IdentifierNode IdentResult = (IdentifierNode) ASTvisitor.visitValueExpression(IdentExpCtx);
 
         Assertions.assertNotNull(IdentResult);
@@ -184,7 +185,7 @@ public class ToASTVisitorTest {
         //Test for float
         var parseTreeForFloat = setupParseTree("var x = 4.2;");
         NybCParser.ValueExpressionContext FloatExpCtx = (NybCParser.ValueExpressionContext)
-                parseTreeForFloat.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0);
+                parseTreeForFloat.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0);
         FloatNode FloatResult = (FloatNode) ASTvisitor.visitValueExpression(FloatExpCtx);
 
         Assertions.assertNotNull(FloatResult);
@@ -197,7 +198,7 @@ public class ToASTVisitorTest {
         //Test for String
         var parseTreeForString = setupParseTree("var x = \"Hello\";");
         NybCParser.ValueExpressionContext StringExpCtx = (NybCParser.ValueExpressionContext)
-                    parseTreeForString.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0);
+                    parseTreeForString.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0);
         StringNode stringResult = (StringNode) ASTvisitor.visitValueExpression(StringExpCtx);
 
         Assertions.assertNotNull(stringResult);
@@ -208,7 +209,7 @@ public class ToASTVisitorTest {
         //Test for bool to fix with merge
         var parseTreeForBool = setupParseTree("var x = true;");
         NybCParser.ValueExpressionContext BoolExpCtx = (NybCParser.ValueExpressionContext)
-                parseTreeForBool.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0);
+                parseTreeForBool.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0);
         BoolNode boolResult = (BoolNode) ASTvisitor.visitValueExpression(BoolExpCtx);
 
         Assertions.assertNotNull(boolResult);
