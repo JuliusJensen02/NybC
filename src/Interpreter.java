@@ -1,6 +1,5 @@
 import ASTNode.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -47,94 +46,104 @@ public class Interpreter extends ASTVisitor {
     @Override
     public Object Visit(LoopNode node) {
         nybCStack.PushStack();
-
         if (node.getDeclaration() != null) {
             Visit(node.getDeclaration());
         }
-        if (!(Visit(node.getCondition()) instanceof Boolean)) {
+        if (!(Visit(node.getCondition()) instanceof Boolean loopCondition)) {
             throw new RuntimeException("Condition for loops needs to be a boolean value");
         }
-        Object CtrlFlow;
-        Boolean bool = (Boolean) Visit(node.getCondition());
         switch (node.getType()) {
             case "while" -> {
-                while (bool) {
-                    nybCStack.PushStack();
-                    bool = (Boolean) Visit(node.getCondition());
-                    label:
-                    for (StmtNode stmt : node.getStmtList()) {
-                        CtrlFlow = Visit(stmt);
-                        if (CtrlFlow != null) {
-                            switch (((CtrlFlowNode) CtrlFlow).getType()) {
-                                case "return":
-                                    nybCStack.PopStack();
-                                    nybCStack.PopStack();
-                                    return CtrlFlow;
-                                case "break":
-                                    bool = false;
-                                    break label;
-                                case "continue":
-                                    break label;
-                            }
-                        }
-                    }
-                    nybCStack.PopStack();
-                }
-                nybCStack.PopStack();
+                return whileLoopLogic(node, loopCondition);
             }
             case "for" -> {
-                while (bool) {
-                    nybCStack.PushStack();
-                    bool = (Boolean) Visit(node.getCondition());
-                    label1: //FIX; Nah fuck det her lav en helper func her
-                    for (StmtNode stmt : node.getStmtList()) {
-                        CtrlFlow = Visit(stmt);
-                        if (CtrlFlow != null) {
-                            switch (((CtrlFlowNode) CtrlFlow).getType()) {
-                                case "return":
-                                    nybCStack.PopStack();
-                                    nybCStack.PopStack();
-                                    return CtrlFlow;
-                                case "break":
-                                    bool = false;
-                                    break label1;
-                                case "continue":
-                                    break label1;
-                            }
-                        }
-
-                    }
-                    nybCStack.PopStack();
-                    Visit(node.getAssignment());
-                }
-                nybCStack.PopStack();
+                return forLoopLogic(node, loopCondition);
             }
             case "do-while" -> {
-                do {
-                    nybCStack.PushStack();
-                    bool = (Boolean) Visit(node.getCondition());
-                    label2: //FIX; Nah fuck det her lav en helper func her
-                    for (StmtNode stmt : node.getStmtList()) {
-                        CtrlFlow = Visit(stmt);
-                        if (CtrlFlow != null) {
-                            switch (((CtrlFlowNode) CtrlFlow).getType()) {
-                                case "return":
-                                    nybCStack.PopStack();
-                                    nybCStack.PopStack();
-                                    return CtrlFlow;
-                                case "break":
-                                    bool = false;
-                                    break label2;
-                                case "continue":
-                                    break label2;
-                            }
-                        }
-                    }
-                    nybCStack.PopStack();
-                } while (bool);
-                nybCStack.PopStack();
+                return doWhileLoopLogic(node, loopCondition);
             }
         }
+        return null;
+    }
+
+    private Object whileLoopLogic(LoopNode node, Boolean loopCondition) {
+        while (loopCondition) {
+            nybCStack.PushStack();
+            loopCondition = (Boolean) Visit(node.getCondition());
+            label:
+            for (StmtNode stmt : node.getStmtList()) {
+                Object CtrlFlow = Visit(stmt);
+                if (CtrlFlow != null) {
+                    switch (((CtrlFlowNode) CtrlFlow).getType()) {
+                        case "return":
+                            nybCStack.PopStack();
+                            nybCStack.PopStack();
+                            return CtrlFlow;
+                        case "break":
+                            loopCondition = false;
+                            break label;
+                        case "continue":
+                            break label;
+                    }
+                }
+            }
+            nybCStack.PopStack();
+            }
+        nybCStack.PopStack();
+        return null;
+    }
+
+    private Object forLoopLogic(LoopNode node, Boolean loopCondition) {
+        while (loopCondition) {
+            nybCStack.PushStack();
+            loopCondition = (Boolean) Visit(node.getCondition());
+            label:
+            for (StmtNode stmt : node.getStmtList()) {
+                Object CtrlFlow = Visit(stmt);
+                if (CtrlFlow != null) {
+                    switch (((CtrlFlowNode) CtrlFlow).getType()) {
+                        case "return":
+                            nybCStack.PopStack();
+                            nybCStack.PopStack();
+                            return CtrlFlow;
+                        case "break":
+                            loopCondition = false;
+                            break label;
+                        case "continue":
+                            break label;
+                    }
+                }
+            }
+            nybCStack.PopStack();
+        }
+        nybCStack.PopStack();
+        return null;
+    }
+
+    private Object doWhileLoopLogic(LoopNode node, Boolean loopCondition) {
+        do {
+            nybCStack.PushStack();
+            loopCondition = (Boolean) Visit(node.getCondition());
+            label2: //FIX; Nah fuck det her lav en helper func her
+            for (StmtNode stmt : node.getStmtList()) {
+                Object CtrlFlow = Visit(stmt);
+                if (CtrlFlow != null) {
+                    switch (((CtrlFlowNode) CtrlFlow).getType()) {
+                        case "return":
+                            nybCStack.PopStack();
+                            nybCStack.PopStack();
+                            return CtrlFlow;
+                        case "break":
+                            loopCondition = false;
+                            break label2;
+                        case "continue":
+                            break label2;
+                    }
+                }
+            }
+            nybCStack.PopStack();
+        } while (loopCondition);
+        nybCStack.PopStack();
         return null;
     }
 
