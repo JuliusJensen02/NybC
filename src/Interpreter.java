@@ -37,12 +37,10 @@ public class Interpreter extends ASTVisitor {
                 if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
                     Error.CONTINUE_BREAK_NOT_ALLOWED_IN_FUNCTION(((CtrlFlowNode) CtrlFlow).getType());
                 } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                    nybCStack.PopStack();
                     return CtrlFlow;
                 }
             }
         }
-        nybCStack.PopStack();
         return null;
     }
 
@@ -306,11 +304,13 @@ public class Interpreter extends ASTVisitor {
             } else {
                 throw new RuntimeException("'out' can only take one argument");
             }
+            return null;
+
         } else if (node.getId().equals("in")) {
             Scanner scan = new Scanner(System.in);
             return scan.nextLine();
+
         } else {
-            //HashMap<String, Object> map = lookupFunc(node.getId());
             nybCStack.PushStack(lookupFunc(node.getId()));
             FuncNode funcNode = (FuncNode) nybCStack.GetVariableOnStack("0");
             if (node.getArgs().size() != funcNode.getParam().size()){
@@ -323,8 +323,11 @@ public class Interpreter extends ASTVisitor {
             }
             Object CtrlFlow = Visit(funcNode);
             if (CtrlFlow != null && ((CtrlFlowNode) CtrlFlow).getReturnExp() != null) {
-                return nybCStack.GetVariableOnStack("1");
+                Object returnValue = nybCStack.GetVariableOnStack("1");
+                nybCStack.PopStack();
+                return returnValue;
             }
+            nybCStack.PopStack();
         }
         return null;
     }
