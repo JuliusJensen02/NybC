@@ -55,7 +55,7 @@ public class Interpreter extends ASTVisitor {
             Visit(node.getDeclaration());
         }
         if (!(Visit(node.getCondition()) instanceof Boolean)) {
-            throw new RuntimeException("Condition for loops needs to be a boolean value");
+            Error.INCORRECT_LOOP_CONDITION(node.getCondition().toString());
         }
         Object CtrlFlow;
         Boolean bool = (Boolean) Visit(node.getCondition());
@@ -203,17 +203,26 @@ public class Interpreter extends ASTVisitor {
         List<Object> array = lookupArray(node.getId());
 
         if (node.getIndex() instanceof Integer) {
-            return array.get((Integer) node.getIndex());
+            try {
+                return array.get((Integer) node.getIndex());
+            } catch (IndexOutOfBoundsException e){
+                Error.ARRAY_INDEX_OUT_OF_BOUNDS(node.getIndex().toString());
+            }
         } else if (node.getIndex() instanceof String) {
             var index = lookup((String) node.getIndex());
             if (index instanceof Integer){
-                return array.get((int) index);
+                try {
+                    return array.get((int) index);
+                } catch (IndexOutOfBoundsException e){
+                    Error.ARRAY_INDEX_OUT_OF_BOUNDS(node.getIndex().toString());
+                }
             } else {
-                throw new RuntimeException("Variable is not a whole number");
+                Error.ARRAY_INDEX_VAR_NOT_INT((String) node.getIndex());
             }
         } else {
-            throw new RuntimeException("Array index must be a whole number or a variable");
+            Error.ARRAY_INDEX_NOT_VALID(node.getIndex().toString());
         }
+        return null;
     }
 
     @Override
@@ -231,10 +240,10 @@ public class Interpreter extends ASTVisitor {
                 if (index instanceof Integer){
                     array.set((int) index, Visit((ExpNode) right));
                 } else {
-                    throw new RuntimeException("Variable is not a whole number");
+                    Error.ARRAY_INDEX_VAR_NOT_INT((String) arrayIndex);
                 }
             } else {
-                throw new RuntimeException("Array index must be a whole number or a variable");
+                Error.ARRAY_INDEX_NOT_VALID(arrayIndex.toString());
             }
         } else if (left instanceof String) {
             lookup((String) left);
@@ -246,13 +255,13 @@ public class Interpreter extends ASTVisitor {
                     } else if (right instanceof ExpNode) {
                         nybCStack.getStack().get(i).replace((String) left, Visit((ExpNode) node.getRight()));
                     } else {
-                        throw new RuntimeException("The assigned value is not accepted");
+                        Error.ASSIGNMENT_VALUE_NOT_VALID(right.toString());
                     }
                     break;
                 }
             }
         } else {
-            throw new RuntimeException("You can not assign values to " + left);
+            Error.ASSIGNMENT_VALUE_NOT_VALID(left.toString());
         }
         return null;
     }
@@ -262,12 +271,12 @@ public class Interpreter extends ASTVisitor {
 
         for (String keyword : keywords) {
             if (node.getId().equals(keyword)) {
-                throw new RuntimeException("Variable name '" + node.getId() + "' is reserved");
+                Error.VARIABLE_NAME_RESERVED(node.getId());
             }
         }
-        for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
-            if (nybCStack.getStack().get(i).containsKey(node.getId())) {
-                throw new RuntimeException("Variable " + node.getId() + " already declared");
+        for (int i = stack.size() - 1; i >= 0; i--) {
+            if (stack.get(i).containsKey(node.getId())) {
+                Error.VARIABLE_ALREADY_DECLARED(node.getId());
             }
         }
         if (node.getValue() instanceof ArrayNode) {
@@ -283,7 +292,7 @@ public class Interpreter extends ASTVisitor {
     @Override
     public Object Visit(IfNode node) {
         if (!(Visit(node.getCondition()) instanceof Boolean) && node.getCondition() != null){
-            throw new RuntimeException("Condition for if statements needs to be a boolean value");
+            Error.INCORRECT_IF_CONDITION(node.getCondition().toString());
         }
         HashMap<String, Object> map = new HashMap<>();
         nybCStack.getStack().push(map);
@@ -313,7 +322,7 @@ public class Interpreter extends ASTVisitor {
             if (node.getArgs().size() == 1) {
                 System.out.println(Visit(node.getArgs().get(0)));
             } else {
-                throw new RuntimeException("'out' can only take one argument");
+                Error.OUT_TOO_MANY_ARGS();
             }
         } else if (node.getId().equals("in")) {
             Scanner scan = new Scanner(System.in);
@@ -323,7 +332,7 @@ public class Interpreter extends ASTVisitor {
             nybCStack.getStack().push(map);
             FuncNode funcNode = (FuncNode) map.get("0");
             if (node.getArgs().size() != funcNode.getParam().size()){
-                throw new RuntimeException("Function call must have the same amount of parameters as function");
+                Error.FUNCTION_CALL_WRONG_AMOUNT_OF_ARGS(funcNode.getId());
             }
             int i = 0;
             for (DeclNode<?> param: funcNode.getParam()) {

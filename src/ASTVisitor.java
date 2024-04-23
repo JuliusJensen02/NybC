@@ -60,62 +60,54 @@ public class ASTVisitor{
                     return (int) left + (int) right;
                 } else if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() + ((Number) right).floatValue();
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_PLUS(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case "-" -> {
                 if (left instanceof Integer && right instanceof Integer) {
                     return (int) left - (int) right;
                 } else if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() - ((Number) right).floatValue();
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_MINUS(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case "*" -> {
                 if (left instanceof Integer && right instanceof Integer) {
                     return (int) left * (int) right;
                 } else if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() * ((Number) right).floatValue();
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_MULT(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case "/" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer) && ((Number) right).floatValue() != 0.0) {
                     return ((Number) left).floatValue() / ((Number) right).floatValue();
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_DIV(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case "<" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() < ((Number) right).floatValue();
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_LT(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case ">" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() > ((Number) right).floatValue();
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_GT(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case "<=" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() <= ((Number) right).floatValue();
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_LTE(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case ">=" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() >= ((Number) right).floatValue();
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_GTE(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case "!=" -> {
                 if (left instanceof String && right instanceof String) {
@@ -126,9 +118,8 @@ public class ASTVisitor{
                     return left != right;
                 } else if (left instanceof Integer && right instanceof Integer) {
                     return (int) left != (int) right;
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_NEQ(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case "==" -> {
                 if (left instanceof String && right instanceof String) {
@@ -139,23 +130,20 @@ public class ASTVisitor{
                     return left == right;
                 } else if (left instanceof Integer && right instanceof Integer) {
                     return (int) left == (int) right;
-                } else {
-                    throw new RuntimeException(left + " " + right);
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_EQ(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case "||" -> {
                 if (left instanceof Boolean && right instanceof Boolean) {
                     return (Boolean) left || (Boolean) right;
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_OR(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
             case "&&" -> {
                 if (left instanceof Boolean && right instanceof Boolean) {
                     return (Boolean) left && (Boolean) right;
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_BINARY_AND(node.getLeft() + " " + node.getOp() + " " + node.getRight());
             }
         }
         return null;
@@ -166,23 +154,20 @@ public class ASTVisitor{
             case "+" -> {
                 if (right instanceof Integer || right instanceof Float) {
                     return ((Number) right).floatValue();
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_UNARY_PLUS(right.toString());
             }
             case "-" -> {
                 if (right instanceof Integer || right instanceof Float) {
                     return -1 * ((Number) right).floatValue();
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_UNARY_MINUS(right.toString());
             }
             case "!" -> {
                 if (right instanceof Boolean) {
                     return !(Boolean) right;
-                } else {
-                    throw new RuntimeException();
                 }
+                Error.TYPE_NOT_VALID_FOR_UNARY_NOT(right.toString());
             }
         }
         return null;
@@ -255,7 +240,8 @@ public class ASTVisitor{
                 return nybCStack.getStack().get(i).get(node);
             }
         }
-        throw new RuntimeException("Variable " + node + " not declared");
+        Error.VARIABLE_NOT_DECLARED(node);
+        return null;
     }
 
     public List<Object> lookupArray (String node) {
@@ -264,14 +250,15 @@ public class ASTVisitor{
                 return (List<Object>) nybCStack.getStack().get(i).get(node);
             }
         }
-        throw new RuntimeException("Array " + node + " not declared");
+        Error.VARIABLE_NOT_DECLARED(node);
+        return null;
     }
 
     public HashMap<String, Object> lookupFunc (String node) {
-        if (nybCStack.getFmap().containsKey(node)){
-            return (HashMap<String, Object>) nybCStack.getFmap().get(node);
-        } else {
-            throw new RuntimeException("Function does not exist");
+        if (fmap.containsKey(node)){
+            return (HashMap<String, Object>) fmap.get(node);
         }
+        Error.FUNCTION_NOT_DECLARED(node);
+        return null;
     }
 }
