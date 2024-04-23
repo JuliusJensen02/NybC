@@ -5,7 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class ASTVisitor implements VisitorInterface{
+public class ASTVisitor{
+    protected NybCStack nybCStack;
+
+    public ASTVisitor(NybCStack nybCStack) {
+        this.nybCStack = nybCStack;
+    }
 
     public Object Visit(IdentifierNode node) {
         return lookup(node.getValue());
@@ -34,9 +39,9 @@ public class ASTVisitor implements VisitorInterface{
     public CtrlFlowNode Visit(CtrlFlowNode node) {
         if (node.getType().equals("return") && node.getReturnExp() != null){
             var value = Visit(node.getReturnExp());
-            for (int i = stack.size() - 1; i >= 0; i--) {
-                if (stack.get(i).containsKey("0")) {
-                    stack.get(i).put("1", value);
+            for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
+                if (nybCStack.getStack().get(i).containsKey("0")) {
+                    nybCStack.getStack().get(i).put("1", value);
                 }
             }
         }
@@ -245,26 +250,26 @@ public class ASTVisitor implements VisitorInterface{
     }
 
     public Object lookup (String node) {
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            if (stack.get(i).containsKey(node)) {
-                return stack.get(i).get(node);
+        for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
+            if (nybCStack.getStack().get(i).containsKey(node)) {
+                return nybCStack.getStack().get(i).get(node);
             }
         }
         throw new RuntimeException("Variable " + node + " not declared");
     }
 
     public List<Object> lookupArray (String node) {
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            if (stack.get(i).containsKey(node)) {
-                return (List<Object>) stack.get(i).get(node);
+        for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
+            if (nybCStack.getStack().get(i).containsKey(node)) {
+                return (List<Object>) nybCStack.getStack().get(i).get(node);
             }
         }
         throw new RuntimeException("Array " + node + " not declared");
     }
 
     public HashMap<String, Object> lookupFunc (String node) {
-        if (fmap.containsKey(node)){
-            return (HashMap<String, Object>) fmap.get(node);
+        if (nybCStack.getFmap().containsKey(node)){
+            return (HashMap<String, Object>) nybCStack.getFmap().get(node);
         } else {
             throw new RuntimeException("Function does not exist");
         }

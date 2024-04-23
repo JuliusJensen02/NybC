@@ -1,8 +1,10 @@
 import ASTNode.*;
+import AntlrGenFiles.NybCBaseVisitor;
+import AntlrGenFiles.NybCParser;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-public class ToASTVisitor extends NybCBaseVisitor<ASTNode>{
+public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
     @Override
     public ASTNode visit(ParseTree tree) {
         if (tree == null) {

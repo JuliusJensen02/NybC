@@ -1,12 +1,9 @@
-// Generated from C:/Users/Bruger/OneDrive - Aalborg Universitet/Software/SW4/NybCProject/src/NybC.g4 by ANTLR 4.13.1
+package AntlrGenFiles;// Generated from C:/Users/Bruger/OneDrive - Aalborg Universitet/Software/SW4/NybCProject/src/NybC.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.*;
 import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
 public class NybCParser extends Parser {
@@ -91,7 +88,7 @@ public class NybCParser extends Parser {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "NybC.g4"; }
+	public String getGrammarFileName() { return "AntlrGenFiles/NybC.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
