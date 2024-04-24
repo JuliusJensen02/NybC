@@ -32,7 +32,7 @@ public class InitialVisitorTest {
         keywords.add("out"); keywords.add("in");
         var InitialVisitor = new InitialVisitor(nybCStack,keywords);
         InitialVisitor.Visit(AST);
-        Assertions.assertEquals("{hello={0=FuncNode{id='hello', param=[], stmtList=[DeclNode{id='x', value=IntNode{value=2}}]}}}",nybCStack.getFmap().toString());
+        Assertions.assertEquals("{hello={0=FuncNode{id='hello', param=[], stmtList=[DeclNode{id='x', value=IntNode{value=2}}]}}}",nybCStack.FmapToString());
 
         // Can a function with the same name happen twice?
         Assertions.assertThrows(RuntimeException.class,()->{

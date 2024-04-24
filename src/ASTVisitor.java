@@ -243,13 +243,6 @@ public class ASTVisitor{
         if(nybCStack.GetVariableOnStack(node) instanceof  List<?>) {
             return (List<Object>) nybCStack.GetVariableOnStack(node);
         }
-        throw new RuntimeException(node + " is not a array");
-        /*
-        for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
-            if (nybCStack.getStack().get(i).containsKey(node)) {
-                return (List<Object>) nybCStack.getStack().get(i).get(node);
-            }
-        }
         Error.VARIABLE_NOT_DECLARED(node);
         return null;
     }

@@ -1,4 +1,4 @@
-begin function hello();
-break;
+begin function hello(var x);
+    out(x);
 end function;
 hello(3);

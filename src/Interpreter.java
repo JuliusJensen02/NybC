@@ -49,9 +49,11 @@ public class Interpreter extends ASTVisitor {
         if (node.getDeclaration() != null) {
             Visit(node.getDeclaration());
         }
+
         if (!(Visit(node.getCondition()) instanceof Boolean)) {
             Error.INCORRECT_LOOP_CONDITION(node.getCondition().toString());
         }
+        Boolean loopCondition = (Boolean) Visit(node.getCondition());
         switch (node.getType()) {
             case "while" -> {
                 return whileLoopLogic(node, loopCondition);
@@ -274,10 +276,8 @@ public class Interpreter extends ASTVisitor {
                 Error.VARIABLE_NAME_RESERVED(node.getId());
             }
         }
-        for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
-            if (nybCStack.getStack().get(i).containsKey(node.getId())) {
-                Error.VARIABLE_ALREADY_DECLARED(node.getId());
-            }
+        if(!nybCStack.IsVariableOnStack(node.getId())) {
+            Error.VARIABLE_ALREADY_DECLARED(node.getId());
         }
         if (node.getValue() instanceof ArrayNode) {
             nybCStack.PutVariableToCurrentStack(node.getId(), Visit((ArrayNode) node.getValue()));

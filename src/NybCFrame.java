@@ -16,4 +16,8 @@ public class NybCFrame {
         variables = new HashMap<String, Object>();
     }
 
+    @Override
+    public String toString() {
+        return variables.toString();
+    }
 }

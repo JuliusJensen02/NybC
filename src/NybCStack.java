@@ -15,17 +15,23 @@ public class NybCStack {
         getFMap().put(id, functionMap);
     }
 
-    public HashMap<String, Object> LookupFunc(String node) {
-        if (getFMap().containsKey(node)){
-            return getFMap().get(node);
+    public HashMap<String, Object> LookupFunc(String id) {
+        if (getFMap().containsKey(id)){
+            return getFMap().get(id);
         } else {
-            throw new RuntimeException("Function does not exist");
+            Error.FUNCTION_NOT_DECLARED(id);
+            return null;
         }
+    }
+
+    public boolean IsFunctionDeclared(String id) {
+        return getFMap().containsKey(id);
     }
 
     public void PutVariableToCurrentStack(String id, Object value) {
         if(IsVariableOnCurrentStack(id)) {
-            throw new RuntimeException("Variable " + id + " already declared");
+            Error.VARIABLE_NOT_DECLARED(id);
+            return;
         }
         getStack().peek().getVariables().put(id, value);
     }
@@ -42,7 +48,7 @@ public class NybCStack {
             stack.get(i).getVariables().replace(id, newValue);
             return;
         }
-        throw new RuntimeException("Variable " + id + " is not declared");
+        Error.VARIABLE_NOT_DECLARED(id);
     }
 
     public boolean IsVariableOnStack(String id) {
@@ -61,7 +67,8 @@ public class NybCStack {
                 return variable;
             }
         }
-        throw new RuntimeException("Variable " + id + " is not declared");
+        Error.VARIABLE_NOT_DECLARED(id);
+        return null;
     }
 
     public void PushStack() {
@@ -75,4 +82,14 @@ public class NybCStack {
     public void PopStack() {
         stack.pop();
     }
+
+    public String StackToString(){
+        return stack.toString();
+    }
+
+    public String FmapToString(){
+        return fMap.toString();
+    }
 }
+
+

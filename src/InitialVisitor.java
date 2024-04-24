@@ -45,11 +45,11 @@ public class InitialVisitor extends ASTVisitor {
                         Error.FUNCTION_NAME_RESERVED(((FuncNode) stmt).getId());
                     }
                 }
-                for (String key: nybCStack.getFmap().keySet()){
-                    if(key.equals(((FuncNode) stmt).getId())) {
-                        Error.FUNCTION_ALREADY_DECLARED(((FuncNode) stmt).getId());
-                    }
+
+                if(nybCStack.IsFunctionDeclared(((FuncNode) stmt).getId())) {
+                    Error.FUNCTION_ALREADY_DECLARED(((FuncNode) stmt).getId());
                 }
+
                 FuncNode function = (FuncNode)Visit((FuncNode) stmt);
                 HashMap<String, Object> functionMap = new HashMap<>();
 
