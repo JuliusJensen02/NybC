@@ -290,18 +290,18 @@ public class Interpreter extends ASTVisitor {
             for (StmtNode stmt: node.getStmts()){
                 CtrlFlow = Visit(stmt);
                 if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
-                    nybCStack.getStack().pop();
+                    nybCStack.PopStack();
                     return CtrlFlow;
                 }
             }
         } else {
             CtrlFlow = Visit(node.getElseIfNode());
             if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
-                nybCStack.getStack().pop();
+                nybCStack.PopStack();
                 return CtrlFlow;
             }
         }
-        nybCStack.getStack().pop();
+        nybCStack.PopStack();
         return null;
     }
 
@@ -320,7 +320,7 @@ public class Interpreter extends ASTVisitor {
             return scan.nextLine();
 
         } else {
-            nybCStack.PushStack(lookupFunc(node.getId()));
+            nybCStack.PushStack(nybCStack.LookupFunc(node.getId()));
             FuncNode funcNode = (FuncNode) nybCStack.GetVariableOnStack("0");
             if (node.getArgs().size() != funcNode.getParam().size()){
                 throw new RuntimeException("Function call must have the same amount of parameters as function");

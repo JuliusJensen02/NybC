@@ -268,7 +268,7 @@ public class ASTVisitor{
         throw new RuntimeException("Array " + node + " not declared");
          */
     }
-
+    /*
     public HashMap<String, Object> lookupFunc (String node) {
         if (nybCStack.getFmap().containsKey(node)){
             return (HashMap<String, Object>) nybCStack.getFmap().get(node);
@@ -276,4 +276,5 @@ public class ASTVisitor{
             throw new RuntimeException("Function does not exist");
         }
     }
+     */
 }

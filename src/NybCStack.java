@@ -5,11 +5,22 @@ public class NybCStack {
     private final HashMap<String, Object> fmap = new HashMap<>();
     private final Stack<NybCFrame> stack = new Stack<>();
 
-    public Stack<NybCFrame> getStack() {
-        return stack;
-    }
-    public HashMap<String, Object> getFmap() {
+    private Stack<NybCFrame> getStack() { return stack; }
+
+    private HashMap<String, Object> getFmap() {
         return fmap;
+    }
+
+    public void PutFunction(String id, HashMap<String, Object> functionMap) {
+        getFmap().put(id, functionMap);
+    }
+
+    public HashMap<String, Object> LookupFunc(String node) {
+        if (getFmap().containsKey(node)){
+            return (HashMap<String, Object>) getFmap().get(node);
+        } else {
+            throw new RuntimeException("Function does not exist");
+        }
     }
 
     public void PutVariableToCurrentStack(String id, Object value) {
@@ -17,13 +28,6 @@ public class NybCStack {
             throw new RuntimeException("Variable " + id + " already declared");
         }
         getStack().peek().getVariables().put(id, value);
-    }
-
-    public Object GetVariableOnCurrentStack(String id) {
-        if(IsVariableOnCurrentStack(id)) {
-            return getStack().peek().getVariables().get(id);
-        }
-        throw new RuntimeException("Variable " + id + " is not declared on current stack");
     }
 
     public boolean IsVariableOnCurrentStack(String id) {
