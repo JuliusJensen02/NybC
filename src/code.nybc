@@ -1,11 +1,4 @@
-
-
 begin function hello();
-out(10);
+break;
 end function;
-
-begin function hello();
-out(3);
-end function;
-
-hello();
+ var x = hello();

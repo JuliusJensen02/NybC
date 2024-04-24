@@ -255,8 +255,8 @@ public class ASTVisitor{
     }
 
     public HashMap<String, Object> lookupFunc (String node) {
-        if (fmap.containsKey(node)){
-            return (HashMap<String, Object>) fmap.get(node);
+        if (nybCStack.getFmap().containsKey(node)){
+            return (HashMap<String, Object>) nybCStack.getFmap().get(node);
         }
         Error.FUNCTION_NOT_DECLARED(node);
         return null;

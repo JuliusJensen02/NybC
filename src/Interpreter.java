@@ -274,8 +274,8 @@ public class Interpreter extends ASTVisitor {
                 Error.VARIABLE_NAME_RESERVED(node.getId());
             }
         }
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            if (stack.get(i).containsKey(node.getId())) {
+        for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
+            if (nybCStack.getStack().get(i).containsKey(node.getId())) {
                 Error.VARIABLE_ALREADY_DECLARED(node.getId());
             }
         }

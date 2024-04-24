@@ -46,7 +46,7 @@ public class InitialVisitor extends ASTVisitor {
                         Error.FUNCTION_NAME_RESERVED(((FuncNode) stmt).getId());
                     }
                 }
-                for (String key: fmap.keySet()){
+                for (String key: nybCStack.getFmap().keySet()){
                     if(key.equals(((FuncNode) stmt).getId())) {
                         Error.FUNCTION_ALREADY_DECLARED(((FuncNode) stmt).getId());
                     }
