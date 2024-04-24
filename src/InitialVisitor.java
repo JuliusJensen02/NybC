@@ -30,8 +30,7 @@ public class InitialVisitor extends ASTVisitor {
 
     @Override
     public void Visit(ProgramNode node) {
-        HashMap<String, Object> global = new HashMap<>();
-        nybCStack.getStack().push(global);
+        nybCStack.PushStack();
 
         for (Object stmt: node.getStmtList()) {
             /*if (stmt instanceof DeclNode) {
@@ -51,14 +50,14 @@ public class InitialVisitor extends ASTVisitor {
                         Error.FUNCTION_ALREADY_DECLARED(((FuncNode) stmt).getId());
                     }
                 }
-                Object function = Visit((FuncNode) stmt);
+                FuncNode function = (FuncNode)Visit((FuncNode) stmt);
                 HashMap<String, Object> functionMap = new HashMap<>();
 
-                for (DeclNode<?> param: ((FuncNode)function).getParam()){
+                for (DeclNode<?> param: (function.getParam())){
                     functionMap.put(param.getId(), param.getValue());
                 }
                 functionMap.put("0", stmt);
-                nybCStack.getFmap().put(((FuncNode) function).getId(), functionMap);
+                nybCStack.PutFunction(function.getId(), functionMap);
             }
         }
     }

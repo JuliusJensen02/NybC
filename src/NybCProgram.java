@@ -56,7 +56,7 @@ public class NybCProgram {
         System.out.println(AST);
         var InitialVisitor = new InitialVisitor(nybCStack, keywords);
         InitialVisitor.Visit((ProgramNode) AST);
-        System.out.println(nybCStack.getFmap());
+        //System.out.println(nybCStack);
         var Interpreter = new Interpreter(nybCStack, keywords);
         Interpreter.Visit((ProgramNode) AST);
     }

@@ -1,4 +1,4 @@
 begin function hello();
 break;
 end function;
- var x = hello();
+hello(3);

@@ -39,10 +39,10 @@ public class ASTVisitor{
     public CtrlFlowNode Visit(CtrlFlowNode node) {
         if (node.getType().equals("return") && node.getReturnExp() != null){
             var value = Visit(node.getReturnExp());
-            for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
-                if (nybCStack.getStack().get(i).containsKey("0")) {
-                    nybCStack.getStack().get(i).put("1", value);
-                }
+
+            //FIX; Hvad fuck er en "0" og hvad vil den med en "1"??? kan vi ikke bruge navne guys?? Vi har ikke math A mere
+            if (nybCStack.GetVariableOnStack("0") != null) {
+                nybCStack.PutVariableToCurrentStack("1", value);
             }
         }
         return node;
@@ -235,16 +235,16 @@ public class ASTVisitor{
     }
 
     public Object lookup (String node) {
-        for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
-            if (nybCStack.getStack().get(i).containsKey(node)) {
-                return nybCStack.getStack().get(i).get(node);
-            }
-        }
-        Error.VARIABLE_NOT_DECLARED(node);
-        return null;
+        return nybCStack.GetVariableOnStack(node);
     }
 
+    @SuppressWarnings("unchecked")
     public List<Object> lookupArray (String node) {
+        if(nybCStack.GetVariableOnStack(node) instanceof  List<?>) {
+            return (List<Object>) nybCStack.GetVariableOnStack(node);
+        }
+        throw new RuntimeException(node + " is not a array");
+        /*
         for (int i = nybCStack.getStack().size() - 1; i >= 0; i--) {
             if (nybCStack.getStack().get(i).containsKey(node)) {
                 return (List<Object>) nybCStack.getStack().get(i).get(node);
@@ -253,7 +253,7 @@ public class ASTVisitor{
         Error.VARIABLE_NOT_DECLARED(node);
         return null;
     }
-
+    /*
     public HashMap<String, Object> lookupFunc (String node) {
         if (nybCStack.getFmap().containsKey(node)){
             return (HashMap<String, Object>) nybCStack.getFmap().get(node);
@@ -261,4 +261,5 @@ public class ASTVisitor{
         Error.FUNCTION_NOT_DECLARED(node);
         return null;
     }
+     */
 }
