@@ -2,22 +2,22 @@ import java.util.HashMap;
 import java.util.Stack;
 
 public class NybCStack {
-    private final HashMap<String, Object> fmap = new HashMap<>();
+    private final HashMap<String, HashMap<String, Object>> fMap = new HashMap<>();
     private final Stack<NybCFrame> stack = new Stack<>();
 
     private Stack<NybCFrame> getStack() { return stack; }
 
-    private HashMap<String, Object> getFmap() {
-        return fmap;
+    private HashMap<String, HashMap<String, Object>> getFMap() {
+        return fMap;
     }
 
     public void PutFunction(String id, HashMap<String, Object> functionMap) {
-        getFmap().put(id, functionMap);
+        getFMap().put(id, functionMap);
     }
 
     public HashMap<String, Object> LookupFunc(String node) {
-        if (getFmap().containsKey(node)){
-            return (HashMap<String, Object>) getFmap().get(node);
+        if (getFMap().containsKey(node)){
+            return getFMap().get(node);
         } else {
             throw new RuntimeException("Function does not exist");
         }
@@ -75,7 +75,4 @@ public class NybCStack {
     public void PopStack() {
         stack.pop();
     }
-
-
-
 }
