@@ -1,4 +1,6 @@
-begin function hello(var x);
-    out(x);
-end function;
-hello(3);
+var x = 0;
+
+begin loop(x<10);
+out(x);
+x = x + 1;
+end loop;

@@ -59,10 +59,10 @@ public class Interpreter extends ASTVisitor {
                 return whileLoopLogic(node, loopCondition);
             }
             case "for" -> {
-                return forLoopLogic(node, loopCondition);
+                return forLoopLogic(node);
             }
             case "do-while" -> {
-                return doWhileLoopLogic(node, loopCondition);
+                return doWhileLoopLogic(node);
             }
         }
         return null;
@@ -122,7 +122,9 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
-    private Object doWhileLoopLogic(LoopNode node, Boolean loopCondition) {
+    private Object doWhileLoopLogic(LoopNode node) {
+        Boolean loopCondition = (Boolean) Visit(node.getCondition());
+        boolean goOutOfLoop = false;
         do {
             nybCStack.PushStack();
             loopCondition = (Boolean) Visit(node.getCondition());
