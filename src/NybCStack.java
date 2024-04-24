@@ -17,7 +17,11 @@ public class NybCStack {
 
     public HashMap<String, Object> LookupFunc(String id) {
         if (getFMap().containsKey(id)){
-            return getFMap().get(id);
+            //There is sent a cloned table to avoid righting in the same table
+            @SuppressWarnings("unchecked")
+            HashMap<String, Object> clonedFunctionMap = (HashMap<String, Object>) getFMap().get(id).clone();
+
+            return clonedFunctionMap;
         } else {
             Error.FUNCTION_NOT_DECLARED(id);
             return null;
@@ -30,7 +34,7 @@ public class NybCStack {
 
     public void PutVariableToCurrentStack(String id, Object value) {
         if(IsVariableOnCurrentStack(id)) {
-            Error.VARIABLE_NOT_DECLARED(id);
+            Error.VARIABLE_ALREADY_DECLARED(id);
             return;
         }
         getStack().peek().getVariables().put(id, value);

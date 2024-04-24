@@ -135,7 +135,6 @@ public class Interpreter extends ASTVisitor {
                 }
                 else if(((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
                     goOutOfLoop = true;
-                    nybCStack.PopStack();
                     break;
                 }
                 else if(((CtrlFlowNode) CtrlFlow).getType().equals("continue")) {
@@ -143,6 +142,7 @@ public class Interpreter extends ASTVisitor {
                 }
             }
             nybCStack.PopStack();
+            Visit(node.getAssignment());
             loopCondition = (Boolean) Visit(node.getCondition());
         }
         nybCStack.PopStack();
@@ -328,7 +328,6 @@ public class Interpreter extends ASTVisitor {
         if (!(Visit(node.getCondition()) instanceof Boolean) && node.getCondition() != null){
             Error.INCORRECT_IF_CONDITION(node.getCondition().toString());
         }
-        //HashMap<String, Object> map = new HashMap<>();
         nybCStack.PushStack();
         Object CtrlFlow;
         if (node.getCondition() == null || (Boolean) Visit(node.getCondition())){

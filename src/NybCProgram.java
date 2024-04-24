@@ -12,10 +12,11 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class NybCProgram {
-    private List<String> keywords = new ArrayList<>();
-    private NybCStack nybCStack;
+    private final List<String> keywords = new ArrayList<>();
+    private final NybCStack nybCStack;
 
     public NybCProgram() {
+        //TODO: Måske skulle vi kun have for out og in siden alt bliver taget af passer. Plus måske tekst file?
         keywords.addAll(Arrays.asList("begin", "end", "loop", "in", "out", "if", "else", "switch", "var", "function", "case", "return", "break", "continue", "true", "false"));
         nybCStack = new NybCStack();
     }
