@@ -339,10 +339,13 @@ public class Interpreter extends ASTVisitor {
                 }
             }
         } else {
-            CtrlFlow = Visit(node.getElseIfNode());
-            if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
-                nybCStack.PopStack();
-                return CtrlFlow;
+            IfNode elseifNode = node.getElseIfNode();
+            if(elseifNode != null) {
+                CtrlFlow = Visit(elseifNode);
+                if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                    nybCStack.PopStack();
+                    return CtrlFlow;
+                }
             }
         }
         nybCStack.PopStack();
