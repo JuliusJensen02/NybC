@@ -310,7 +310,7 @@ public class Interpreter extends ASTVisitor {
                 Error.VARIABLE_NAME_RESERVED(node.getId());
             }
         }
-        if(nybCStack.IsVariableOnStack(node.getId())) {
+        if(nybCStack.IsVariableOnCurrentStack(node.getId())) {
             Error.VARIABLE_ALREADY_DECLARED(node.getId());
         }
         if (node.getValue() instanceof ArrayNode) {
@@ -339,10 +339,13 @@ public class Interpreter extends ASTVisitor {
                 }
             }
         } else {
-            CtrlFlow = Visit(node.getElseIfNode());
-            if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
-                nybCStack.PopStack();
-                return CtrlFlow;
+            IfNode elseifNode = node.getElseIfNode();
+            if(elseifNode != null) {
+                CtrlFlow = Visit(elseifNode);
+                if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                    nybCStack.PopStack();
+                    return CtrlFlow;
+                }
             }
         }
         nybCStack.PopStack();
