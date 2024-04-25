@@ -67,9 +67,10 @@ public class NybCStack {
     public Object GetVariableOnStack(String id) {
         for (int i = stack.size() - 1; i >= 0; i--) {
             Object variable = stack.get(i).getVariables().get(id);
-
+            if (variable == null && stack.get(i).getVariables().containsKey(id)) {
+                return null;
+            }
             return variable;
-
         }
         Error.VARIABLE_NOT_DECLARED(id);
         return null;
