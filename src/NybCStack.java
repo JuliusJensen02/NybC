@@ -70,7 +70,9 @@ public class NybCStack {
             if (variable == null && stack.get(i).getVariables().containsKey(id)) {
                 return null;
             }
-            return variable;
+            else if(variable != null){
+                return variable;
+            }
         }
         Error.VARIABLE_NOT_DECLARED(id);
         return null;
