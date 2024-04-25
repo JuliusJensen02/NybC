@@ -1,9 +1,7 @@
 import ASTNode.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
 
 public class ASTVisitor{
     protected NybCStack nybCStack;

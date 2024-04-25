@@ -53,7 +53,6 @@ public class Interpreter extends ASTVisitor {
         if (!(Visit(node.getCondition()) instanceof Boolean)) {
             Error.INCORRECT_LOOP_CONDITION(node.getCondition().toString());
         }
-        Boolean loopCondition = (Boolean) Visit(node.getCondition());
         switch (node.getType()) {
             case "while" -> {
                 return whileLoopLogic(node);
@@ -68,23 +67,9 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
-    //get node
-
-    //loop in a while until condition is false
-        //push stack
-        //Loop stmts
-        //if stmt is CtrlFlowNode
-            //Do logic based on type
-        //pop stack
-
-
-
-
-
     private Object whileLoopLogic(LoopNode node) {
-        Boolean loopCondition = (Boolean) Visit(node.getCondition());
         boolean goOutOfLoop = false;
-        while (loopCondition) {
+        while ((Boolean) Visit(node.getCondition())) {
             if(goOutOfLoop) {
                 break;
             }
@@ -109,16 +94,14 @@ public class Interpreter extends ASTVisitor {
                 }
             }
             nybCStack.PopStack();
-            loopCondition = (Boolean) Visit(node.getCondition());
         }
         nybCStack.PopStack();
         return null;
     }
 
     private Object forLoopLogic(LoopNode node) {
-        Boolean loopCondition = (Boolean) Visit(node.getCondition());
         boolean goOutOfLoop = false;
-        while (loopCondition) {
+        while ((Boolean) Visit(node.getCondition())) {
             if(goOutOfLoop) {
                 break;
             }
@@ -143,14 +126,12 @@ public class Interpreter extends ASTVisitor {
             }
             nybCStack.PopStack();
             Visit(node.getAssignment());
-            loopCondition = (Boolean) Visit(node.getCondition());
         }
         nybCStack.PopStack();
         return null;
     }
 
     private Object doWhileLoopLogic(LoopNode node) {
-        Boolean loopCondition = (Boolean) Visit(node.getCondition());
         boolean goOutOfLoop = false;
         do {
             if(goOutOfLoop) {
@@ -177,8 +158,7 @@ public class Interpreter extends ASTVisitor {
                 }
             }
             nybCStack.PopStack();
-            loopCondition = (Boolean) Visit(node.getCondition());
-        } while (loopCondition);
+        } while ((Boolean) Visit(node.getCondition()));
         nybCStack.PopStack();
         return null;
     }
