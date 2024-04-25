@@ -4,122 +4,118 @@ import AntlrGenFiles.NybCParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class ASTVisitorTest {
 
 
-    private ProgramNode setupAST(String input) {
-        var inputStream = CharStreams.fromString(input);
-        var lexer = new NybCLexer(inputStream);
-        var tokenStream = new CommonTokenStream(lexer);
-        var parser = new NybCParser(tokenStream);
-        var parseTree = parser.program();
-        var ASTVisitor = new ToASTVisitor();
-        return (ProgramNode) ASTVisitor.visit(parseTree);
-    }
-
-
-
-
-
     @Test
-    void visitCtrlFlowNode(){
-        //Setup a return control flow node with no return expression
+    void visitBinaryOpsNode() {
+        //Setup
         NybCStack nybCStack = new NybCStack();
-        var ASTVisitor = new ASTVisitor(nybCStack);
+        ASTVisitor astVisitor = new ASTVisitor(nybCStack);
 
-        var tmpMap = new HashMap<String, Object>();
-        var tmpMap2 = new HashMap<String, Object>();
-
-        var funcNode = new FuncNode();
-        funcNode.setId("hello");
-
-        CtrlFlowNode ctrlFlowNode = new CtrlFlowNode();
-        ctrlFlowNode.setType("return");
-        funcNode.addStmt(ctrlFlowNode);
-
-        tmpMap2.put("0",funcNode);
-        tmpMap.put("hello",tmpMap2);
-        nybCStack.PutFunction(funcNode.getId(),tmpMap2);
-
-        CtrlFlowNode rtrnCFLN = ASTVisitor.Visit(ctrlFlowNode);
-
-        Assertions.assertEquals(ctrlFlowNode,rtrnCFLN);
-
-        System.out.println(nybCStack.StackToString());
-
-        //Assertions.assertEquals("[{hello={0=FuncNode{id='hello', param=[], stmtList=[CtrlFlowNode{type='return', returnExp=null}]}}}]",nybCStack.);
-
-
-
-        //Setup a return control flow node with a return expression
-        nybCStack = new NybCStack();
-        ASTVisitor = new ASTVisitor(nybCStack);
-
-        tmpMap = new HashMap<String, Object>();
-        tmpMap2 = new HashMap<String, Object>();
-
-        funcNode = new FuncNode();
-        funcNode.setId("hello");
-
-        ctrlFlowNode = new CtrlFlowNode();
-        ctrlFlowNode.setType("return");
-
-        var intNode = new IntNode();
+        // Add all variables
+        IntNode intNode = new IntNode();
         intNode.setValue(2);
-        ctrlFlowNode.setReturnExp(intNode);
-
-        funcNode.addStmt(ctrlFlowNode);
-
-
-        tmpMap2.put("0",funcNode);
-        tmpMap.put("hello",tmpMap2);
-        nybCStack.PushStack(tmpMap2);
-
-        rtrnCFLN = ASTVisitor.Visit(ctrlFlowNode);
-
-        Assertions.assertEquals(ctrlFlowNode,rtrnCFLN);
-        Assertions.assertEquals("[{0=FuncNode{id='hello', param=[], stmtList=[CtrlFlowNode{type='return', returnExp=IntNode{value=2}}]}, 1=2}]",nybCStack.StackToString());
+        FloatNode floatNode = new FloatNode();
+        floatNode.setValue(2.5f);
+        BoolNode boolNode = new BoolNode();
+        boolNode.setValue(true);
+        StringNode stringNode = new StringNode();
+        stringNode.setValue("Hello");
 
 
-        //Setup a break control flow node
-//        nybCStack = new NybCStack();
-//        ASTVisitor = new ASTVisitor(nybCStack);
-//
-//        tmpMap = new HashMap<String, Object>();
-//        tmpMap2 = new HashMap<String, Object>();
-//
-//        var switchNode = new SwitchNode();
-//        switchNode.setSwitchCond();
-//
-//        ctrlFlowNode = new CtrlFlowNode();
-//        ctrlFlowNode.setType("break");
-//
-//        var intNode = new IntNode();
-//        intNode.setValue(2);
-//        ctrlFlowNode.setReturnExp(intNode);
-//
-//        funcNode.addStmt(ctrlFlowNode);
-//
-//
-//        tmpMap2.put("0",funcNode);
-//        tmpMap.put("hello",tmpMap2);
-//        nybCStack.getStack().add(tmpMap);
-//
-//        rtrnCFLN = ASTVisitor.Visit(ctrlFlowNode);
-//
-//        Assertions.assertEquals(ctrlFlowNode,rtrnCFLN);
-//        Assertions.assertEquals("[{hello={0=FuncNode{id='hello', param=[], stmtList=[CtrlFlowNode{type='return', returnExp=IntNode{value=2}}]}}}]",nybCStack.getStack().toString());
+        // Test for Int + Int
+        BinaryOpNode binaryOpNode = new BinaryOpNode(intNode, "+", intNode);
+        var resultIntInt = astVisitor.Visit(binaryOpNode);
+        Assertions.assertNotNull(resultIntInt);
+        Assertions.assertEquals(4, resultIntInt);
 
+        // Test for Int + float
+        binaryOpNode = new BinaryOpNode(intNode, "+", floatNode);
+        var resultIntFloat = astVisitor.Visit(binaryOpNode);
+        Assertions.assertNotNull(resultIntFloat);
+        Assertions.assertEquals(5.5f, resultIntFloat);
 
+        // Test for Int + Bool
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            BinaryOpNode TMPbinaryOpNode = new BinaryOpNode(intNode, "+", boolNode);
+            var resultIntBool = astVisitor.Visit(TMPbinaryOpNode);
+            Assertions.assertNull(resultIntBool);
+        });
 
+        // Test for Int + String
+        binaryOpNode = new BinaryOpNode(intNode, "+", stringNode);
+        var resultIntString = astVisitor.Visit(binaryOpNode);
+        Assertions.assertNotNull(resultIntString);
+        Assertions.assertEquals("2there", resultIntString);
+
+        // Test for Float + Float
+        binaryOpNode = new BinaryOpNode(floatNode, "+", floatNode);
+        var resultFloatFloat = astVisitor.Visit(binaryOpNode);
+        Assertions.assertNotNull(resultFloatFloat);
+        Assertions.assertEquals(6.0f, resultFloatFloat);
+
+        // Test for Float + bool
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            BinaryOpNode TMPbinaryOpNode = new BinaryOpNode(floatNode, "+", boolNode);
+            var resultFloatBool = astVisitor.Visit(TMPbinaryOpNode);
+            Assertions.assertNull(resultFloatBool);
+        });
+
+        // Test for Float + String
+        binaryOpNode = new BinaryOpNode(floatNode, "+", stringNode);
+        var resultFloatString = astVisitor.Visit(binaryOpNode);
+        Assertions.assertNotNull(resultFloatString);
+        Assertions.assertEquals("2.5there", resultFloatString);
+
+        // Test for Bool + bool
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            BinaryOpNode TMPbinaryOpNode = new BinaryOpNode(boolNode, "+", boolNode);
+            var resultBoolBool = astVisitor.Visit(TMPbinaryOpNode);
+            Assertions.assertNull(resultBoolBool);
+        });
+
+        // Test for Bool + String
+        binaryOpNode = new BinaryOpNode(boolNode, "+", stringNode);
+        var resultBoolString = astVisitor.Visit(binaryOpNode);
+        Assertions.assertNotNull(resultBoolString);
+        Assertions.assertEquals("truethere", resultBoolString);
+
+        // Test for String + String
+        binaryOpNode = new BinaryOpNode(stringNode, "+", stringNode);
+        var resultStringString = astVisitor.Visit(binaryOpNode);
+        Assertions.assertNotNull(resultStringString);
+        Assertions.assertEquals("Hellothere", resultStringString);
 
     }
-
-
 }
+
+
+//    @Test
+//    void visitUnaryOpsNode(){
+//        //Setup
+//        NybCStack nybCStack = new NybCStack();
+//        ASTVisitor astVisitor = new ASTVisitor(nybCStack);
+//
+//        // Add all variables
+//        IntNode intNode = new IntNode();
+//        intNode.setValue(2);
+//        FloatNode floatNode = new FloatNode();
+//        floatNode.setValue(2.5f);
+//        BoolNode boolNode = new BoolNode();
+//        boolNode.setValue(true);
+//        StringNode stringNode = new StringNode();
+//        stringNode.setValue("Hello");
+//
+//        // Test for Unary Plus
+//        UnaryOpNode unaryOpNode = new UnaryOpNode("+",intNode);
+//        var resultInt = astVisitor.Visit(unaryOpNode);
+//        Assertions.assertNotNull(resultInt);
+//        Assertions.assertEquals(2,resultInt);
+//
+//}

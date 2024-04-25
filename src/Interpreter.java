@@ -13,11 +13,11 @@ public class Interpreter extends ASTVisitor {
     @Override
     public void Visit(ProgramNode node) {
         Object CtrlFlow;
-        for (Object stmt: node.getStmtList()) {
-            if (!(stmt instanceof FuncNode)){
+        for (Object stmt : node.getStmtList()) {
+            if (!(stmt instanceof FuncNode)) {
                 CtrlFlow = Visit((StmtNode) stmt);
                 if (CtrlFlow != null) {
-                    if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
+                    if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
                         Error.CONTINUE_BREAK_NOT_ALLOWED_IN_GLOBAL(((CtrlFlowNode) CtrlFlow).getType());
                     } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
                         break;

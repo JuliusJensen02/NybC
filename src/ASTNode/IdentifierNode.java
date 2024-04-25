@@ -11,6 +11,13 @@ public class IdentifierNode extends ExpNode implements ASTNode {
 
     private String value;
 
+    public IdentifierNode(String value) {
+        this.value = value;
+    }
+
+    public IdentifierNode() {
+    }
+
     public String toString() {
         return value;
     }
