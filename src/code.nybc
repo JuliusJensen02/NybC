@@ -1,9 +1,5 @@
-var y = [3,4,2,5];
-begin loop(var x = 0; x<4; x=x+1);
-    out(hello(y[x]));
-    break;
+var x = 2;
+begin loop(x<10);
+    x = x + 1;
+    out(x);
 end loop;
-
-begin function hello(var g);
-    return g * 2;
-end function;
