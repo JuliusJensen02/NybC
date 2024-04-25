@@ -17,7 +17,7 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
     public ProgramNode visitProgram(NybCParser.ProgramContext ctx) {
         ProgramNode node = new ProgramNode();
         for (ParseTree childNode: ctx.children) {
-            if (!childNode.getClass().getSimpleName().equals("StmtContext") && !childNode.getClass().getSimpleName().equals("FunctionStmtContext")) {
+            if (!(childNode instanceof NybCParser.StmtContext) && !(childNode instanceof NybCParser.FunctionStmtContext)) {
                 Error.GLOBAL_MUST_CONTAIN_STMT(childNode.getClass().getSimpleName());
             }
             node.addStmt(visit(childNode));
@@ -73,21 +73,18 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
             }
             case "loop" -> {
                 LoopNode node = new LoopNode();
-                switch (ctx.getChild(3).getClass().getSimpleName()) {
-                    case "ExpressionContext" -> {
-                        node.setType("while");
-                        node.setCondition((ExpNode) visit(ctx.getChild(3)));
-                    }
-                    case "StmtContext" -> {
-                        node.setType("do-while");
-                        node.setCondition((ExpNode) visit(ctx.getChild(ctx.children.size() - 2)));
-                    }
-                    case "DeclareStmtContext" -> {
-                        node.setType("for");
-                        node.setDeclaration((DeclNode<Integer>) visit(ctx.getChild(3)));
-                        node.setCondition((ExpNode) visit(ctx.getChild(5)));
-                        node.setAssignment((AssignNode<String, Integer>) visit(ctx.getChild(7)));
-                    }
+                    ParseTree ctxChild = ctx.getChild(3);
+                if (ctxChild instanceof NybCParser.ExpressionContext expressionContext) {
+                    node.setType("while");
+                    node.setCondition((ExpNode) visit(expressionContext));
+                } else if (ctxChild instanceof NybCParser.StmtContext) {
+                    node.setType("do-while");
+                    node.setCondition((ExpNode) visit(ctx.getChild(ctx.children.size() - 2)));
+                } else if (ctxChild instanceof NybCParser.DeclareStmtContext declareStmtContext) {
+                    node.setType("for");
+                    node.setDeclaration((DeclNode<Integer>) visit(declareStmtContext));
+                    node.setCondition((ExpNode) visit(ctx.getChild(5)));
+                    node.setAssignment((AssignNode<String, Integer>) visit(ctx.getChild(7)));
                 }
                 for (ParseTree stmt : ctx.stmt()) {
                     node.addStmt((StmtNode) visit(stmt));
@@ -133,22 +130,24 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
     @Override
     public DeclNode<?> visitDeclareStmt(NybCParser.DeclareStmtContext ctx) {
         if (ctx.getChild(3) != null) {
-            switch (ctx.getChild(3).getClass().getSimpleName()) {
-                case "ExpressionContext" -> {return new DeclNode<>(ctx.IDENT().getText(), (ExpNode) visit(ctx.expression()));}
-                case "ArrayContext" -> {return new DeclNode<>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.array()));}
-                default -> Error.DECLARE_ASSIGNMENT_WRONG_TYPE(ctx.getChild(3).getClass().getSimpleName());
-            };
+            if (ctx.getChild(3) instanceof  NybCParser.ExpressionContext) {
+                return new DeclNode<>(ctx.IDENT().getText(), (ExpNode) visit(ctx.expression()));
+            } else if (ctx.getChild(3) instanceof NybCParser.ArrayContext) {
+                return new DeclNode<>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.array()));
+            } else {
+                Error.DECLARE_ASSIGNMENT_WRONG_TYPE(ctx.getChild(3).getClass().getSimpleName());
+            }
         } else return new DeclNode<>(ctx.IDENT().getText());
         return null;
     }
 
     @Override
     public AssignNode<?, ?> visitAssignStmt(NybCParser.AssignStmtContext ctx) {
-        if(ctx.getChild(0).getClass().getSimpleName().equals("ArrayAccessContext")){
+        if(ctx.getChild(0) instanceof NybCParser.ArrayAccessContext){
             return new AssignNode<>(((ArrayAccessNode<?>)visit(ctx.getChild(0))), ((ExpNode)visit(ctx.getChild(2))));
         }
         else{
-            if(ctx.getChild(2).getClass().getSimpleName().equals("ArrayContext")) {
+            if(ctx.getChild(2) instanceof NybCParser.ArrayContext) {
                 return new AssignNode<>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.getChild(2)));
             }
             else{
@@ -299,7 +298,7 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         CallFuncNode node = new CallFuncNode();
         node.setId(ctx.IDENT().getText());
         for (ParseTree childNode: ctx.children) {
-            if (childNode.getClass().getSimpleName().equals("ExpressionContext")){
+            if (childNode instanceof NybCParser.ExpressionContext){
                 node.addArgs((ExpNode) visit(childNode));
             }
         }
