@@ -51,7 +51,7 @@ public class ASTVisitorTest {
 
         Assertions.assertEquals(ctrlFlowNode,rtrnCFLN);
 
-        System.out.println(nybCStack.toString());
+        System.out.println(nybCStack.StackToString());
 
         //Assertions.assertEquals("[{hello={0=FuncNode{id='hello', param=[], stmtList=[CtrlFlowNode{type='return', returnExp=null}]}}}]",nybCStack.);
 
