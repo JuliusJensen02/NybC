@@ -33,25 +33,28 @@ public class InitialVisitor extends ASTVisitor {
         nybCStack.PushStack();
 
         for (Object stmt: node.getStmtList()) {
+            /*if (stmt instanceof DeclNode) {
+                if (global.containsKey(((DeclNode<?>) stmt).getId())){
+                    throw new RuntimeException("Variable " + ((DeclNode<?>) stmt).getId() + " has already been declared");
+                }
+                global.put(((DeclNode<?>) stmt).getId(),Visit(((DeclNode<?>) stmt)));
+            } else*/
             if (stmt instanceof FuncNode) {
                 for (String keyword : keywords) {
                     if (((FuncNode) stmt).getId().equals(keyword)) {
-                        Error.FUNCTION_NAME_RESERVED((FuncNode) stmt);
+                        Error.FUNCTION_NAME_RESERVED(((FuncNode) stmt));
                     }
                 }
-                for (String key: fmap.keySet()){
-                    if(key.equals(((FuncNode) stmt).getId())) {
-                        Error.FUNCTION_ALREADY_DECLARED(((FuncNode) stmt));
-                    }
+
+                if(nybCStack.IsFunctionDeclared(((FuncNode) stmt).getId())) {
+                    Error.FUNCTION_ALREADY_DECLARED(((FuncNode) stmt));
                 }
 
                 FuncNode function = (FuncNode)Visit((FuncNode) stmt);
                 HashMap<String, Object> functionMap = new HashMap<>();
 
-                for (DeclNode<?> param: ((FuncNode)function).getParam()){
-                    IdentifierNode identifierNode = (IdentifierNode) param.getId();
-                    String id = identifierNode.getValue();
-                    functionMap.put(id, param.getValue());
+                for (DeclNode<String> param: (function.getParam())){
+                    functionMap.put(param.getId(), param.getValue());
                 }
                 functionMap.put("0", stmt);
                 functionMap.put("1", null);

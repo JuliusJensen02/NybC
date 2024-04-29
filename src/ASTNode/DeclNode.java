@@ -4,6 +4,12 @@ public class DeclNode <T> extends StmtNode implements ASTNode {
     private T id;
     private T value;
 
+    public DeclNode(T id, T value) {
+        this.id = id;
+        this.value = value;
+    }
+
+
     public T getId() {
         return id;
     }

@@ -13,6 +13,12 @@ public class BinaryOpNode extends ExpNode implements ASTNode{
         this.endLine = endLine;
     }
 
+    public BinaryOpNode(ExpNode left, String op,ExpNode right) {
+        Left = left;
+        Right = right;
+        Op = op;
+    }
+
     public ExpNode getLeft() {
         return Left;
     }

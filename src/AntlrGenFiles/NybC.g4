@@ -38,7 +38,7 @@ assignStmt: IDENT '=' expression
           | arrayAccess '=' expression
           ;
 
-array: '['(expression(',' expression)*)*']'
+array: '['(expression(',' expression)*)?']'
      ;
 
 arrayAccess: IDENT'['INT']'

@@ -240,7 +240,7 @@ public class Interpreter extends ASTVisitor {
                 Error.ARRAY_INDEX_OUT_OF_BOUNDS(node);
             }
         } else if (node.getIndex() instanceof String) {
-            var index = lookup((String) node.getIndex());
+            var index = nybCStack.GetVariableOnStack((String) node.getIndex());
             if (index instanceof Integer){
                 try {
                     return array.get((int) index);
@@ -267,7 +267,7 @@ public class Interpreter extends ASTVisitor {
             if (arrayIndex instanceof Integer) {
                 array.set((int) arrayIndex, Visit((ExpNode) right));
             } else if (arrayIndex instanceof String) {
-                var index = lookup((String) arrayIndex);
+                var index = nybCStack.GetVariableOnStack((String) arrayIndex);
                 if (index instanceof Integer){
                     array.set((int) index, Visit((ExpNode) right));
                 } else {
@@ -278,8 +278,15 @@ public class Interpreter extends ASTVisitor {
             }
         } else if (left instanceof IdentifierNode) {
             left = ((IdentifierNode) left).getValue();
-            lookup((String) left);
+            nybCStack.GetVariableOnStack((String) left);
 
+            if(right instanceof ArrayNode) {
+                nybCStack.ReplaceVariableOnStack((String) left, Visit((ArrayNode) node.getRight()));
+            }
+            else if(right instanceof ExpNode) {
+                nybCStack.ReplaceVariableOnStack((String) left, Visit((ExpNode) node.getRight()));
+            }
+            /*
             for (int i = stack.size() - 1; i >= 0; i--) {
                 if (stack.get(i).containsKey(left)) {
                     if (right instanceof ArrayNode) {
@@ -301,8 +308,8 @@ public class Interpreter extends ASTVisitor {
 
     @Override
     public Object Visit(DeclNode<?> node) {
-        IdentifierNode leftIdentifierNode = (IdentifierNode) node.getId();
-        String leftId = leftIdentifierNode.getValue();
+//        IdentifierNode leftIdentifierNode = (IdentifierNode) node.getId();
+//        String leftId = leftIdentifierNode.getValue();
         for (String keyword : keywords) {
             if (node.getId().equals(keyword)) {
                 Error.VARIABLE_NAME_RESERVED(node);
@@ -384,10 +391,8 @@ public class Interpreter extends ASTVisitor {
                 Error.FUNCTION_CALL_WRONG_AMOUNT_OF_ARGS(funcNode);
             }
             int i = 0;
-            for (DeclNode<?> param: funcNode.getParam()) {
-                IdentifierNode identifierNode = (IdentifierNode) param.getId();
-                String id = identifierNode.getValue();
-                nybCStack.ReplaceVariableOnStack(id, paramList.get(i));
+            for (DeclNode<String> param: funcNode.getParam()) {
+                nybCStack.ReplaceVariableOnStack(param.getId(), paramList.get(i));
                 i++;
             }
             Object CtrlFlow = Visit(funcNode);

@@ -15,9 +15,9 @@ public class NybCStack {
         getFMap().put(id, functionMap);
     }
 
-    public HashMap<String, Object> LookupFunc(String id) {
-        if (getFMap().containsKey(id)){
-            //There is sent a cloned table to avoid righting in the same table
+    public HashMap<String, Object> LookupFunc(CallFuncNode node) {
+        if (getFMap().containsKey(node.getId())){
+            //There is sent a cloned table to avoid writ in the same table
             @SuppressWarnings("unchecked")
             HashMap<String, Object> clonedFunctionMap = (HashMap<String, Object>) getFMap().get(id).clone();
 
@@ -52,7 +52,6 @@ public class NybCStack {
             stack.get(i).getVariables().replace(id, newValue);
             return;
         }
-        Error.VARIABLE_NOT_DECLARED(id);
     }
 
     public boolean IsVariableOnStack(String id) {

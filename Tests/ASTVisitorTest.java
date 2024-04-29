@@ -39,7 +39,7 @@ public class ASTVisitorTest {
         binaryOpNode = new BinaryOpNode(intNode, "+", floatNode);
         var resultIntFloat = astVisitor.Visit(binaryOpNode);
         Assertions.assertNotNull(resultIntFloat);
-        Assertions.assertEquals(5.5f, resultIntFloat);
+        Assertions.assertEquals(4.5f, resultIntFloat);
 
         // Test for Int + Bool
         Assertions.assertThrows(RuntimeException.class, () -> {
@@ -52,13 +52,13 @@ public class ASTVisitorTest {
         binaryOpNode = new BinaryOpNode(intNode, "+", stringNode);
         var resultIntString = astVisitor.Visit(binaryOpNode);
         Assertions.assertNotNull(resultIntString);
-        Assertions.assertEquals("2there", resultIntString);
+        Assertions.assertEquals("2Hello", resultIntString);
 
         // Test for Float + Float
         binaryOpNode = new BinaryOpNode(floatNode, "+", floatNode);
         var resultFloatFloat = astVisitor.Visit(binaryOpNode);
         Assertions.assertNotNull(resultFloatFloat);
-        Assertions.assertEquals(6.0f, resultFloatFloat);
+        Assertions.assertEquals(5.0f, resultFloatFloat);
 
         // Test for Float + bool
         Assertions.assertThrows(RuntimeException.class, () -> {
@@ -71,7 +71,7 @@ public class ASTVisitorTest {
         binaryOpNode = new BinaryOpNode(floatNode, "+", stringNode);
         var resultFloatString = astVisitor.Visit(binaryOpNode);
         Assertions.assertNotNull(resultFloatString);
-        Assertions.assertEquals("2.5there", resultFloatString);
+        Assertions.assertEquals("2.5Hello", resultFloatString);
 
         // Test for Bool + bool
         Assertions.assertThrows(RuntimeException.class, () -> {
@@ -84,13 +84,13 @@ public class ASTVisitorTest {
         binaryOpNode = new BinaryOpNode(boolNode, "+", stringNode);
         var resultBoolString = astVisitor.Visit(binaryOpNode);
         Assertions.assertNotNull(resultBoolString);
-        Assertions.assertEquals("truethere", resultBoolString);
+        Assertions.assertEquals("trueHello", resultBoolString);
 
         // Test for String + String
         binaryOpNode = new BinaryOpNode(stringNode, "+", stringNode);
         var resultStringString = astVisitor.Visit(binaryOpNode);
         Assertions.assertNotNull(resultStringString);
-        Assertions.assertEquals("Hellothere", resultStringString);
+        Assertions.assertEquals("HelloHello", resultStringString);
 
     }
 }

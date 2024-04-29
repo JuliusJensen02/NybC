@@ -3,10 +3,7 @@ package ASTNode;
 public class IdentifierNode extends ExpNode implements ASTNode {
     private String value;
 
-    public IdentifierNode(){}
-    public IdentifierNode(String value){
-        this.value = value;
-    }
+
     public String getValue() {
         return value;
     }
@@ -14,8 +11,6 @@ public class IdentifierNode extends ExpNode implements ASTNode {
     public void setValue(String value) {
         this.value = value;
     }
-
-    private String value;
 
     public IdentifierNode(String value) {
         this.value = value;

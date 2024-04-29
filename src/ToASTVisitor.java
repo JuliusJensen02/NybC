@@ -147,7 +147,7 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
             } else if (ctx.getChild(3) instanceof NybCParser.ArrayContext) {
                 return new DeclNode<>(ctx.IDENT().getText(), (ArrayNode) visit(ctx.array()));
             } else {
-                Error.DECLARE_ASSIGNMENT_WRONG_TYPE(ctx.getChild(3).getClass().getSimpleName());
+                Error.DECLARE_ASSIGNMENT_WRONG_TYPE((NybCParser.DeclareStmtContext) ctx.getChild(3));
             }
         } else return new DeclNode<>(ctx.IDENT().getText());
         return null;

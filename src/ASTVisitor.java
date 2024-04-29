@@ -11,7 +11,7 @@ public class ASTVisitor{
     }
 
     public Object Visit(IdentifierNode node) {
-        return lookup(node.getValue());
+        return nybCStack.GetVariableOnStack(node.getValue());
     }
     public Boolean Visit(BoolNode node){
         return node.isValue();

@@ -46,7 +46,7 @@ public class ToASTVisitorTest {
                 parseTreeForCallStmt.getChild(0).getChild(0).getChild(3).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0).getChild(0));
 
         Assertions.assertNotNull(callFuncCtx);
-        Assertions.assertEquals("CallFuncNode{id='a', args=[x]}",callFuncCtx.toString());
+        Assertions.assertEquals("CallFuncNode{id='a', args=[IdentifierNode{value='x'}]}",callFuncCtx.toString());
     }
 
     @Test
@@ -63,25 +63,25 @@ public class ToASTVisitorTest {
         var parseTreeForLoop = setupParseTree("begin loop(x<10); x = x+1; end loop;");
         LoopNode loopNodeCtx = (LoopNode) ASTvisitor.visitBeginStmt((NybCParser.BeginStmtContext) parseTreeForLoop.getChild(0).getChild(0));
         Assertions.assertNotNull(loopNodeCtx);
-        Assertions.assertEquals("LoopNode{condition=BinaryOpNode{Left=x, Op=<, Right=IntNode{value=10}}, declaration=null, assignment=null, type='while', stmtList=[AssignNode{Left=x, Right=BinaryOpNode{Left=x, Op=+, Right=IntNode{value=1}}}]}", loopNodeCtx.toString());
+        Assertions.assertEquals("LoopNode{condition=BinaryOpNode{Left=IdentifierNode{value='x'}, Op=<, Right=IntNode{value=10}}, declaration=null, assignment=null, type='while', stmtList=[AssignNode{Left=IdentifierNode{value='x'}, Right=BinaryOpNode{Left=IdentifierNode{value='x'}, Op=+, Right=IntNode{value=1}}}]}", loopNodeCtx.toString());
 
         //Test for a for loop
         var parseTreeForForLoop = setupParseTree("begin loop(var x = 0; x<10; x=x+1); a(2); end loop;");
         LoopNode ForLoopNodeCtx = (LoopNode) ASTvisitor.visitBeginStmt((NybCParser.BeginStmtContext) parseTreeForForLoop.getChild(0).getChild(0));
         Assertions.assertNotNull(ForLoopNodeCtx);
-        Assertions.assertEquals("LoopNode{condition=BinaryOpNode{Left=x, Op=<, Right=IntNode{value=10}}, declaration=DeclNode{id='x', value=IntNode{value=0}}, assignment=AssignNode{Left=x, Right=BinaryOpNode{Left=x, Op=+, Right=IntNode{value=1}}}, type='for', stmtList=[CallFuncNode{id='a', args=[IntNode{value=2}]}]}",ForLoopNodeCtx.toString());
+        Assertions.assertEquals("LoopNode{condition=BinaryOpNode{Left=IdentifierNode{value='x'}, Op=<, Right=IntNode{value=10}}, declaration=DeclNode{id='x', value=IntNode{value=0}}, assignment=AssignNode{Left=IdentifierNode{value='x'}, Right=BinaryOpNode{Left=IdentifierNode{value='x'}, Op=+, Right=IntNode{value=1}}}, type='for', stmtList=[CallFuncNode{id='a', args=[IntNode{value=2}]}]}",ForLoopNodeCtx.toString());
 
         //Test for a do while loop
         var parseTreeForDoWhile = setupParseTree("begin loop; x = x+1; end loop(x<10);");
         LoopNode DoWhileLoopNodeCtx = (LoopNode) ASTvisitor.visitBeginStmt((NybCParser.BeginStmtContext) parseTreeForDoWhile.getChild(0).getChild(0));
         Assertions.assertNotNull(DoWhileLoopNodeCtx);
-        Assertions.assertEquals("LoopNode{condition=BinaryOpNode{Left=x, Op=<, Right=IntNode{value=10}}, declaration=null, assignment=null, type='do-while', stmtList=[AssignNode{Left=x, Right=BinaryOpNode{Left=x, Op=+, Right=IntNode{value=1}}}]}",DoWhileLoopNodeCtx.toString());
+        Assertions.assertEquals("LoopNode{condition=BinaryOpNode{Left=IdentifierNode{value='x'}, Op=<, Right=IntNode{value=10}}, declaration=null, assignment=null, type='do-while', stmtList=[AssignNode{Left=IdentifierNode{value='x'}, Right=BinaryOpNode{Left=IdentifierNode{value='x'}, Op=+, Right=IntNode{value=1}}}]}",DoWhileLoopNodeCtx.toString());
 
         //Test for a switch
         var parseTreeSwitch = setupParseTree("begin switch(x); case 2: out(x); case 4: out(x); default: out(x); end switch;");
         SwitchNode SwitchNodeCtx = (SwitchNode) ASTvisitor.visitBeginStmt((NybCParser.BeginStmtContext) parseTreeSwitch.getChild(0).getChild(0));
         Assertions.assertNotNull(SwitchNodeCtx);
-        Assertions.assertEquals("SwitchNode{switchCond=x, cases=[CaseNode{caseExp=IntNode{value=2}, stmtList=[CallFuncNode{id='out', args=[x]}]}, CaseNode{caseExp=IntNode{value=4}, stmtList=[CallFuncNode{id='out', args=[x]}]}, CaseNode{caseExp=null, stmtList=[CallFuncNode{id='out', args=[x]}]}]}",SwitchNodeCtx.toString());
+        Assertions.assertEquals("SwitchNode{switchCond=IdentifierNode{value='x'}, cases=[CaseNode{caseExp=IntNode{value=2}, stmtList=[CallFuncNode{id='out', args=[IdentifierNode{value='x'}]}]}, CaseNode{caseExp=IntNode{value=4}, stmtList=[CallFuncNode{id='out', args=[IdentifierNode{value='x'}]}]}, CaseNode{caseExp=null, stmtList=[CallFuncNode{id='out', args=[IdentifierNode{value='x'}]}]}]}",SwitchNodeCtx.toString());
 
 
     }
@@ -136,7 +136,7 @@ public class ToASTVisitorTest {
         AssignNode<String, IntNode> assignExpressionNode = (AssignNode<String, IntNode>) ASTvisitor.visitAssignStmt(assignExpressionStmtContext);
 
         Assertions.assertNotNull(assignExpressionNode);
-        Assertions.assertEquals("x", assignExpressionNode.getLeft());
+        Assertions.assertEquals("IdentifierNode{value='x'}", assignExpressionNode.getLeft());
         Assertions.assertEquals(4, assignExpressionNode.getRight().getValue());
 
         //Test for array

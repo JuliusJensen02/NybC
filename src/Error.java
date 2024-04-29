@@ -1,4 +1,5 @@
 import ASTNode.*;
+import AntlrGenFiles.NybCParser;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Error{
