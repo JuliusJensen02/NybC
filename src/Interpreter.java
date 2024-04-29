@@ -42,7 +42,6 @@ public class Interpreter extends ASTVisitor {
             if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
                 Error.CONTINUE_BREAK_NOT_ALLOWED_IN_FUNCTION(((CtrlFlowNode) CtrlFlow));
             } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                stack.pop();
                 return CtrlFlow;
             }
         }
@@ -299,7 +298,7 @@ public class Interpreter extends ASTVisitor {
                     break;
                 }
             }
-
+            */
         } else {
             Error.ASSIGNEE_NOT_VALID(node);
         }
@@ -315,15 +314,12 @@ public class Interpreter extends ASTVisitor {
                 Error.VARIABLE_NAME_RESERVED(node);
             }
         }
-        if(nybCStack.IsVariableOnCurrentStack(node.getId())) {
-            Error.VARIABLE_ALREADY_DECLARED(node.getId());
-        }
         if (node.getValue() instanceof ArrayNode) {
-            nybCStack.PutVariableToCurrentStack(node.getId(), Visit((ArrayNode) node.getValue()));
+            nybCStack.PutVariableToCurrentStack(node, Visit((ArrayNode) node.getValue()));
         } else if (node.getValue() instanceof ExpNode) {
-            nybCStack.PutVariableToCurrentStack(node.getId(), Visit((ExpNode) node.getValue()));
+            nybCStack.PutVariableToCurrentStack(node, Visit((ExpNode) node.getValue()));
         } else {
-            nybCStack.PutVariableToCurrentStack(node.getId(), null);
+            nybCStack.PutVariableToCurrentStack(node, null);
         }
         return null;
     }
@@ -375,11 +371,8 @@ public class Interpreter extends ASTVisitor {
             return scan.nextLine();
 
         } else {
-            if(lookupFunc(node.getId()) == null){
-                Error.FUNCTION_NOT_DECLARED(node);
-            }
 
-            HashMap<String, Object> fMap = nybCStack.LookupFunc(node.getId());
+            HashMap<String, Object> fMap = nybCStack.LookupFunc(node);
             FuncNode funcNode = (FuncNode) fMap.get("0");
 
             List<Object> paramList = new ArrayList<>();

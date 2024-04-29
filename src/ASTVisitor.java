@@ -232,14 +232,6 @@ public class ASTVisitor{
         return null;
     }
 
-    public Object lookup (String node) {
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            if (stack.get(i).containsKey(node)) {
-                return stack.get(i).get(node);
-            }
-        }
-        return null;
-    }
     @SuppressWarnings("unchecked")
     public List<Object> lookupArray (String node) {
         if(nybCStack.GetVariableOnStack(node) instanceof  List<?>) {
