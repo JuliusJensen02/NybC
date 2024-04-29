@@ -20,6 +20,14 @@ public class UnaryOpNode extends ExpNode implements ASTNode{
         Op = op;
     }
 
+    public UnaryOpNode(ExpNode right, String op) {
+        Right = right;
+        Op = op;
+    }
+
+    public UnaryOpNode() {
+    }
+
     @Override
     public String toString() {
         return "UnaryOpNode{" +

@@ -1,13 +1,15 @@
 
 import ASTNode.*;
-import org.antlr.v4.codegen.model.decl.Decl;
 
-import javax.sound.midi.SysexMessage;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 
-public class InitialVisitor extends ASTVisitor implements VisitorInterface{
+public class InitialVisitor extends ASTVisitor {
+    List<String> keywords;
+    public InitialVisitor(NybCStack nybCStack, List<String> keywords) {
+        super(nybCStack);
+        this.keywords = keywords;
+    }
 
 /*    @Override
     public Object Visit(DeclNode<?> node) {
@@ -28,8 +30,7 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
 
     @Override
     public void Visit(ProgramNode node) {
-        HashMap<String, Object> global = new HashMap<>();
-        stack.push(global);
+        nybCStack.PushStack();
 
         for (Object stmt: node.getStmtList()) {
             if (stmt instanceof FuncNode) {
@@ -43,7 +44,8 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
                         Error.FUNCTION_ALREADY_DECLARED(((FuncNode) stmt));
                     }
                 }
-                Object function = Visit((FuncNode) stmt);
+
+                FuncNode function = (FuncNode)Visit((FuncNode) stmt);
                 HashMap<String, Object> functionMap = new HashMap<>();
 
                 for (DeclNode<?> param: ((FuncNode)function).getParam()){
@@ -52,7 +54,12 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
                     functionMap.put(id, param.getValue());
                 }
                 functionMap.put("0", stmt);
-                fmap.put(((FuncNode) function).getId(), functionMap);
+                functionMap.put("1", null);
+
+                @SuppressWarnings("unchecked")
+                HashMap<String, Object> functionMapHashTable = (HashMap<String, Object>) functionMap.clone();
+
+                nybCStack.PutFunction(function.getId(), functionMapHashTable);
             }
         }
     }

@@ -15,6 +15,14 @@ public class IdentifierNode extends ExpNode implements ASTNode {
         this.value = value;
     }
 
+    private String value;
+
+    public IdentifierNode(String value) {
+        this.value = value;
+    }
+
+    public IdentifierNode() {
+    }
 
     @Override
     public String toString() {

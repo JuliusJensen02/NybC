@@ -10,4 +10,11 @@ public class ParenthNode extends ExpNode implements ASTNode {
     public void setInner(ExpNode inner) {
         Inner = inner;
     }
+
+    @Override
+    public String toString() {
+        return "ParenthNode{" +
+                "Inner=" + Inner +
+                '}';
+    }
 }

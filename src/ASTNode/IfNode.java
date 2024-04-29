@@ -3,6 +3,7 @@ package ASTNode;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO hviker ikke i interpreter: ifNode er null når den skal bruges 😫
 public class IfNode extends StmtNode implements ASTNode{
     private ExpNode condition;
     private List<StmtNode> stmts = new ArrayList<StmtNode>();

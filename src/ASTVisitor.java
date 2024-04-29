@@ -1,11 +1,14 @@
 import ASTNode.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
+public class ASTVisitor{
+    protected NybCStack nybCStack;
 
-public class ASTVisitor implements VisitorInterface{
+    public ASTVisitor(NybCStack nybCStack) {
+        this.nybCStack = nybCStack;
+    }
 
     public Object Visit(IdentifierNode node) {
         return lookup(node.getValue());
@@ -34,10 +37,10 @@ public class ASTVisitor implements VisitorInterface{
     public CtrlFlowNode Visit(CtrlFlowNode node) {
         if (node.getType().equals("return") && node.getReturnExp() != null){
             var value = Visit(node.getReturnExp());
-            for (int i = stack.size() - 1; i >= 0; i--) {
-                if (stack.get(i).containsKey("0")) {
-                    stack.get(i).put("1", value);
-                }
+
+            //TODO; Hvad er en "0" og hvad vil den med en "1"??? kan vi ikke bruge navne guys?? Vi har ikke math A mere
+            if (nybCStack.GetVariableOnStack("0") != null) {
+                nybCStack.ReplaceVariableOnStack("1", value);
             }
         }
         return node;
@@ -237,20 +240,19 @@ public class ASTVisitor implements VisitorInterface{
         }
         return null;
     }
-
+    @SuppressWarnings("unchecked")
     public List<Object> lookupArray (String node) {
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            if (stack.get(i).containsKey(node)) {
-                return (List<Object>) stack.get(i).get(node);
-            }
+        if(nybCStack.GetVariableOnStack(node) instanceof  List<?>) {
+            return (List<Object>) nybCStack.GetVariableOnStack(node);
         }
         return null;
     }
-
+    /*
     public HashMap<String, Object> lookupFunc (String node) {
-        if (fmap.containsKey(node)){
-            return (HashMap<String, Object>) fmap.get(node);
+        if (nybCStack.getFmap().containsKey(node)){
+            return (HashMap<String, Object>) nybCStack.getFmap().get(node);
         }
         return null;
     }
+     */
 }

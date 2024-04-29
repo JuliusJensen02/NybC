@@ -1,24 +1,32 @@
 import ASTNode.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-public class Interpreter extends ASTVisitor implements VisitorInterface{
+public class Interpreter extends ASTVisitor {
+    List<String> keywords;
+    public Interpreter(NybCStack nybCStack, List<String> keywords) {
+        super(nybCStack);
+        this.keywords = keywords;
+    }
 
     @Override
     public void Visit(ProgramNode node) {
         Object CtrlFlow;
         for (Object stmt: node.getStmtList()) {
-            if (!(stmt instanceof FuncNode)){
-                CtrlFlow = Visit((StmtNode) stmt);
-                if (CtrlFlow != null) {
-                    if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
-                        Error.CONTINUE_BREAK_NOT_ALLOWED_IN_GLOBAL(((CtrlFlowNode) CtrlFlow));
-                    } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                        break;
-                    }
-                }
+            if (stmt instanceof FuncNode){
+                continue;
+            }
+            CtrlFlow = Visit((StmtNode) stmt);
+            if (CtrlFlow == null) {
+                continue;
+            }
+            if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
+                Error.CONTINUE_BREAK_NOT_ALLOWED_IN_GLOBAL(((CtrlFlowNode) CtrlFlow));
+            } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                break;
             }
         }
     }
@@ -28,155 +36,180 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
         Object CtrlFlow;
         for (StmtNode stmt: node.getStmsList()) {
             CtrlFlow = Visit(stmt);
-            if (CtrlFlow != null) {
-                if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
-                    Error.CONTINUE_BREAK_NOT_ALLOWED_IN_FUNCTION(((CtrlFlowNode) CtrlFlow));
-                } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                    stack.pop();
-                    return CtrlFlow;
-                }
+            if (CtrlFlow == null) {
+                continue;
+            }
+            if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
+                Error.CONTINUE_BREAK_NOT_ALLOWED_IN_FUNCTION(((CtrlFlowNode) CtrlFlow));
+            } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                stack.pop();
+                return CtrlFlow;
             }
         }
-        stack.pop();
         return null;
     }
 
     @Override
     public Object Visit(LoopNode node) {
-        HashMap<String, Object> map = new HashMap<>();
-        stack.push(map);
-
+        nybCStack.PushStack();
         if (node.getDeclaration() != null) {
             Visit(node.getDeclaration());
         }
+
         if (!(Visit(node.getCondition()) instanceof Boolean)) {
             Error.INCORRECT_LOOP_CONDITION(node);
         }
-        Object CtrlFlow;
-        Boolean bool = (Boolean) Visit(node.getCondition());
         switch (node.getType()) {
             case "while" -> {
-                while (bool) {
-                    HashMap<String, Object> InnerMap = new HashMap<>();
-                    stack.push(InnerMap);
-                    bool = (Boolean) Visit(node.getCondition());
-                    label:
-                    for (StmtNode stmt : node.getStmtList()) {
-                        CtrlFlow = Visit(stmt);
-                        if (CtrlFlow != null) {
-                            switch (((CtrlFlowNode) CtrlFlow).getType()) {
-                                case "return":
-                                    stack.pop();
-                                    stack.pop();
-                                    return CtrlFlow;
-                                case "break":
-                                    bool = false;
-                                    break label;
-                                case "continue":
-                                    break label;
-                            }
-                        }
-                    }
-                    stack.pop();
-                }
-                stack.pop();
+                return whileLoopLogic(node);
             }
             case "for" -> {
-                while (bool) {
-                    HashMap<String, Object> InnerMap = new HashMap<>();
-                    stack.push(InnerMap);
-                    bool = (Boolean) Visit(node.getCondition());
-                    label1:
-                    for (StmtNode stmt : node.getStmtList()) {
-                        CtrlFlow = Visit(stmt);
-                        if (CtrlFlow != null) {
-                            switch (((CtrlFlowNode) CtrlFlow).getType()) {
-                                case "return":
-                                    stack.pop();
-                                    stack.pop();
-                                    return CtrlFlow;
-                                case "break":
-                                    bool = false;
-                                    break label1;
-                                case "continue":
-                                    break label1;
-                            }
-                        }
-
-                    }
-                    stack.pop();
-                    Visit(node.getAssignment());
-                }
-                stack.pop();
+                return forLoopLogic(node);
             }
             case "do-while" -> {
-                do {
-                    HashMap<String, Object> InnerMap = new HashMap<>();
-                    stack.push(InnerMap);
-                    bool = (Boolean) Visit(node.getCondition());
-                    label2:
-                    for (StmtNode stmt : node.getStmtList()) {
-                        CtrlFlow = Visit(stmt);
-                        if (CtrlFlow != null) {
-                            switch (((CtrlFlowNode) CtrlFlow).getType()) {
-                                case "return":
-                                    stack.pop();
-                                    stack.pop();
-                                    return CtrlFlow;
-                                case "break":
-                                    bool = false;
-                                    break label2;
-                                case "continue":
-                                    break label2;
-                            }
-                        }
-                    }
-                    stack.pop();
-                } while (bool);
-                stack.pop();
+                return doWhileLoopLogic(node);
             }
         }
+        return null;
+    }
+
+    private Object whileLoopLogic(LoopNode node) {
+        boolean goOutOfLoop = false;
+        while ((Boolean) Visit(node.getCondition())) {
+            if(goOutOfLoop) {
+                break;
+            }
+            nybCStack.PushStack();
+            for (StmtNode stmt : node.getStmtList()) {
+                Object CtrlFlow = Visit(stmt);
+                if (CtrlFlow == null) {
+                    continue;
+                }
+                if(((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                    nybCStack.PopStack();
+                    nybCStack.PopStack();
+                    return CtrlFlow;
+                }
+                else if(((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
+                    goOutOfLoop = true;
+                    nybCStack.PopStack();
+                    break;
+                }
+                else if(((CtrlFlowNode) CtrlFlow).getType().equals("continue")) {
+                    break;
+                }
+            }
+            nybCStack.PopStack();
+        }
+        nybCStack.PopStack();
+        return null;
+    }
+
+    private Object forLoopLogic(LoopNode node) {
+        boolean goOutOfLoop = false;
+        while ((Boolean) Visit(node.getCondition())) {
+            if(goOutOfLoop) {
+                break;
+            }
+            nybCStack.PushStack();
+            for (StmtNode stmt : node.getStmtList()) {
+                Object CtrlFlow = Visit(stmt);
+                if (CtrlFlow == null) {
+                    continue;
+                }
+                if(((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                    nybCStack.PopStack();
+                    nybCStack.PopStack();
+                    return CtrlFlow;
+                }
+                else if(((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
+                    goOutOfLoop = true;
+                    break;
+                }
+                else if(((CtrlFlowNode) CtrlFlow).getType().equals("continue")) {
+                    break;
+                }
+            }
+            nybCStack.PopStack();
+            Visit(node.getAssignment());
+        }
+        nybCStack.PopStack();
+        return null;
+    }
+
+    private Object doWhileLoopLogic(LoopNode node) {
+        boolean goOutOfLoop = false;
+        do {
+            if(goOutOfLoop) {
+                break;
+            }
+            nybCStack.PushStack();
+            for (StmtNode stmt : node.getStmtList()) {
+                Object CtrlFlow = Visit(stmt);
+                if (CtrlFlow == null) {
+                    continue;
+                }
+                if(((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                    nybCStack.PopStack();
+                    nybCStack.PopStack();
+                    return CtrlFlow;
+                }
+                else if(((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
+                    goOutOfLoop = true;
+                    nybCStack.PopStack();
+                    break;
+                }
+                else if(((CtrlFlowNode) CtrlFlow).getType().equals("continue")) {
+                    break;
+                }
+            }
+            nybCStack.PopStack();
+        } while ((Boolean) Visit(node.getCondition()));
+        nybCStack.PopStack();
         return null;
     }
 
     @Override
     public Object Visit(SwitchNode node) {
-        HashMap<String, Object> map = new HashMap<>();
-        stack.push(map);
+        nybCStack.PushStack();
         Object CtrlFlow;
 
         if (Visit(node.getSwitchCond()) instanceof String) {
             for (CaseNode cases: node.getCases()) {
-                if (Visit(node.getSwitchCond()).equals(Visit(cases.getCaseExp())) || cases.getCaseExp() == null) {
-                    CtrlFlow = Visit(cases);
-                    if (CtrlFlow != null) {
-                        if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
-                            stack.pop();
-                            return null;
-                        } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                            stack.pop();
-                            return CtrlFlow;
-                        }
-                    }
+                if (!(Visit(node.getSwitchCond()).equals(Visit(cases.getCaseExp())) || cases.getCaseExp() == null)) {
+                    continue;
+                }
+                CtrlFlow = Visit(cases);
+                if (CtrlFlow == null) {
+                    continue;
+                }
+                if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
+                    nybCStack.PopStack();
+                    return null;
+                } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                    nybCStack.PopStack();
+                    return CtrlFlow;
                 }
             }
         } else {
             for (CaseNode cases: node.getCases()) {
-                if (Visit(node.getSwitchCond()) == Visit(cases.getCaseExp()) || cases.getCaseExp() == null) {
-                    CtrlFlow = Visit(cases);
-                    if (CtrlFlow != null) {
-                        if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
-                            stack.pop();
-                            return null;
-                        } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
-                            stack.pop();
-                            return CtrlFlow;
-                        }
-                    }
+                if (!(Visit(node.getSwitchCond()) == Visit(cases.getCaseExp()) || cases.getCaseExp() == null)) {
+                    continue;
+                }
+                CtrlFlow = Visit(cases);
+                if (CtrlFlow == null) {
+                    continue;
+                }
+                if (((CtrlFlowNode) CtrlFlow).getType().equals("break")) {
+                    nybCStack.PopStack();
+                    return null;
+                } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
+                    nybCStack.PopStack();
+                    return CtrlFlow;
                 }
             }
         }
-        stack.pop();
+        nybCStack.PopStack();
         return null;
     }
 
@@ -259,6 +292,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                     break;
                 }
             }
+
         } else {
             Error.ASSIGNEE_NOT_VALID(node);
         }
@@ -274,15 +308,15 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                 Error.VARIABLE_NAME_RESERVED(node);
             }
         }
-        if (stack.peek().containsKey(leftId)) {
-            Error.VARIABLE_ALREADY_DECLARED(node);
+        if(nybCStack.IsVariableOnCurrentStack(node.getId())) {
+            Error.VARIABLE_ALREADY_DECLARED(node.getId());
         }
         if (node.getValue() instanceof ArrayNode) {
-            stack.peek().put(leftId, Visit((ArrayNode) node.getValue()));
+            nybCStack.PutVariableToCurrentStack(node.getId(), Visit((ArrayNode) node.getValue()));
         } else if (node.getValue() instanceof ExpNode) {
-            stack.peek().put(leftId, Visit((ExpNode) node.getValue()));
+            nybCStack.PutVariableToCurrentStack(node.getId(), Visit((ExpNode) node.getValue()));
         } else {
-            stack.peek().put(leftId, null);
+            nybCStack.PutVariableToCurrentStack(node.getId(), null);
         }
         return null;
     }
@@ -292,25 +326,27 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
         if (!(Visit(node.getCondition()) instanceof Boolean) && node.getCondition() != null){
             Error.INCORRECT_IF_CONDITION(node);
         }
-        HashMap<String, Object> map = new HashMap<>();
-        stack.push(map);
+        nybCStack.PushStack();
         Object CtrlFlow;
         if (node.getCondition() == null || (Boolean) Visit(node.getCondition())){
             for (StmtNode stmt: node.getStmts()){
                 CtrlFlow = Visit(stmt);
                 if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
-                    stack.pop();
+                    nybCStack.PopStack();
                     return CtrlFlow;
                 }
             }
         } else {
-            CtrlFlow = Visit(node.getElseIfNode());
-            if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
-                stack.pop();
-                return CtrlFlow;
+            IfNode elseifNode = node.getElseIfNode();
+            if(elseifNode != null) {
+                CtrlFlow = Visit(elseifNode);
+                if (CtrlFlow != null && (((CtrlFlowNode) CtrlFlow).getType().equals("return") || ((CtrlFlowNode) CtrlFlow).getType().equals("break") || ((CtrlFlowNode) CtrlFlow).getType().equals("continue"))){
+                    nybCStack.PopStack();
+                    return CtrlFlow;
+                }
             }
         }
-        stack.pop();
+        nybCStack.PopStack();
         return null;
     }
 
@@ -322,19 +358,28 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
             } else {
                 Error.OUT_TOO_MANY_ARGS(node);
             }
+            return null;
+
         } else if (node.getId().equals("in")) {
             if(!node.getArgs().isEmpty()){
                 Error.IN_TOO_MANY_ARGS(node);
             }
             Scanner scan = new Scanner(System.in);
             return scan.nextLine();
+
         } else {
             if(lookupFunc(node.getId()) == null){
                 Error.FUNCTION_NOT_DECLARED(node);
             }
-            HashMap<String, Object> map = lookupFunc(node.getId());
-            stack.push(map);
-            FuncNode funcNode = (FuncNode) map.get("0");
+
+            HashMap<String, Object> fMap = nybCStack.LookupFunc(node.getId());
+            FuncNode funcNode = (FuncNode) fMap.get("0");
+
+            List<Object> paramList = new ArrayList<>();
+            for (int i = 0; i < funcNode.getParam().size(); i++) {
+                paramList.add(Visit(node.getArgs().get(i)));
+            }
+            nybCStack.PushStack(fMap);
             if (node.getArgs().size() != funcNode.getParam().size()){
                 Error.FUNCTION_CALL_WRONG_AMOUNT_OF_ARGS(funcNode);
             }
@@ -342,13 +387,16 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
             for (DeclNode<?> param: funcNode.getParam()) {
                 IdentifierNode identifierNode = (IdentifierNode) param.getId();
                 String id = identifierNode.getValue();
-                map.replace(id, Visit(node.getArgs().get(i)));
+                nybCStack.ReplaceVariableOnStack(id, paramList.get(i));
                 i++;
             }
             Object CtrlFlow = Visit(funcNode);
             if (CtrlFlow != null && ((CtrlFlowNode) CtrlFlow).getReturnExp() != null) {
-                return map.get("1");
+                Object returnValue = nybCStack.GetVariableOnStack("1");
+                nybCStack.PopStack();
+                return returnValue;
             }
+            nybCStack.PopStack();
         }
         return null;
     }
