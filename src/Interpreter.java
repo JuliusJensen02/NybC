@@ -14,7 +14,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                 CtrlFlow = Visit((StmtNode) stmt);
                 if (CtrlFlow != null) {
                     if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
-                        Error.CONTINUE_BREAK_NOT_ALLOWED_IN_GLOBAL(((CtrlFlowNode) CtrlFlow).getType());
+                        Error.CONTINUE_BREAK_NOT_ALLOWED_IN_GLOBAL(((CtrlFlowNode) CtrlFlow));
                     } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
                         break;
                     }
@@ -30,7 +30,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
             CtrlFlow = Visit(stmt);
             if (CtrlFlow != null) {
                 if (((CtrlFlowNode) CtrlFlow).getType().equals("continue") || ((CtrlFlowNode) CtrlFlow).getType().equals("break")){
-                    Error.CONTINUE_BREAK_NOT_ALLOWED_IN_FUNCTION(((CtrlFlowNode) CtrlFlow).getType());
+                    Error.CONTINUE_BREAK_NOT_ALLOWED_IN_FUNCTION(((CtrlFlowNode) CtrlFlow));
                 } else if (((CtrlFlowNode) CtrlFlow).getType().equals("return")) {
                     stack.pop();
                     return CtrlFlow;
@@ -50,7 +50,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
             Visit(node.getDeclaration());
         }
         if (!(Visit(node.getCondition()) instanceof Boolean)) {
-            Error.INCORRECT_LOOP_CONDITION(node.getCondition().toString());
+            Error.INCORRECT_LOOP_CONDITION(node);
         }
         Object CtrlFlow;
         Boolean bool = (Boolean) Visit(node.getCondition());
@@ -196,12 +196,15 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
     public Object Visit(ArrayAccessNode<?> node) {
 
         List<Object> array = lookupArray(node.getId());
+        if (array == null) {
+            Error.VARIABLE_NOT_DECLARED(node);
+        }
 
         if (node.getIndex() instanceof Integer) {
             try {
                 return array.get((Integer) node.getIndex());
             } catch (IndexOutOfBoundsException e){
-                Error.ARRAY_INDEX_OUT_OF_BOUNDS(node.getIndex().toString());
+                Error.ARRAY_INDEX_OUT_OF_BOUNDS(node);
             }
         } else if (node.getIndex() instanceof String) {
             var index = lookup((String) node.getIndex());
@@ -209,13 +212,13 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                 try {
                     return array.get((int) index);
                 } catch (IndexOutOfBoundsException e){
-                    Error.ARRAY_INDEX_OUT_OF_BOUNDS(node.getIndex().toString());
+                    Error.ARRAY_INDEX_OUT_OF_BOUNDS(node);
                 }
             } else {
-                Error.ARRAY_INDEX_VAR_NOT_INT((String) node.getIndex());
+                Error.ARRAY_INDEX_VAR_NOT_INT(node);
             }
         } else {
-            Error.ARRAY_INDEX_NOT_VALID(node.getIndex().toString());
+            Error.ARRAY_INDEX_NOT_VALID(node, node.getIndex().toString());
         }
         return null;
     }
@@ -235,12 +238,13 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                 if (index instanceof Integer){
                     array.set((int) index, Visit((ExpNode) right));
                 } else {
-                    Error.ARRAY_INDEX_VAR_NOT_INT((String) arrayIndex);
+                    Error.ASSIGNMENT_ARRAY_INDEX_VAR_NOT_INT(node, (String) arrayIndex);
                 }
             } else {
-                Error.ARRAY_INDEX_NOT_VALID(arrayIndex.toString());
+                Error.ASSIGNMENT_ARRAY_INDEX_NOT_VALID(node, arrayIndex.toString());
             }
-        } else if (left instanceof String) {
+        } else if (left instanceof IdentifierNode) {
+            left = ((IdentifierNode) left).getValue();
             lookup((String) left);
 
             for (int i = stack.size() - 1; i >= 0; i--) {
@@ -250,36 +254,35 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
                     } else if (right instanceof ExpNode) {
                         stack.get(i).replace((String) left, Visit((ExpNode) node.getRight()));
                     } else {
-                        Error.ASSIGNMENT_VALUE_NOT_VALID(right.toString());
+                        Error.ASSIGNMENT_VALUE_NOT_VALID(node);
                     }
                     break;
                 }
             }
         } else {
-            Error.ASSIGNMENT_VALUE_NOT_VALID(left.toString());
+            Error.ASSIGNEE_NOT_VALID(node);
         }
         return null;
     }
 
     @Override
     public Object Visit(DeclNode<?> node) {
-
+        IdentifierNode leftIdentifierNode = (IdentifierNode) node.getId();
+        String leftId = leftIdentifierNode.getValue();
         for (String keyword : keywords) {
             if (node.getId().equals(keyword)) {
-                Error.VARIABLE_NAME_RESERVED(node.getId());
+                Error.VARIABLE_NAME_RESERVED(node);
             }
         }
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            if (stack.get(i).containsKey(node.getId())) {
-                Error.VARIABLE_ALREADY_DECLARED(node.getId());
-            }
+        if (stack.peek().containsKey(leftId)) {
+            Error.VARIABLE_ALREADY_DECLARED(node);
         }
         if (node.getValue() instanceof ArrayNode) {
-            stack.peek().put(node.getId(), Visit((ArrayNode) node.getValue()));
+            stack.peek().put(leftId, Visit((ArrayNode) node.getValue()));
         } else if (node.getValue() instanceof ExpNode) {
-            stack.peek().put(node.getId(), Visit((ExpNode) node.getValue()));
+            stack.peek().put(leftId, Visit((ExpNode) node.getValue()));
         } else {
-            stack.peek().put(node.getId(), null);
+            stack.peek().put(leftId, null);
         }
         return null;
     }
@@ -287,7 +290,7 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
     @Override
     public Object Visit(IfNode node) {
         if (!(Visit(node.getCondition()) instanceof Boolean) && node.getCondition() != null){
-            Error.INCORRECT_IF_CONDITION(node.getCondition().toString());
+            Error.INCORRECT_IF_CONDITION(node);
         }
         HashMap<String, Object> map = new HashMap<>();
         stack.push(map);
@@ -317,21 +320,29 @@ public class Interpreter extends ASTVisitor implements VisitorInterface{
             if (node.getArgs().size() == 1) {
                 System.out.println(Visit(node.getArgs().get(0)));
             } else {
-                Error.OUT_TOO_MANY_ARGS();
+                Error.OUT_TOO_MANY_ARGS(node);
             }
         } else if (node.getId().equals("in")) {
+            if(!node.getArgs().isEmpty()){
+                Error.IN_TOO_MANY_ARGS(node);
+            }
             Scanner scan = new Scanner(System.in);
             return scan.nextLine();
         } else {
+            if(lookupFunc(node.getId()) == null){
+                Error.FUNCTION_NOT_DECLARED(node);
+            }
             HashMap<String, Object> map = lookupFunc(node.getId());
             stack.push(map);
             FuncNode funcNode = (FuncNode) map.get("0");
             if (node.getArgs().size() != funcNode.getParam().size()){
-                Error.FUNCTION_CALL_WRONG_AMOUNT_OF_ARGS(funcNode.getId());
+                Error.FUNCTION_CALL_WRONG_AMOUNT_OF_ARGS(funcNode);
             }
             int i = 0;
             for (DeclNode<?> param: funcNode.getParam()) {
-                map.replace(param.getId(), Visit(node.getArgs().get(i)));
+                IdentifierNode identifierNode = (IdentifierNode) param.getId();
+                String id = identifierNode.getValue();
+                map.replace(id, Visit(node.getArgs().get(i)));
                 i++;
             }
             Object CtrlFlow = Visit(funcNode);

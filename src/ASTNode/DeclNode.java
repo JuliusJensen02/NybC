@@ -1,14 +1,14 @@
 package ASTNode;
 
 public class DeclNode <T> extends StmtNode implements ASTNode {
-    private String id;
+    private T id;
     private T value;
 
-    public String getId() {
+    public T getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(T id) {
         this.id = id;
     }
 
@@ -20,11 +20,13 @@ public class DeclNode <T> extends StmtNode implements ASTNode {
         this.value = value;
     }
 
-    public DeclNode(String id, T value) {
+    public DeclNode(T id, T value, int startLine, int endLine) {
         this.id = id;
         this.value = value;
+        this.startLine = startLine;
+        this.endLine = endLine;
     }
-    public DeclNode(String id){
+    public DeclNode(T id){
         this.id = id;
     }
 

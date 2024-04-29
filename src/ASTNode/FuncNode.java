@@ -1,13 +1,10 @@
 package ASTNode;
-
-import org.antlr.v4.codegen.model.decl.Decl;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class FuncNode extends StmtNode implements ASTNode {
     private String id;
-    private List<DeclNode> param = new ArrayList<DeclNode>();
+    private List<DeclNode> param = new ArrayList<>();
 
     private List<StmtNode> stmtList = new ArrayList<StmtNode>();
 

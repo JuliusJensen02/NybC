@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ProgramNode implements ASTNode{
-
-
     private List<ASTNode> stmtList = new ArrayList<>();
 
     public List<ASTNode> getStmtList() {

@@ -2,7 +2,7 @@ package ASTNode;
 
 public class IntNode extends ExpNode implements ASTNode {
 
-    public int value;
+    private int value;
     public int getValue() {
         return value;
     }

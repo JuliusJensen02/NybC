@@ -5,10 +5,12 @@ public class BinaryOpNode extends ExpNode implements ASTNode{
     private ExpNode Right;
     private String Op;
 
-    public BinaryOpNode(ExpNode left, String op, ExpNode right) {
+    public BinaryOpNode(ExpNode left, String op, ExpNode right, int startLine, int endLine) {
         Left = left;
         Right = right;
         Op = op;
+        this.startLine = startLine;
+        this.endLine = endLine;
     }
 
     public ExpNode getLeft() {

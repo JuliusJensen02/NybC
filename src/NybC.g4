@@ -9,7 +9,7 @@ stmt: beginStmt';'
     | ctrlFlowStmt';'
     ;
 
-functionStmt : 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' 'function'';'
+functionStmt : 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' ('function' | IDENT)';'
              | 'begin' 'function' IDENT '('('var' IDENT (',' 'var' IDENT)*)?')' ';' (stmt)+ 'end' IDENT ';'
              ;
 

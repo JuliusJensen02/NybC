@@ -56,7 +56,7 @@ public class ASTVisitor implements VisitorInterface{
                 } else if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() + ((Number) right).floatValue();
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_PLUS(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_PLUS(node);
             }
             case "-" -> {
                 if (left instanceof Integer && right instanceof Integer) {
@@ -64,7 +64,7 @@ public class ASTVisitor implements VisitorInterface{
                 } else if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() - ((Number) right).floatValue();
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_MINUS(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_MINUS(node);
             }
             case "*" -> {
                 if (left instanceof Integer && right instanceof Integer) {
@@ -72,37 +72,37 @@ public class ASTVisitor implements VisitorInterface{
                 } else if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() * ((Number) right).floatValue();
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_MULT(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_MULT(node);
             }
             case "/" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer) && ((Number) right).floatValue() != 0.0) {
                     return ((Number) left).floatValue() / ((Number) right).floatValue();
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_DIV(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_DIV(node);
             }
             case "<" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() < ((Number) right).floatValue();
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_LT(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_LT(node);
             }
             case ">" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() > ((Number) right).floatValue();
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_GT(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_GT(node);
             }
             case "<=" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() <= ((Number) right).floatValue();
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_LTE(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_LTE(node);
             }
             case ">=" -> {
                 if ((left instanceof Float || left instanceof Integer) && (right instanceof Float || right instanceof Integer)) {
                     return ((Number) left).floatValue() >= ((Number) right).floatValue();
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_GTE(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_GTE(node);
             }
             case "!=" -> {
                 if (left instanceof String && right instanceof String) {
@@ -114,7 +114,7 @@ public class ASTVisitor implements VisitorInterface{
                 } else if (left instanceof Integer && right instanceof Integer) {
                     return (int) left != (int) right;
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_NEQ(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_NEQ(node);
             }
             case "==" -> {
                 if (left instanceof String && right instanceof String) {
@@ -126,19 +126,19 @@ public class ASTVisitor implements VisitorInterface{
                 } else if (left instanceof Integer && right instanceof Integer) {
                     return (int) left == (int) right;
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_EQ(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_EQ(node);
             }
             case "||" -> {
                 if (left instanceof Boolean && right instanceof Boolean) {
                     return (Boolean) left || (Boolean) right;
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_OR(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_OR(node);
             }
             case "&&" -> {
                 if (left instanceof Boolean && right instanceof Boolean) {
                     return (Boolean) left && (Boolean) right;
                 }
-                Error.TYPE_NOT_VALID_FOR_BINARY_AND(node.getLeft() + " " + node.getOp() + " " + node.getRight());
+                Error.TYPE_NOT_VALID_FOR_BINARY_AND(node);
             }
         }
         return null;
@@ -150,19 +150,19 @@ public class ASTVisitor implements VisitorInterface{
                 if (right instanceof Integer || right instanceof Float) {
                     return ((Number) right).floatValue();
                 }
-                Error.TYPE_NOT_VALID_FOR_UNARY_PLUS(right.toString());
+                Error.TYPE_NOT_VALID_FOR_UNARY_PLUS(node);
             }
             case "-" -> {
                 if (right instanceof Integer || right instanceof Float) {
                     return -1 * ((Number) right).floatValue();
                 }
-                Error.TYPE_NOT_VALID_FOR_UNARY_MINUS(right.toString());
+                Error.TYPE_NOT_VALID_FOR_UNARY_MINUS(node);
             }
             case "!" -> {
                 if (right instanceof Boolean) {
                     return !(Boolean) right;
                 }
-                Error.TYPE_NOT_VALID_FOR_UNARY_NOT(right.toString());
+                Error.TYPE_NOT_VALID_FOR_UNARY_NOT(node);
             }
         }
         return null;
@@ -235,7 +235,6 @@ public class ASTVisitor implements VisitorInterface{
                 return stack.get(i).get(node);
             }
         }
-        Error.VARIABLE_NOT_DECLARED(node);
         return null;
     }
 
@@ -245,7 +244,6 @@ public class ASTVisitor implements VisitorInterface{
                 return (List<Object>) stack.get(i).get(node);
             }
         }
-        Error.VARIABLE_NOT_DECLARED(node);
         return null;
     }
 
@@ -253,7 +251,6 @@ public class ASTVisitor implements VisitorInterface{
         if (fmap.containsKey(node)){
             return (HashMap<String, Object>) fmap.get(node);
         }
-        Error.FUNCTION_NOT_DECLARED(node);
         return null;
     }
 }

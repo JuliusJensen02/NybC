@@ -1,6 +1,12 @@
 package ASTNode;
 
 public class IdentifierNode extends ExpNode implements ASTNode {
+    private String value;
+
+    public IdentifierNode(){}
+    public IdentifierNode(String value){
+        this.value = value;
+    }
     public String getValue() {
         return value;
     }
@@ -9,10 +15,12 @@ public class IdentifierNode extends ExpNode implements ASTNode {
         this.value = value;
     }
 
-    private String value;
 
+    @Override
     public String toString() {
-        return value;
+        return "IdentifierNode{" +
+                "value='" + value + '\'' +
+                '}';
     }
 }
 

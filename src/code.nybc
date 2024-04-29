@@ -1,12 +1,7 @@
-var a = 0;
-begin if ( a + 2 != 2 || a != 1 );
-    out(a);
-end if;
-begin function hello (var a);
-    out("Hello World!");
-    return a;
+var b = 0;
+begin function a();
+    var b = 1;
+    return b;
 end function;
-begin function hello (var a);
-    out("Hello World!");
-    return a;
-end function;
+var x = a();
+out(x);

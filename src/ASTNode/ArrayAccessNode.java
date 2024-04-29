@@ -4,9 +4,11 @@ public class ArrayAccessNode <T> extends ExpNode implements ASTNode{
     private String id;
     private T index;
 
-    public ArrayAccessNode(String id, T index){
+    public ArrayAccessNode(String id, T index, int startLine, int endLine){
         this.id = id;
         this.index = index;
+        this.startLine = startLine;
+        this.endLine = endLine;
     }
 
     public void setId(String id){
@@ -25,8 +27,13 @@ public class ArrayAccessNode <T> extends ExpNode implements ASTNode{
         return index;
     }
 
-    public String toString(){
-        return id+"["+index+"]";
+    @Override
+    public String toString() {
+        return "ArrayAccessNode{" +
+                "id='" + id + '\'' +
+                ", index=" + index +
+                ", startLine=" + startLine +
+                ", endLine=" + endLine +
+                '}';
     }
-
 }

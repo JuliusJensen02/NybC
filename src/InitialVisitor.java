@@ -32,28 +32,24 @@ public class InitialVisitor extends ASTVisitor implements VisitorInterface{
         stack.push(global);
 
         for (Object stmt: node.getStmtList()) {
-            /*if (stmt instanceof DeclNode) {
-                if (global.containsKey(((DeclNode<?>) stmt).getId())){
-                    throw new RuntimeException("Variable " + ((DeclNode<?>) stmt).getId() + " has already been declared");
-                }
-                global.put(((DeclNode<?>) stmt).getId(),Visit(((DeclNode<?>) stmt)));
-            } else*/
             if (stmt instanceof FuncNode) {
                 for (String keyword : keywords) {
                     if (((FuncNode) stmt).getId().equals(keyword)) {
-                        Error.FUNCTION_NAME_RESERVED(((FuncNode) stmt).getId());
+                        Error.FUNCTION_NAME_RESERVED((FuncNode) stmt);
                     }
                 }
                 for (String key: fmap.keySet()){
                     if(key.equals(((FuncNode) stmt).getId())) {
-                        Error.FUNCTION_ALREADY_DECLARED(((FuncNode) stmt).getId());
+                        Error.FUNCTION_ALREADY_DECLARED(((FuncNode) stmt));
                     }
                 }
                 Object function = Visit((FuncNode) stmt);
                 HashMap<String, Object> functionMap = new HashMap<>();
 
                 for (DeclNode<?> param: ((FuncNode)function).getParam()){
-                    functionMap.put(param.getId(), param.getValue());
+                    IdentifierNode identifierNode = (IdentifierNode) param.getId();
+                    String id = identifierNode.getValue();
+                    functionMap.put(id, param.getValue());
                 }
                 functionMap.put("0", stmt);
                 fmap.put(((FuncNode) function).getId(), functionMap);
