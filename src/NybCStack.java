@@ -1,3 +1,7 @@
+import ASTNode.CallFuncNode;
+import ASTNode.DeclNode;
+import ASTNode.ExpNode;
+
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -19,11 +23,11 @@ public class NybCStack {
         if (getFMap().containsKey(node.getId())){
             //There is sent a cloned table to avoid writ in the same table
             @SuppressWarnings("unchecked")
-            HashMap<String, Object> clonedFunctionMap = (HashMap<String, Object>) getFMap().get(id).clone();
+            HashMap<String, Object> clonedFunctionMap = (HashMap<String, Object>) getFMap().get(node.getId()).clone();
 
             return clonedFunctionMap;
         } else {
-            Error.FUNCTION_NOT_DECLARED(id);
+            Error.FUNCTION_NOT_DECLARED(node);
             return null;
         }
     }
@@ -32,12 +36,12 @@ public class NybCStack {
         return getFMap().containsKey(id);
     }
 
-    public void PutVariableToCurrentStack(String id, Object value) {
-        if(IsVariableOnCurrentStack(id)) {
-            Error.VARIABLE_ALREADY_DECLARED(id);
+    public void PutVariableToCurrentStack(DeclNode<?> node, Object value) {
+        if(IsVariableOnCurrentStack((String) node.getId())) {
+            Error.VARIABLE_ALREADY_DECLARED(node);
             return;
         }
-        getStack().peek().getVariables().put(id, value);
+        getStack().peek().getVariables().put((String) node.getId(), value);
     }
 
     public boolean IsVariableOnCurrentStack(String id) {
@@ -73,7 +77,6 @@ public class NybCStack {
                 return variable;
             }
         }
-        Error.VARIABLE_NOT_DECLARED(id);
         return null;
     }
 
