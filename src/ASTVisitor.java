@@ -1,9 +1,7 @@
 import ASTNode.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
 
 public class ASTVisitor{
     protected NybCStack nybCStack;
@@ -40,9 +38,9 @@ public class ASTVisitor{
         if (node.getType().equals("return") && node.getReturnExp() != null){
             var value = Visit(node.getReturnExp());
 
-            //FIX; Hvad fuck er en "0" og hvad vil den med en "1"??? kan vi ikke bruge navne guys?? Vi har ikke math A mere
+            //TODO; Hvad er en "0" og hvad vil den med en "1"??? kan vi ikke bruge navne guys?? Vi har ikke math A mere
             if (nybCStack.GetVariableOnStack("0") != null) {
-                nybCStack.PutVariableToCurrentStack("1", value);
+                nybCStack.ReplaceVariableOnStack("1", value);
             }
         }
         return node;
