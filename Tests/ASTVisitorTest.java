@@ -96,26 +96,3 @@ public class ASTVisitorTest {
 }
 
 
-//    @Test
-//    void visitUnaryOpsNode(){
-//        //Setup
-//        NybCStack nybCStack = new NybCStack();
-//        ASTVisitor astVisitor = new ASTVisitor(nybCStack);
-//
-//        // Add all variables
-//        IntNode intNode = new IntNode();
-//        intNode.setValue(2);
-//        FloatNode floatNode = new FloatNode();
-//        floatNode.setValue(2.5f);
-//        BoolNode boolNode = new BoolNode();
-//        boolNode.setValue(true);
-//        StringNode stringNode = new StringNode();
-//        stringNode.setValue("Hello");
-//
-//        // Test for Unary Plus
-//        UnaryOpNode unaryOpNode = new UnaryOpNode("+",intNode);
-//        var resultInt = astVisitor.Visit(unaryOpNode);
-//        Assertions.assertNotNull(resultInt);
-//        Assertions.assertEquals(2,resultInt);
-//
-//}

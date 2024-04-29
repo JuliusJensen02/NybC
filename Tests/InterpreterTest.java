@@ -1,260 +1,291 @@
 import ASTNode.*;
+import AntlrGenFiles.NybCLexer;
+import AntlrGenFiles.NybCParser;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.misc.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
 
 class InterpreterTest {
 
+    private Pair<NybCStack,ProgramNode> setupInterpreter(String input){
+        var inputStream = CharStreams.fromString(input);
+        var lexer = new NybCLexer(inputStream);
+        var tokenStream = new CommonTokenStream(lexer);
+        var parser = new NybCParser(tokenStream);
+        var parseTree = parser.program();
+        var ASTVisitor = new ToASTVisitor();
+        ProgramNode correctAST = (ProgramNode) ASTVisitor.visit(parseTree);
+
+        NybCStack nybCStack = new NybCStack();
+
+        var initialVisitor = new InitialVisitor(nybCStack,new ArrayList<>());
+        initialVisitor.Visit(correctAST);
+
+        ASTVisitor astVisitor = new ASTVisitor(nybCStack);
+        astVisitor.Visit(correctAST);
+
+        return new Pair<NybCStack,ProgramNode>(nybCStack,correctAST);
+    }
+
     @Test
     void visitLoopNode(){
-
-        // Setup the interpreter
-        NybCStack nybCStack = new NybCStack();
-        Interpreter interpreter = new Interpreter(nybCStack, new ArrayList<>());
-        nybCStack.PushStack();
-
         // Test for while loop
-        DeclNode declNode = new DeclNode("x",2);
-        nybCStack.PutVariableToCurrentStack(declNode.getId(),declNode.getValue());
 
-        LoopNode whileLoopNode = new LoopNode();
-        whileLoopNode.setType("while");
-        whileLoopNode.setCondition(new BinaryOpNode(new IdentifierNode("x"),"<",new IntNode(10)));
+        // make the code and get the return stack and AST
+        Pair<NybCStack,ProgramNode> returnPair = setupInterpreter("var x = 0; begin loop(x < 10); x = x + 1; end loop;");
+        NybCStack nybCStack = returnPair.a;
+        ProgramNode AST = returnPair.b;
 
-        CallFuncNode print = new CallFuncNode();
-        print.setId("out");
-        print.addArgs(new IdentifierNode("x"));
-        whileLoopNode.addStmt(print);
+        // setup the interpreter and make it visit the AST
+        Interpreter interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
 
-        whileLoopNode.addStmt(new AssignNode<>("x",new BinaryOpNode(new IdentifierNode("x"),"+",new IntNode(2))));
-        interpreter.Visit(whileLoopNode);
+        // Test that the loop has completed and corectly incremented x
+        Assertions.assertEquals(10,(int) nybCStack.GetVariableOnStack("x"));
 
-        int xValue = (int) nybCStack.GetVariableOnStack("x");
-
-        Assertions.assertEquals(xValue,10);
 
         // Test for for loop
+        // make the code and get the return stack and AST
+        returnPair = setupInterpreter("var y = 0; begin loop(var x = 0;x < 10; x = x + 1); y = y + 1; end loop;");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
 
-        DeclNode gOrgVal = new DeclNode<>("g",new IntNode(0));
-        nybCStack.PutVariableToCurrentStack(gOrgVal.getId(),gOrgVal.getValue());
-        System.out.println(nybCStack.StackToString());
+        // setup the interpreter and make it visit the AST
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
 
-        LoopNode forLoopNode = new LoopNode();
-        forLoopNode.setType("for");
-        forLoopNode.setDeclaration(new DeclNode("y",new IntNode(0)));
-        forLoopNode.setCondition(new BinaryOpNode(new IdentifierNode("y"),"<",new IntNode(10)));
-        forLoopNode.setAssignment(new AssignNode("y",new BinaryOpNode(new IdentifierNode("y"),"+",new IntNode(1))));
-
-
-        System.out.println(nybCStack.StackToString());
-
-        //TODO Fix det her lort den kan ikke finde g på stakken samtigidt med at den kan i have no idea man
-        AssignNode updateGVar = new AssignNode("g",new BinaryOpNode(new IdentifierNode("y"),"+",new IntNode(1)));
-        System.out.println(updateGVar);
-        forLoopNode.addStmt(updateGVar);
-
-        interpreter.Visit(forLoopNode);
-
-       int gNewVal = (int) nybCStack.GetVariableOnStack("g");
-
-       System.out.println(gNewVal);
-//       Assertions.assertEquals(gOrgVal.getValue(),gNewVal);
+        // Test that the loop has completed and corectly incremented y
+        Assertions.assertEquals(10,(int) nybCStack.GetVariableOnStack("y"));
 
 
+        // Test for Do while Loop
+        // make the code and get the return stack and AST
+        returnPair = setupInterpreter("var z = 0; begin loop; z = z + 1; end loop(z<10);");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
 
+        // setup the interpreter and make it visit the AST
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
 
-        // Test for do while loop
-
-        DeclNode iVar = new DeclNode("i",0);
-        nybCStack.PutVariableToCurrentStack(iVar.getId(),iVar.getValue());
-
-        LoopNode doWhileLoop = new LoopNode();
-        doWhileLoop.setCondition(new BinaryOpNode(new IdentifierNode("i"),"<",new IntNode(10)));
-        doWhileLoop.setType("do-while");
-
-        doWhileLoop.addStmt(new AssignNode<>("i",new BinaryOpNode(new IdentifierNode("i"),"+",new IntNode(1))));
-
-        interpreter.Visit(doWhileLoop);
-
-        int NewIVar = (int) nybCStack.GetVariableOnStack("i");
-
-        Assertions.assertEquals(10,NewIVar);
-
+        // Test that the loop has completed and corectly incremented z
+        Assertions.assertEquals(10,(int) nybCStack.GetVariableOnStack("z"));
 
 
     }
-
 
     @Test
     void visitSwitchNode(){
-        //setup the stack and interpreter
-        NybCStack nybCStack = new NybCStack();
-        Interpreter interpreter = new Interpreter(nybCStack, new ArrayList<>());
-        nybCStack.PushStack();
-
-
         // Test for switch with two cases' that have a break and a default
 
+        // make the code and get the return stack and AST
+        Pair<NybCStack,ProgramNode> returnPair = setupInterpreter("var x = 2; begin switch(x); case 1: x = x+1; break; case 2: x = x+2; break; default: x = x+3; break; end switch;");
+        NybCStack nybCStack = returnPair.a;
+        ProgramNode AST = returnPair.b;
 
-        SwitchNode switchNode = new SwitchNode();
-        switchNode.setSwitchCond(new IdentifierNode("x"));
+        // setup the interpreter and make it visit the AST
+        Interpreter interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
 
-        CaseNode case1 = new CaseNode();
-        case1.setCaseExp(new IntNode(1));
-        AssignNode updateX = new AssignNode<>("x",new BinaryOpNode(new IdentifierNode("x"),"+",new IntNode(1)));
-        case1.addStmt(updateX);
-        CtrlFlowNode breaking = new CtrlFlowNode();
-        breaking.setType("break");
-        case1.addStmt(breaking);
-
-        CaseNode case2 = new CaseNode();
-        case2.setCaseExp(new IntNode(2));
-        updateX = new AssignNode<>("x",new BinaryOpNode(new IdentifierNode("x"),"+",new IntNode(2)));
-        case2.addStmt(updateX);
-        case2.addStmt(breaking);
-
-
-        CaseNode defaultCase = new CaseNode();
-        updateX = new AssignNode<>("x",new BinaryOpNode(new IdentifierNode("x"),"+",new IntNode(3)));
-
-        defaultCase.addStmt(updateX);
-        defaultCase.addStmt(breaking);
-
-        switchNode.addCase(case1);
-        switchNode.addCase(case2);
-        switchNode.addCase(defaultCase);
-
-
-        DeclNode xVar = new DeclNode("x",1);
-        nybCStack.PutVariableToCurrentStack(xVar.getId(),xVar.getValue());
-
-        interpreter.Visit(switchNode);
-
-        Assertions.assertEquals(2,(int)nybCStack.GetVariableOnStack("x"));
-
-        xVar = new DeclNode("x",2);
-        nybCStack.ReplaceVariableOnStack(xVar.getId(),xVar.getValue());
-
-        interpreter.Visit(switchNode);
-
-        Assertions.assertEquals(4,(int)nybCStack.GetVariableOnStack("x"));
-
-        xVar = new DeclNode("x",6);
-        nybCStack.ReplaceVariableOnStack(xVar.getId(),xVar.getValue());
-
-        interpreter.Visit(switchNode);
-
-        Assertions.assertEquals(9,(int)nybCStack.GetVariableOnStack("x"));
-
-
+        Assertions.assertEquals(4,(int) nybCStack.GetVariableOnStack("x"));
 
         // Test for switch with two cases' that have no break and a default
-        switchNode = new SwitchNode();
-        switchNode.setSwitchCond(new IdentifierNode("x"));
 
-        case1 = new CaseNode();
-        case1.setCaseExp(new IntNode(1));
-        updateX = new AssignNode<>("x",new BinaryOpNode(new IdentifierNode("x"),"+",new IntNode(1)));
-        case1.addStmt(updateX);
+        // make the code and get the return stack and AST
+        returnPair = setupInterpreter("var x = 1; begin switch(x); case 1: x = x+1; case 2: x = x+2; default: x = x+3; end switch;");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
 
-        case2 = new CaseNode();
-        case2.setCaseExp(new IntNode(2));
-        updateX = new AssignNode<>("x",new BinaryOpNode(new IdentifierNode("x"),"+",new IntNode(2)));
-        case2.addStmt(updateX);
+        // setup the interpreter and make it visit the AST
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
 
-        defaultCase = new CaseNode();
-        updateX = new AssignNode<>("x",new BinaryOpNode(new IdentifierNode("x"),"+",new IntNode(3)));
+        Assertions.assertEquals(7,(int) nybCStack.GetVariableOnStack("x"));
 
-        defaultCase.addStmt(updateX);
-        defaultCase.addStmt(breaking);
+        // Test for switch with only a default
 
-        switchNode.addCase(case1);
-        switchNode.addCase(case2);
-        switchNode.addCase(defaultCase);
+        // make the code and get the return stack and AST
+        returnPair = setupInterpreter("var x = 1; begin switch(x);default: x = x+3; end switch;");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
 
+        // setup the interpreter and make it visit the AST
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
 
-        xVar = new DeclNode("x",1);
-        nybCStack.ReplaceVariableOnStack(xVar.getId(),xVar.getValue());
-
-        interpreter.Visit(switchNode);
-
-        Assertions.assertEquals(7,(int)nybCStack.GetVariableOnStack("x"));
-
-        xVar = new DeclNode("x",2);
-        nybCStack.ReplaceVariableOnStack(xVar.getId(),xVar.getValue());
-
-        interpreter.Visit(switchNode);
-
-        Assertions.assertEquals(7,(int)nybCStack.GetVariableOnStack("x"));
-
-        xVar = new DeclNode("x",6);
-        nybCStack.ReplaceVariableOnStack(xVar.getId(),xVar.getValue());
-
-        interpreter.Visit(switchNode);
-
-        Assertions.assertEquals(9,(int)nybCStack.GetVariableOnStack("x"));
-
-
+        Assertions.assertEquals(4,(int) nybCStack.GetVariableOnStack("x"));
     }
 
 
     @Test
-    void visitAssignNode(){
+    void avisitAssignNode(){
+    // Test for assignment int
 
-        //setup the stack and interpreter
-        NybCStack nybCStack = new NybCStack();
-        Interpreter interpreter = new Interpreter(nybCStack, new ArrayList<>());
-        nybCStack.PushStack();
+        // make the code and get the return stack and AST
+        Pair<NybCStack,ProgramNode> returnPair = setupInterpreter("var x = 2;");
+        NybCStack nybCStack = returnPair.a;
+        ProgramNode AST = returnPair.b;
 
-        DeclNode varX = new DeclNode("x",2);
-        nybCStack.PutVariableToCurrentStack(varX.getId(),varX.getValue());
+        Interpreter interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
 
-        AssignNode assignNode = new AssignNode<>("x",new BinaryOpNode(new IdentifierNode("x"),"+", new IntNode( 10)));
+        Assertions.assertEquals(2,(int) nybCStack.GetVariableOnStack("x"));
 
-        interpreter.Visit(assignNode);
+    // Test for assignment float
+        // make the code and get the return stack and AST
+        returnPair = setupInterpreter("var x = 2.4;");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
 
-        Assertions.assertEquals((int) nybCStack.GetVariableOnStack("x"),(int)varX.getValue() + 10);
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
+
+        Assertions.assertEquals(2.4f,(float) nybCStack.GetVariableOnStack("x"));
+
+
+    // Test for assignment string
+        returnPair = setupInterpreter("var x = \"Hello\";");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
+
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
+
+        Assertions.assertEquals("Hello",nybCStack.GetVariableOnStack("x"));
+
+    // Test for assignment boolean
+        returnPair = setupInterpreter("var x = true;");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
+
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
+
+        Assertions.assertEquals(true,nybCStack.GetVariableOnStack("x"));
+
+
+    // test for assigment to bool with uops
+        returnPair = setupInterpreter("var x = !true;");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
+
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
+
+        Assertions.assertEquals(false,nybCStack.GetVariableOnStack("x"));
+
+
     }
 
     @Test
     void visitCallFuncNode(){
-        //setup the stack and interpreter
-        NybCStack nybCStack = new NybCStack();
-        Interpreter interpreter = new Interpreter(nybCStack, new ArrayList<>());
-        nybCStack.PushStack();
 
-        //Setup the function
-        FuncNode function = new FuncNode();
-        function.setId("add2ToVar");
-        function.addParam(new DeclNode("x"));
+    // Test for a custom function
+        // make the code and get the return stack and AST
+        Pair<NybCStack,ProgramNode> returnPair = setupInterpreter("begin function add2ToVar(var x); x = x + 2; return x; end function; var y = 2; y = add2ToVar(y);");
+        NybCStack nybCStack = returnPair.a;
+        ProgramNode AST = returnPair.b;
 
-        function.addStmt(new AssignNode<>("x",new BinaryOpNode(new IdentifierNode("x"),"+", new IntNode( 2))));
+        Interpreter interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
 
-        CtrlFlowNode rtrn = new CtrlFlowNode();
-        rtrn.setType("return");
-        rtrn.setReturnExp(new IdentifierNode("x"));
-        function.addStmt(rtrn);
+        Assertions.assertEquals(4,(int) nybCStack.GetVariableOnStack("y"));
 
-        nybCStack.PutFunction("add2ToVar",new HashMap<String,Object>());
+    // Test for a custom function with multiple parameters
+        returnPair = setupInterpreter("begin function add2ToVar(var x, var z); x = x + 2; x = x + z; return x; end function; var y = 2; y = add2ToVar(y,2);");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
+
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
+
+        Assertions.assertEquals(6,(int) nybCStack.GetVariableOnStack("y"));
 
 
-        // Call the function
-        CallFuncNode callFuncNode = new CallFuncNode();
-        callFuncNode.addArgs(new IntNode(2));
-        callFuncNode.setId("add2ToVar");
+    // Test for a custom function with no parameters
+        returnPair = setupInterpreter("begin function returnVar(); return 2; end function; var y; y = returnVar();");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
 
-        DeclNode varY = new DeclNode<>("y",2);
-        nybCStack.PutVariableToCurrentStack(varY.getId(),varY.getValue());
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
 
-        AssignNode assignNode = new AssignNode("y",callFuncNode);
+        Assertions.assertEquals(2,(int) nybCStack.GetVariableOnStack("y"));
 
-        interpreter.Visit(assignNode);
+    // Test for a custom function with the name of a reserved keyword
+        returnPair = setupInterpreter("begin function out(); return 2; end function; var y; y = returnVar();");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
 
-        Assertions.assertEquals(4,nybCStack.GetVariableOnStack("y"));
+        List<String> keywords = new ArrayList<>();
+        keywords.add("out");
+        interpreter = new Interpreter(nybCStack,keywords);
+
+        Interpreter TMPInterpreter = interpreter;
+        ProgramNode TMPAST = AST;
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            TMPInterpreter.Visit(TMPAST);
+        });
+
+    }
+
+    @Test
+    void visitArrayAccessNode(){
+
+    // Test for array access with int array
+        // make the code and get the return stack and AST
+        Pair<NybCStack,ProgramNode> returnPair = setupInterpreter("var x = [0,1,2]; var y = 2 + x[1];");
+        NybCStack nybCStack = returnPair.a;
+        ProgramNode AST = returnPair.b;
+
+        // setup the interpreter and make it visit the AST
+        Interpreter interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
+
+        Assertions.assertEquals(3,(int) nybCStack.GetVariableOnStack("y"));
+
+    // Test for array access with string
+        returnPair = setupInterpreter("var x = [\"Hello\",\"There\"]; var y = 2 + x[1];");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
+
+        // setup the interpreter and make it visit the AST
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
+
+        Assertions.assertEquals("2There",nybCStack.GetVariableOnStack("y"));
+
+    // Test for array access with string
+        returnPair = setupInterpreter("var x = [2.9]; var y = 2 + x[0];");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
+
+        // setup the interpreter and make it visit the AST
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
+
+        Assertions.assertEquals(4.9f,nybCStack.GetVariableOnStack("y"));
+
+    // Test for array access with string, int and float
+        returnPair = setupInterpreter("var x = [\"Hello\",2,2.5]; var y = 2 + x[0]; var z = 2 + x[1]; var a = 2 + x[2];");
+        nybCStack = returnPair.a;
+        AST = returnPair.b;
+
+
+        // setup the interpreter and make it visit the AST
+        interpreter = new Interpreter(nybCStack,new ArrayList<>());
+        interpreter.Visit(AST);
+
+        Assertions.assertEquals("2Hello",nybCStack.GetVariableOnStack("y"));
+        Assertions.assertEquals(4,nybCStack.GetVariableOnStack("z"));
+        Assertions.assertEquals(4.5f,nybCStack.GetVariableOnStack("a"));
+
 
 
     }
