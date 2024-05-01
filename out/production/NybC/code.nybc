@@ -1,7 +1,0 @@
-var b = 0;
-begin function a();
-    var b = 1;
-    return b;
-end function;
-var x = a();
-out(x);
