@@ -133,19 +133,19 @@ public class ToASTVisitorTest {
         //Test for expression
         var parseTreeForAssignStmt = setupParseTree("x = 4;");
         NybCParser.AssignStmtContext assignExpressionStmtContext =(NybCParser.AssignStmtContext) parseTreeForAssignStmt.getChild(0).getChild(0);
-        AssignNode<IdentifierNode, IntNode> assignExpressionNode = (AssignNode<IdentifierNode, IntNode>) ASTvisitor.visitAssignStmt(assignExpressionStmtContext);
+        AssignNode<String, IntNode> assignExpressionNode = (AssignNode<String, IntNode>) ASTvisitor.visitAssignStmt(assignExpressionStmtContext);
 
         Assertions.assertNotNull(assignExpressionNode);
-        Assertions.assertEquals("x", assignExpressionNode.getLeft().getValue());
+        Assertions.assertEquals("IdentifierNode{value='x'}", assignExpressionNode.getLeft());
         Assertions.assertEquals(4, assignExpressionNode.getRight().getValue());
 
         //Test for array
         var parseTreeForArrayStmt = setupParseTree("x = [4];");
         NybCParser.AssignStmtContext assignArrayStmtContext =(NybCParser.AssignStmtContext) parseTreeForArrayStmt.getChild(0).getChild(0);
-        AssignNode<IdentifierNode, ArrayNode> assignArrayNode = (AssignNode<IdentifierNode, ArrayNode>) ASTvisitor.visitAssignStmt(assignArrayStmtContext);
+        AssignNode<String, ArrayNode> assignArrayNode = (AssignNode<String, ArrayNode>) ASTvisitor.visitAssignStmt(assignArrayStmtContext);
 
         Assertions.assertNotNull(assignArrayNode);
-        Assertions.assertEquals("x", assignArrayNode.getLeft().getValue());
+        Assertions.assertEquals("x", assignArrayNode.getLeft());
         Assertions.assertEquals(1, assignArrayNode.getRight().getValues().size());
 
         //Test for arrayAccess expression assign
