@@ -136,7 +136,7 @@ public class ToASTVisitorTest {
         AssignNode<String, IntNode> assignExpressionNode = (AssignNode<String, IntNode>) ASTvisitor.visitAssignStmt(assignExpressionStmtContext);
 
         Assertions.assertNotNull(assignExpressionNode);
-        Assertions.assertEquals("x", assignExpressionNode.getLeft());
+        Assertions.assertEquals("IdentifierNode{value='x'}", assignExpressionNode.getLeft());
         Assertions.assertEquals(4, assignExpressionNode.getRight().getValue());
 
         //Test for array
