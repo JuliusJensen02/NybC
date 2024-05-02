@@ -54,10 +54,8 @@ public class NybCProgram {
         }
         var ASTVisitor = new ToASTVisitor();
         var AST = ASTVisitor.visit(parseTree);
-        System.out.println(AST);
         var InitialVisitor = new InitialVisitor(nybCStack, keywords);
         InitialVisitor.Visit((ProgramNode) AST);
-        //System.out.println(nybCStack);
         var Interpreter = new Interpreter(nybCStack, keywords);
         Interpreter.Visit((ProgramNode) AST);
     }
