@@ -11,7 +11,7 @@ public class ASTVisitor{
     }
 
     public Object Visit(IdentifierNode node) {
-        return nybCStack.GetVariableOnStack(node.getValue());
+        return nybCStack.GetVariableOnStack(node.getValue(), node);
     }
     public Boolean Visit(BoolNode node){
         return node.isValue();
@@ -39,7 +39,7 @@ public class ASTVisitor{
             var value = Visit(node.getReturnExp());
 
             //TODO; Hvad er en "0" og hvad vil den med en "1"??? kan vi ikke bruge navne guys?? Vi har ikke math A mere
-            if (nybCStack.GetVariableOnStack("0") != null) {
+            if (nybCStack.IsVariableOnStack("0")) {
                 nybCStack.ReplaceVariableOnStack("1", value);
             }
         }
@@ -233,9 +233,9 @@ public class ASTVisitor{
     }
 
     @SuppressWarnings("unchecked")
-    public List<Object> lookupArray (String node) {
-        if(nybCStack.GetVariableOnStack(node) instanceof  List<?>) {
-            return (List<Object>) nybCStack.GetVariableOnStack(node);
+    public List<Object> lookupArray (String id, ExpNode node) {
+        if(nybCStack.GetVariableOnStack(id, node) instanceof  List<?>) {
+            return (List<Object>) nybCStack.GetVariableOnStack(id, node);
         }
         return null;
     }
