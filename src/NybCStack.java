@@ -70,7 +70,7 @@ public class NybCStack {
     public Object GetVariableOnStack(String id, ExpNode node) {
         for (int i = stack.size() - 1; i >= 0; i--) {
             Object variable = stack.get(i).getVariables().get(id);
-            if (variable == null && !stack.get(i).getVariables().containsKey(id)) {
+            if (variable == null && !IsVariableOnStack(id)) {
                 Error.VARIABLE_NOT_DECLARED(node);
                 return null;
             }
