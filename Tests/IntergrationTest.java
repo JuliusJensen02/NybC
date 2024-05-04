@@ -55,9 +55,9 @@ public class IntergrationTest {
         interpreter.Visit(AST);
         System.out.println(nybCStack.StackToString());
 
-        Assertions.assertEquals(8,nybCStack.GetVariableOnStack("h"));
-        Assertions.assertEquals(8.0f,nybCStack.GetVariableOnStack("m"));
-        Assertions.assertEquals(true,nybCStack.GetVariableOnStack("t"));
+        Assertions.assertEquals(8,nybCStack.GetVariableOnStack("h", null));
+        Assertions.assertEquals(8.0f,nybCStack.GetVariableOnStack("m", null));
+        Assertions.assertEquals(true,nybCStack.GetVariableOnStack("t", null));
 
 
     }

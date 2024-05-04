@@ -47,7 +47,7 @@ class InterpreterTest {
         interpreter.Visit(AST);
 
         // Test that the loop has completed and corectly incremented x
-        Assertions.assertEquals(10,(int) nybCStack.GetVariableOnStack("x"));
+        Assertions.assertEquals(10,(int) nybCStack.GetVariableOnStack("x", null));
 
 
         // Test for for loop
@@ -61,7 +61,7 @@ class InterpreterTest {
         interpreter.Visit(AST);
 
         // Test that the loop has completed and corectly incremented y
-        Assertions.assertEquals(10,(int) nybCStack.GetVariableOnStack("y"));
+        Assertions.assertEquals(10,(int) nybCStack.GetVariableOnStack("y", null));
 
 
         // Test for Do while Loop
@@ -75,7 +75,7 @@ class InterpreterTest {
         interpreter.Visit(AST);
 
         // Test that the loop has completed and corectly incremented z
-        Assertions.assertEquals(10,(int) nybCStack.GetVariableOnStack("z"));
+        Assertions.assertEquals(10,(int) nybCStack.GetVariableOnStack("z", null));
 
 
     }
@@ -93,7 +93,7 @@ class InterpreterTest {
         Interpreter interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(4,(int) nybCStack.GetVariableOnStack("x"));
+        Assertions.assertEquals(4,(int) nybCStack.GetVariableOnStack("x", null));
 
         // Test for switch with two cases' that have no break and a default
 
@@ -106,7 +106,7 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(7,(int) nybCStack.GetVariableOnStack("x"));
+        Assertions.assertEquals(7,(int) nybCStack.GetVariableOnStack("x", null));
 
         // Test for switch with only a default
 
@@ -119,7 +119,7 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(4,(int) nybCStack.GetVariableOnStack("x"));
+        Assertions.assertEquals(4,(int) nybCStack.GetVariableOnStack("x", null));
     }
 
 
@@ -135,7 +135,7 @@ class InterpreterTest {
         Interpreter interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(2,(int) nybCStack.GetVariableOnStack("x"));
+        Assertions.assertEquals(2,(int) nybCStack.GetVariableOnStack("x", null));
 
     // Test for assignment float
         // make the code and get the return stack and AST
@@ -146,7 +146,7 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(2.4f,(float) nybCStack.GetVariableOnStack("x"));
+        Assertions.assertEquals(2.4f,(float) nybCStack.GetVariableOnStack("x", null));
 
 
     // Test for assignment string
@@ -157,7 +157,7 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals("Hello",nybCStack.GetVariableOnStack("x"));
+        Assertions.assertEquals("Hello",nybCStack.GetVariableOnStack("x", null));
 
     // Test for assignment boolean
         returnPair = setupInterpreter("var x = true;");
@@ -167,7 +167,7 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(true,nybCStack.GetVariableOnStack("x"));
+        Assertions.assertEquals(true,nybCStack.GetVariableOnStack("x", null));
 
 
     // test for assigment to bool with uops
@@ -178,7 +178,7 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(false,nybCStack.GetVariableOnStack("x"));
+        Assertions.assertEquals(false,nybCStack.GetVariableOnStack("x", null));
 
 
     }
@@ -195,7 +195,7 @@ class InterpreterTest {
         Interpreter interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(4,(int) nybCStack.GetVariableOnStack("y"));
+        Assertions.assertEquals(4,(int) nybCStack.GetVariableOnStack("y", null));
 
     // Test for a custom function with multiple parameters
         returnPair = setupInterpreter("begin function add2ToVar(var x, var z); x = x + 2; x = x + z; return x; end function; var y = 2; y = add2ToVar(y,2);");
@@ -205,7 +205,7 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(6,(int) nybCStack.GetVariableOnStack("y"));
+        Assertions.assertEquals(6,(int) nybCStack.GetVariableOnStack("y", null));
 
 
     // Test for a custom function with no parameters
@@ -216,7 +216,7 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(2,(int) nybCStack.GetVariableOnStack("y"));
+        Assertions.assertEquals(2,(int) nybCStack.GetVariableOnStack("y", null));
 
     // Test for a custom function with the name of a reserved keyword
         returnPair = setupInterpreter("begin function out(); return 2; end function; var y; y = returnVar();");
@@ -248,7 +248,7 @@ class InterpreterTest {
         Interpreter interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(3,(int) nybCStack.GetVariableOnStack("y"));
+        Assertions.assertEquals(3,(int) nybCStack.GetVariableOnStack("y", null));
 
     // Test for array access with string
         returnPair = setupInterpreter("var x = [\"Hello\",\"There\"]; var y = 2 + x[1];");
@@ -259,7 +259,7 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals("2There",nybCStack.GetVariableOnStack("y"));
+        Assertions.assertEquals("2There",nybCStack.GetVariableOnStack("y", null));
 
     // Test for array access with string
         returnPair = setupInterpreter("var x = [2.9]; var y = 2 + x[0];");
@@ -270,7 +270,7 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals(4.9f,nybCStack.GetVariableOnStack("y"));
+        Assertions.assertEquals(4.9f,nybCStack.GetVariableOnStack("y", null));
 
     // Test for array access with string, int and float
         returnPair = setupInterpreter("var x = [\"Hello\",2,2.5]; var y = 2 + x[0]; var z = 2 + x[1]; var a = 2 + x[2];");
@@ -282,9 +282,9 @@ class InterpreterTest {
         interpreter = new Interpreter(nybCStack,new ArrayList<>());
         interpreter.Visit(AST);
 
-        Assertions.assertEquals("2Hello",nybCStack.GetVariableOnStack("y"));
-        Assertions.assertEquals(4,nybCStack.GetVariableOnStack("z"));
-        Assertions.assertEquals(4.5f,nybCStack.GetVariableOnStack("a"));
+        Assertions.assertEquals("2Hello",nybCStack.GetVariableOnStack("y", null));
+        Assertions.assertEquals(4,nybCStack.GetVariableOnStack("z", null));
+        Assertions.assertEquals(4.5f,nybCStack.GetVariableOnStack("a", null));
 
 
 
