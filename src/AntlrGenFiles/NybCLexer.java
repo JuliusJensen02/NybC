@@ -1,9 +1,13 @@
-package AntlrGenFiles;// Generated from C:/Users/Bruger/OneDrive - Aalborg Universitet/Software/SW4/NybCProject/src/NybC.g4 by ANTLR 4.13.1
+// Generated from C:/Users/marku/IdeaProjects/NybC/src/AntlrGenFiles/NybC.g4 by ANTLR 4.13.1
+package AntlrGenFiles;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue", "this-escape"})
 public class NybCLexer extends Lexer {
@@ -96,7 +100,7 @@ public class NybCLexer extends Lexer {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "AntlrGenFiles/NybC.g4"; }
+	public String getGrammarFileName() { return "NybC.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

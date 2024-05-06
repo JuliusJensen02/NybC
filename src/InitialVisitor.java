@@ -59,10 +59,7 @@ public class InitialVisitor extends ASTVisitor {
                 functionMap.put("0", stmt);
                 functionMap.put("1", null);
 
-                @SuppressWarnings("unchecked")
-                HashMap<String, Object> functionMapHashTable = (HashMap<String, Object>) functionMap.clone();
-
-                nybCStack.PutFunction(function.getId(), functionMapHashTable);
+                nybCStack.PutFunction(function.getId(), functionMap);
             }
         }
     }

@@ -227,7 +227,7 @@ public class Interpreter extends ASTVisitor {
     @Override
     public Object Visit(ArrayAccessNode<?> node) {
 
-        List<Object> array = lookupArray(node.getId());
+        List<Object> array = lookupArray(node.getId(), node);
         if (array == null) {
             Error.VARIABLE_NOT_DECLARED(node);
         }
@@ -239,7 +239,7 @@ public class Interpreter extends ASTVisitor {
                 Error.ARRAY_INDEX_OUT_OF_BOUNDS(node);
             }
         } else if (node.getIndex() instanceof String) {
-            var index = nybCStack.GetVariableOnStack((String) node.getIndex());
+            var index = nybCStack.GetVariableOnStack((String) node.getIndex(), node);
             if (index instanceof Integer){
                 try {
                     return array.get((int) index);
@@ -262,11 +262,11 @@ public class Interpreter extends ASTVisitor {
         if (left instanceof ArrayAccessNode){
             var arrayName = ((ArrayAccessNode<?>) left).getId();
             var arrayIndex = ((ArrayAccessNode<?>) left).getIndex();
-            List<Object> array = lookupArray(arrayName);
+            List<Object> array = lookupArray(arrayName, node);
             if (arrayIndex instanceof Integer) {
                 array.set((int) arrayIndex, Visit((ExpNode) right));
             } else if (arrayIndex instanceof String) {
-                var index = nybCStack.GetVariableOnStack((String) arrayIndex);
+                var index = nybCStack.GetVariableOnStack((String) arrayIndex, node);
                 if (index instanceof Integer){
                     array.set((int) index, Visit((ExpNode) right));
                 } else {
@@ -277,7 +277,7 @@ public class Interpreter extends ASTVisitor {
             }
         } else if (left instanceof IdentifierNode) {
             left = ((IdentifierNode) left).getValue();
-            nybCStack.GetVariableOnStack((String) left);
+            nybCStack.GetVariableOnStack((String) left, node);
 
             if(right instanceof ArrayNode) {
                 nybCStack.ReplaceVariableOnStack((String) left, Visit((ArrayNode) node.getRight()));
@@ -390,7 +390,7 @@ public class Interpreter extends ASTVisitor {
             }
             Object CtrlFlow = Visit(funcNode);
             if (CtrlFlow != null && ((CtrlFlowNode) CtrlFlow).getReturnExp() != null) {
-                Object returnValue = nybCStack.GetVariableOnStack("1");
+                Object returnValue = nybCStack.GetVariableOnStack("1", node);
                 nybCStack.PopStack();
                 return returnValue;
             }
