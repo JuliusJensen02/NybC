@@ -232,13 +232,7 @@ public class ASTVisitor{
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Object> lookupArray (String id, ExpNode node) {
-        if(nybCStack.GetVariableOnStack(id, node) instanceof  List<?>) {
-            return (List<Object>) nybCStack.GetVariableOnStack(id, node);
-        }
-        return null;
-    }
+
     /*
     public HashMap<String, Object> lookupFunc (String node) {
         if (nybCStack.getFmap().containsKey(node)){
