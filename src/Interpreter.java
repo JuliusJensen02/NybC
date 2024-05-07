@@ -263,7 +263,7 @@ public class Interpreter extends ASTVisitor {
      */
     @Override
     public Object Visit(ArrayAccessNode<?> node) {
-        List<Object> array = lookupArray(node.getId(), node);
+        List<Object> array = nybCStack.getArray(node.getId(), node);
         if (array == null) {
             Error.VARIABLE_NOT_DECLARED(node);
         }
@@ -303,7 +303,7 @@ public class Interpreter extends ASTVisitor {
         if (left instanceof ArrayAccessNode){
             var arrayName = ((ArrayAccessNode<?>) left).getId();
             var arrayIndex = ((ArrayAccessNode<?>) left).getIndex();
-            List<Object> array = lookupArray(arrayName, node);
+            List<Object> array = nybCStack.getArray(arrayName, node);
             if (arrayIndex instanceof Integer) {
                 array.set((int) arrayIndex, Visit((ExpNode) right));
             } else if (arrayIndex instanceof String) {

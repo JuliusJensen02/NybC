@@ -3,6 +3,7 @@ import ASTNode.DeclNode;
 import ASTNode.ExpNode;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -103,6 +104,16 @@ public class NybCStack {
     public String FmapToString(){
         return fMap.toString();
     }
+
+    @SuppressWarnings("unchecked")
+    public List<Object> getArray (String id, ExpNode node) {
+        if(GetVariableOnStack(id, node) instanceof  List<?>) {
+            return (List<Object>) GetVariableOnStack(id, node);
+        }
+        return null;
+    }
+
+
 }
 
 
