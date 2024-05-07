@@ -11,9 +11,9 @@ import java.util.Stack;
  */
 public class NybCStack {
     private final HashMap<String, HashMap<String, Object>> fMap = new HashMap<>();
-    private final Stack<NybCFrame> stack = new Stack<>();
+    private final Stack<NybCScope> stack = new Stack<>();
 
-    private Stack<NybCFrame> getStack() { return stack; }
+    private Stack<NybCScope> getStack() { return stack; }
 
     private HashMap<String, HashMap<String, Object>> getFMap() {
         return fMap;
@@ -86,11 +86,11 @@ public class NybCStack {
     }
 
     public void PushStack() {
-        stack.push(new NybCFrame());
+        stack.push(new NybCScope());
     }
 
     public void PushStack(HashMap<String, Object> hashMap) {
-        stack.push(new NybCFrame(hashMap));
+        stack.push(new NybCScope(hashMap));
     }
 
     public void PopStack() {
