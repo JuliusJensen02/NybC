@@ -5,6 +5,9 @@ import ASTNode.ExpNode;
 import java.util.HashMap;
 import java.util.Stack;
 
+/**
+ * This class is used to store the current state of the program.
+ */
 public class NybCStack {
     private final HashMap<String, HashMap<String, Object>> fMap = new HashMap<>();
     private final Stack<NybCFrame> stack = new Stack<>();

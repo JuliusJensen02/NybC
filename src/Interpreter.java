@@ -12,6 +12,10 @@ public class Interpreter extends ASTVisitor {
         this.keywords = keywords;
     }
 
+    /**
+     * Visit the AST and interpret the code
+     * @param node the root node of the AST
+     */
     @Override
     public void Visit(ProgramNode node) {
         Object CtrlFlow;
@@ -31,6 +35,10 @@ public class Interpreter extends ASTVisitor {
         }
     }
 
+    /**
+     * Visit the FuncNode and visit all the statements in the statements list of the function
+     * @param node func node
+     */
     @Override
     public Object Visit(FuncNode node) {
         Object CtrlFlow;
@@ -48,6 +56,11 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
+    /**
+     * Visit loop node and run the logic corresponding to the type of loop
+     * @param node loopnode
+     * @return null or a ctrlFlowNode
+     */
     @Override
     public Object Visit(LoopNode node) {
         nybCStack.PushStack();
@@ -72,6 +85,9 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
+    /**
+     * Logic for while-loop
+     */
     private Object whileLoopLogic(LoopNode node) {
         boolean goOutOfLoop = false;
         while ((Boolean) Visit(node.getCondition())) {
@@ -104,6 +120,9 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
+    /**
+     * Logic for for-loop
+     */
     private Object forLoopLogic(LoopNode node) {
         boolean goOutOfLoop = false;
         while ((Boolean) Visit(node.getCondition())) {
@@ -136,6 +155,9 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
+    /**
+     * Logic for do-while-loop
+     */
     private Object doWhileLoopLogic(LoopNode node) {
         boolean goOutOfLoop = false;
         do {
@@ -168,6 +190,11 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
+    /**
+     * Visit the switch node and return null or a ctrlFlowNode
+     * @param node switch node
+     * @return a ctrlFlowNode or null
+     */
     @Override
     public Object Visit(SwitchNode node) {
         nybCStack.PushStack();
@@ -212,6 +239,11 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
+    /**
+     * Visit the case node
+     * @param node return node
+     * @return a ctrlFlowNode or null
+     */
     @Override
     public Object Visit(CaseNode node) {
         Object CtrlFlow;
@@ -224,9 +256,13 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
+    /**
+     * Visit the array access node
+     * @param node array access node
+     * @return a ctrlFlowNode or null
+     */
     @Override
     public Object Visit(ArrayAccessNode<?> node) {
-
         List<Object> array = lookupArray(node.getId(), node);
         if (array == null) {
             Error.VARIABLE_NOT_DECLARED(node);
@@ -255,6 +291,11 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
+    /**
+     * Visit the assign node
+     * @param node assign node
+     * @return null
+     */
     @Override
     public Object Visit(AssignNode<?,?> node) {
         var left = node.getLeft();
@@ -278,37 +319,25 @@ public class Interpreter extends ASTVisitor {
         } else if (left instanceof IdentifierNode) {
             left = ((IdentifierNode) left).getValue();
             nybCStack.GetVariableOnStack((String) left, node);
-
             if(right instanceof ArrayNode) {
                 nybCStack.ReplaceVariableOnStack((String) left, Visit((ArrayNode) node.getRight()));
             }
             else if(right instanceof ExpNode) {
                 nybCStack.ReplaceVariableOnStack((String) left, Visit((ExpNode) node.getRight()));
             }
-            /*
-            for (int i = stack.size() - 1; i >= 0; i--) {
-                if (stack.get(i).containsKey(left)) {
-                    if (right instanceof ArrayNode) {
-                        stack.get(i).replace((String) left, Visit((ArrayNode) node.getRight()));
-                    } else if (right instanceof ExpNode) {
-                        stack.get(i).replace((String) left, Visit((ExpNode) node.getRight()));
-                    } else {
-                        Error.ASSIGNMENT_VALUE_NOT_VALID(node);
-                    }
-                    break;
-                }
-            }
-            */
         } else {
             Error.ASSIGNEE_NOT_VALID(node);
         }
         return null;
     }
 
+    /**
+     * Visit the decl node
+     * @param node decl node
+     * @return null
+     */
     @Override
     public Object Visit(DeclNode<?> node) {
-//        IdentifierNode leftIdentifierNode = (IdentifierNode) node.getId();
-//        String leftId = leftIdentifierNode.getValue();
         for (String keyword : keywords) {
             if (node.getId().equals(keyword)) {
                 Error.VARIABLE_NAME_RESERVED(node);
@@ -324,6 +353,11 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
+    /**
+     * Visit the if node
+     * @param node if node
+     * @return a ctrlFlowNode or null
+     */
     @Override
     public Object Visit(IfNode node) {
         if (!(Visit(node.getCondition()) instanceof Boolean) && node.getCondition() != null){
@@ -353,6 +387,11 @@ public class Interpreter extends ASTVisitor {
         return null;
     }
 
+    /**
+     * Visit the call func node
+     * @param node call func node
+     * @return a null or a return value of the function
+     */
     @Override
     public Object Visit(CallFuncNode node) {
         if (node.getId().equals("out")) {

@@ -4,28 +4,76 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ASTVisitor{
+    /**
+     * The NybCStack instance used by the ASTVisitor.
+     * This stack is used to store and retrieve variables during the traversal of the AST.
+     */
     protected NybCStack nybCStack;
 
+    /**
+     * Constructor for the ASTVisitor.
+     * @param nybCStack The NybCStack instance used by the ASTVisitor.
+     */
     public ASTVisitor(NybCStack nybCStack) {
         this.nybCStack = nybCStack;
     }
 
+    /**
+     * Visit method for the IdentifierNode.
+     * This method is used to retrieve the value of a variable from the NybCStack.
+     * @param node The IdentifierNode to visit.
+     * @return The value of the variable.
+     */
     public Object Visit(IdentifierNode node) {
         return nybCStack.GetVariableOnStack(node.getValue(), node);
     }
+
+    /**
+     * Visit method for the BoolNode.
+     * This method is used to retrieve the value of a boolean node.
+     * @param node The BoolNode to visit.
+     * @return The value of the boolean.
+     */
     public Boolean Visit(BoolNode node){
         return node.isValue();
     }
+
+    /**
+     * Visit method for the FloatNode.
+     * This method is used to retrieve the value of a float node.
+     * @param node The FloatNode to visit.
+     * @return The value of the float.
+     */
     public Float Visit(FloatNode node){
         return node.getValue();
     }
+
+    /**
+     * Visit method for the IntNode.
+     * This method is used to retrieve the value of an integer node.
+     * @param node The IntNode to visit.
+     * @return The value of the integer.
+     */
     public Integer Visit(IntNode node){
         return node.getValue();
     }
+
+    /**
+     * Visit method for the StringNode.
+     * This method is used to retrieve the value of a string node.
+     * @param node The StringNode to visit.
+     * @return The value of the string.
+     */
     public String Visit(StringNode node){
         return node.getValue();
     }
 
+    /**
+     * Visit method for the ArrayNode.
+     * This method is used to retrieve the values of an array node.
+     * @param node The ArrayNode to visit.
+     * @return The values of the array as a list.
+     */
     public List<Object> Visit(ArrayNode node) {
         List<Object> list = new ArrayList<>();
         for (ExpNode exp: node.getValues()) {
@@ -34,17 +82,28 @@ public class ASTVisitor{
         return list;
     }
 
+    /**
+     * Visit method for the CtrlFlowNode.
+     * This method is used to handle the return, continue and break statements in the AST.
+     * @param node The CtrlFlowNode to visit.
+     * @return The CtrlFlowNode.
+     */
     public CtrlFlowNode Visit(CtrlFlowNode node) {
         if (node.getType().equals("return") && node.getReturnExp() != null){
             var value = Visit(node.getReturnExp());
-
-            //TODO; Hvad er en "0" og hvad vil den med en "1"??? kan vi ikke bruge navne guys?? Vi har ikke math A mere
             if (nybCStack.IsVariableOnStack("0")) {
                 nybCStack.ReplaceVariableOnStack("1", value);
             }
         }
         return node;
     }
+
+    /**
+     * Visit method for the BinaryOpNode.
+     * This method is used to handle binary operations as well as conversion of types in the AST.
+     * @param node The BinaryOpNode to visit.
+     * @return The result of the binary operation.
+     */
     public Object Visit(BinaryOpNode node){
         var left = Visit(node.getLeft());
         var right = Visit(node.getRight());
@@ -146,6 +205,13 @@ public class ASTVisitor{
         }
         return null;
     }
+
+    /**
+     * Visit method for the UnaryOpNode.
+     * This method is used to handle unary operations in the AST.
+     * @param node The UnaryOpNode to visit.
+     * @return The result of the unary operation.
+     */
     public Object Visit(UnaryOpNode node) {
         var right = Visit(node.getRight());
         switch (node.getOp()) {
@@ -171,7 +237,12 @@ public class ASTVisitor{
         return null;
     }
 
-
+    /**
+     * Visit method for the ParenthNode.
+     * This method is used to handle parentheses in the AST.
+     * @param node The ParenthNode to visit.
+     * @return The result of the inner expression.
+     */
     public Object Visit(ParenthNode node) {
         return Visit(node.getInner());
     }
@@ -186,6 +257,12 @@ public class ASTVisitor{
     public  Object Visit(FuncNode node){return null;}
     public  void Visit(ProgramNode node){}
 
+    /**
+     * Visit method for the ExpNode.
+     * This method is used to visit the different types of expressions in the AST.
+     * @param node The ExpNode to visit.
+     * @return The result of the expression.
+     */
     public Object Visit(ExpNode node)
     {
         if (node instanceof BoolNode) {
@@ -212,6 +289,12 @@ public class ASTVisitor{
         return null;
     }
 
+    /**
+     * Visit method for the StmtNode.
+     * This method is used to visit the different types of statements in the AST.
+     * @param node The StmtNode to visit.
+     * @return The result of the statement.
+     */
     public Object Visit (StmtNode node)
     {
         if (node instanceof IfNode) {
@@ -239,12 +322,4 @@ public class ASTVisitor{
         }
         return null;
     }
-    /*
-    public HashMap<String, Object> lookupFunc (String node) {
-        if (nybCStack.getFmap().containsKey(node)){
-            return (HashMap<String, Object>) nybCStack.getFmap().get(node);
-        }
-        return null;
-    }
-     */
 }

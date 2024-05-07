@@ -13,6 +13,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         return tree.accept(this);
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#program}.
+     * @param ctx the parse tree
+     * @return ProgramNode
+     */
     @Override
     public ProgramNode visitProgram(NybCParser.ProgramContext ctx) {
         ProgramNode node = new ProgramNode();
@@ -25,11 +30,21 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         return node;
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#stmt}.
+     * @param ctx the parse tree
+     * @return StmtNode
+     */
     @Override
     public StmtNode visitStmt(NybCParser.StmtContext ctx) {
         return (StmtNode) visit(ctx.getChild(0));
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#functionStmt}.
+     * @param ctx the parse tree
+     * @return FuncNode
+     */
     @Override
     public FuncNode visitFunctionStmt(NybCParser.FunctionStmtContext ctx) {
         FuncNode node = new FuncNode();
@@ -61,6 +76,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         return node;
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#beginStmt}.
+     * @param ctx the parse tree
+     * @return IfNode | LoopNode | SwitchNode | null (if none of the above
+     */
     @Override
     public ASTNode visitBeginStmt(NybCParser.BeginStmtContext ctx) {
         return switch (ctx.getChild(1).getText()){
@@ -111,9 +131,13 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         };
     }
 
-
+    /**
+     * Visit a parse tree produced by {@link NybCParser#switchCase}.
+     * @param ctx the parse tree
+     * @return CaseNode
+     */
     @Override
-    public ASTNode visitSwitchCase(NybCParser.SwitchCaseContext ctx) {
+    public CaseNode visitSwitchCase(NybCParser.SwitchCaseContext ctx) {
         CaseNode node = new CaseNode();
         node.setStartLine(ctx.getStart().getLine());
         node.setEndLine(ctx.getStop().getLine());
@@ -126,6 +150,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         return node;
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#extendedIf}.
+     * @param ctx the parse tree
+     * @return IfNode
+     */
     @Override
     public IfNode visitExtendedIf(NybCParser.ExtendedIfContext ctx) {
         IfNode node = new IfNode();
@@ -139,6 +168,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         return node;
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#declareStmt}.
+     * @param ctx the parse tree
+     * @return DeclNode
+     */
     @Override
     public DeclNode<?> visitDeclareStmt(NybCParser.DeclareStmtContext ctx) {
         if (ctx.getChild(3) != null) {
@@ -153,6 +187,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         return null;
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#assignStmt}.
+     * @param ctx the parse tree
+     * @return AssignNode
+     */
     @Override
     public AssignNode<?, ?> visitAssignStmt(NybCParser.AssignStmtContext ctx) {
         if(ctx.getChild(0).getClass().getSimpleName().equals("ArrayAccessContext")){
@@ -168,6 +207,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#array}.
+     * @param ctx the parse tree
+     * @return ArrayNode
+     */
     @Override
     public ArrayNode visitArray(NybCParser.ArrayContext ctx) {
         ArrayNode arrayNode = new ArrayNode();
@@ -179,11 +223,21 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         return arrayNode;
     }
 
+    /**
+     * Visit a terminal node.
+     * @param node the parse tree
+     * @return
+     */
     @Override
     public ASTNode visitTerminal(TerminalNode node) {
         return super.visitTerminal(node);
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#ctrlFlowStmt}.
+     * @param ctx the parse tree
+     * @return CtrlFlowNode
+     */
     @Override
     public CtrlFlowNode visitCtrlFlowStmt(NybCParser.CtrlFlowStmtContext ctx) {
         CtrlFlowNode node = new CtrlFlowNode();
@@ -198,6 +252,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         return node;
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#expression()}.
+     * @param ctx the parse tree
+     * @return BinaryOpNode | ExpNode
+     */
     @Override
     public ASTNode visitExpression(NybCParser.ExpressionContext ctx) {
         if (ctx.children.size() == 3) {
@@ -213,6 +272,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#orExp()}.
+     * @param ctx the parse tree
+     * @return BinaryOpNode | ExpNode
+     */
     @Override
     public ASTNode visitOrExp(NybCParser.OrExpContext ctx) {
         if (ctx.children.size() == 3) {
@@ -228,6 +292,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#andExp()}.
+     * @param ctx the parse tree
+     * @return BinaryOpNode | ExpNode
+     */
     @Override
     public ASTNode visitAndExp(NybCParser.AndExpContext ctx) {
         if (ctx.children.size() == 3) {
@@ -243,6 +312,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#eqExp()}.
+     * @param ctx the parse tree
+     * @return BinaryOpNode | ExpNode
+     */
     @Override
     public ASTNode visitEqExp(NybCParser.EqExpContext ctx) {
         if (ctx.children.size() == 3) {
@@ -258,6 +332,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#relationalExp()}.
+     * @param ctx the parse tree
+     * @return BinaryOpNode | ExpNode
+     */
     @Override
     public ASTNode visitRelationalExp(NybCParser.RelationalExpContext ctx) {
         if (ctx.children.size() == 3) {
@@ -273,6 +352,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#additionExp()}.
+     * @param ctx the parse tree
+     * @return BinaryOpNode | ExpNode
+     */
     @Override
     public ASTNode visitAdditionExp(NybCParser.AdditionExpContext ctx) {
         if (ctx.children.size() == 3) {
@@ -288,6 +372,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#unaryExp()}.
+     * @param ctx the parse tree
+     * @return UnaryOpNode | ExpNode
+     */
     @Override
     public ASTNode visitUnaryExp(NybCParser.UnaryExpContext ctx) {
         if (ctx.children.size() == 2) {
@@ -302,6 +391,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#parenthExp()}.
+     * @param ctx the parse tree
+     * @return ParenthNode | ExpNode
+     */
     @Override
     public ASTNode visitParenthExp(NybCParser.ParenthExpContext ctx) {
         if (ctx.children.size() ==  3) {
@@ -315,6 +409,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#arrayAccess}.
+     * @param ctx the parse tree
+     * @return ArrayAccessNode
+     */
     @Override
     public ArrayAccessNode<?> visitArrayAccess(NybCParser.ArrayAccessContext ctx) {
         String id = ctx.getChild(0).getText();
@@ -325,6 +424,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         }
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#callStmt}.
+     * @param ctx the parse tree
+     * @return CallFuncNode
+     */
     @Override
     public CallFuncNode visitCallStmt(NybCParser.CallStmtContext ctx) {
         CallFuncNode node = new CallFuncNode();
@@ -339,6 +443,11 @@ public class ToASTVisitor extends NybCBaseVisitor<ASTNode> {
         return node;
     }
 
+    /**
+     * Visit a parse tree produced by {@link NybCParser#valueExpression}.
+     * @param ctx the parse tree
+     * @return IntNode | IdentifierNode | FloatNode | StringNode | BoolNode
+     */
     @Override
     public ASTNode visitValueExpression(NybCParser.ValueExpressionContext ctx) {
         if (ctx.INT() != null) {

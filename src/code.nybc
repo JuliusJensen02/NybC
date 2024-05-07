@@ -1,7 +1,0 @@
-
-
-var b = 4;
-var x;
-b = x;
-
-out(b);

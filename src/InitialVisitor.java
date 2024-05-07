@@ -1,44 +1,31 @@
-
 import ASTNode.*;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class InitialVisitor extends ASTVisitor {
+    /*List containing all the reserved words*/
     List<String> keywords;
+
+    /*Constructor for the InitialVisitor class*/
     public InitialVisitor(NybCStack nybCStack, List<String> keywords) {
         super(nybCStack);
         this.keywords = keywords;
     }
 
-/*    @Override
-    public Object Visit(DeclNode<?> node) {
-
-        if (node.getValue() instanceof ArrayNode) {
-            return (List<Object>) Visit((ArrayNode) node.getValue());
-        } else if (node.getValue() instanceof ExpNode){
-            return Visit((ExpNode) node.getValue());
-        } else  {
-            return null;
-        }
-    }*/
-
+    /*Visit method for the FuncNode class*/
     @Override
     public Object Visit(FuncNode node) {
         return node;
     }
 
+    /*Visit method for the ProgramNode class. Takes all function declarations
+    and inserts them into the function map*/
     @Override
     public void Visit(ProgramNode node) {
         nybCStack.PushStack();
 
         for (Object stmt: node.getStmtList()) {
-            /*if (stmt instanceof DeclNode) {
-                if (global.containsKey(((DeclNode<?>) stmt).getId())){
-                    throw new RuntimeException("Variable " + ((DeclNode<?>) stmt).getId() + " has already been declared");
-                }
-                global.put(((DeclNode<?>) stmt).getId(),Visit(((DeclNode<?>) stmt)));
-            } else*/
             if (stmt instanceof FuncNode) {
                 for (String keyword : keywords) {
                     if (((FuncNode) stmt).getId().equals(keyword)) {
