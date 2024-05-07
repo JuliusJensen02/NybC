@@ -1,7 +1,9 @@
 import ASTNode.*;
 import AntlrGenFiles.NybCParser;
 import org.antlr.v4.runtime.tree.ParseTree;
-
+/*
+* The class Error is used to throw exceptions when an error occurs in the code.
+* */
 public class Error{
     public static void SYNTAX_ERROR(NullPointerException e){
         throw new RuntimeException("Syntax error: "+e);

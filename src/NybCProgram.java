@@ -15,12 +15,20 @@ public class NybCProgram {
     private final List<String> keywords = new ArrayList<>();
     private final NybCStack nybCStack;
 
+    /**
+     * Constructor for NybCProgram
+     * Adds keywords to the list of reserved words and creates the stack for the program
+     */
     public NybCProgram() {
-        //TODO: Måske skulle vi kun have for out og in siden alt bliver taget af passer. Plus måske tekst file?
         keywords.addAll(Arrays.asList("begin", "end", "loop", "in", "out", "if", "else", "switch", "var", "function", "case", "return", "break", "continue", "true", "false"));
         nybCStack = new NybCStack();
     }
 
+    /**
+     * StartProgram method that starts the program
+     * If no arguments are given, it will run the program with the default file
+     * If an argument is given, it will run the program with the given file
+     */
     public void StartProgram() {
         Path filePath = Path.of("src/code.nybc");
         setup(filePath);
@@ -30,8 +38,12 @@ public class NybCProgram {
         setup(filePath);
     }
 
+    /**
+     * Setup method that sets up the program
+     * @param filePath the path to the file
+     * It reads the file and runs the lexer, parser, initial visitor and interpreter
+     */
     private void setup(Path filePath) {
-
         CodePointCharStream inputStream;
         try {
             inputStream = CharStreams.fromString(Files.readString(filePath));
@@ -59,7 +71,4 @@ public class NybCProgram {
         var Interpreter = new Interpreter(nybCStack, keywords);
         Interpreter.Visit((ProgramNode) AST);
     }
-
-
-
 }
