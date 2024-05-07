@@ -1,6 +1,6 @@
 import ASTNode.*;
 import AntlrGenFiles.NybCParser;
-import org.antlr.v4.runtime.tree.ParseTree;
+
 /*
 * The class Error is used to throw exceptions when an error occurs in the code.
 * */
@@ -147,5 +147,8 @@ public class Error{
     }
     public static void TYPE_NOT_VALID_FOR_BINARY_LTE(BinaryOpNode node){
         throw new RuntimeException("Type not valid for binary less than or equals operation: " + node.getLeft() + " " + node.getOp() + " " + node.getRight()+". Used in line "+node.getStartLine());
+    }
+    public static void TYPE_NOT_VALID_FOR_OUT(CallFuncNode node, Object value){
+        throw new RuntimeException("Type not valid for out: "+ value +". Used in line "+node.getStartLine());
     }
 }

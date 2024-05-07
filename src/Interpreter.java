@@ -395,13 +395,15 @@ public class Interpreter extends ASTVisitor {
     @Override
     public Object Visit(CallFuncNode node) {
         if (node.getId().equals("out")) {
-            if (node.getArgs().size() == 1) {
-                System.out.println(Visit(node.getArgs().get(0)));
-            } else {
+            if (node.getArgs().size() != 1) {
                 Error.OUT_TOO_MANY_ARGS(node);
             }
-            return null;
+            if(Visit(node.getArgs().get(0)) == null) {
+                Error.TYPE_NOT_VALID_FOR_OUT(node, Visit(node.getArgs().get(0)));
+            }
+            System.out.println(Visit(node.getArgs().get(0)));
 
+            return null;
         } else if (node.getId().equals("in")) {
             if(!node.getArgs().isEmpty()){
                 Error.IN_TOO_MANY_ARGS(node);
