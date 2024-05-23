@@ -222,22 +222,4 @@ public class ToASTVisitorTest {
 
 
 
-
-    @Test
-    void visitProgram() throws IOException {
-
-        Path fileName = Path.of("Tests/FullTest.txt");
-        var inputStream = CharStreams.fromString(Files.readString(fileName));
-        var lexer = new NybCLexer(inputStream);
-        var tokenStream = new CommonTokenStream(lexer);
-        var parser = new NybCParser(tokenStream);
-        var parseTree = parser.program();
-        var ASTvisitor = new ToASTVisitor();
-
-
-        System.out.println(ASTvisitor.visit(parseTree).toString());
-
-    }
-
-
 }
